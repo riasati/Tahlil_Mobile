@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -39,8 +40,9 @@ class _SignInPageState extends State<SignInPage> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 20.0, bottom: 10.0, left: 25.0, right: 25.0),
                         child: TextField(
+                          textAlign: TextAlign.right,
                           focusNode: myFocusNodeEmailLogin,
                           controller: loginEmailController,
                           keyboardType: TextInputType.emailAddress,
@@ -50,13 +52,13 @@ class _SignInPageState extends State<SignInPage> {
                               color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(
-                              Icons.smart_button,
+                            suffixIcon: Icon(
+                              FontAwesomeIcons.userGraduate,
                               // FontAwesomeIcons.envelope,
                               color: Colors.black,
                               size: MediaQuery.of(context).size.width * 0.05,
                             ),
-                            hintText: "Email Or Username",
+                            hintText: "ایمیل یا نام کاربری",
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold",
                               fontSize: MediaQuery.of(context).size.width * 0.035,
@@ -71,8 +73,9 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 10.0, bottom: 10.0, left: 25.0, right: 25.0),
                         child: TextField(
+                          textAlign: TextAlign.right,
                           focusNode: myFocusNodePasswordLogin,
                           controller: loginPasswordController,
                           obscureText: _obscureTextLogin,
@@ -82,29 +85,34 @@ class _SignInPageState extends State<SignInPage> {
                               color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(
-                              Icons.smart_button,
+                            suffixIcon: Icon(
+                              FontAwesomeIcons.lock,
                               // FontAwesomeIcons.lock,
                               size: MediaQuery.of(context).size.width * 0.05,
                               color: Colors.black,
                             ),
-                            hintText: "Password",
+                            hintText: "رمز عبور",
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold",
                               fontSize: MediaQuery.of(context).size.width * 0.035,
                             ),
-                            // suffixIcon: GestureDetector(
-                            //   onTap: _toggleLogin,
-                            //   child: Icon(
-                            //     _obscureTextLogin
-                            //         ? FontAwesomeIcons.eye
-                            //         : FontAwesomeIcons.eyeSlash,
-                            //     size: 15.0,
-                            //     color: Colors.black,
-                            //   ),
-                            // ),
+                            icon: GestureDetector(
+                              // onTap: _toggleLogin,
+                              child: Icon(
+                                _obscureTextLogin
+                                    ? FontAwesomeIcons.eye
+                                    : FontAwesomeIcons.eyeSlash,
+                                size: MediaQuery.of(context).size.width * 0.03,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        height: 1.0,
+                        color: Colors.grey[900],
                       ),
                     ],
                   ),
@@ -149,7 +157,7 @@ class _SignInPageState extends State<SignInPage> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
                       child: Text(
-                        "LOGIN",
+                        "ورود",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: MediaQuery.of(context).size.width * 0.045,
@@ -167,7 +175,7 @@ class _SignInPageState extends State<SignInPage> {
             child: FlatButton(
                 onPressed: () {},
                 child: Text(
-                  "Forgot Password?",
+                  "فراموشی رمز عبور؟",
                   style: TextStyle(
                       decoration: TextDecoration.underline,
                       color: Colors.white,

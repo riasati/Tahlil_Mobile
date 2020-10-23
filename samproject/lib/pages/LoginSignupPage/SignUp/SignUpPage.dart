@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -50,13 +51,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.43,
                   child: Column(
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 5.0, left: 25.0, right: 25.0),
+                            top: 20.0, bottom: 0.0, left: 25.0, right: 25.0),
                         child: TextField(
+                          textAlign: TextAlign.right,
                           focusNode: myFocusNodeUsernameSignup,
                           controller: signupUsernameController,
                           keyboardType: TextInputType.text,
@@ -67,12 +69,12 @@ class _SignUpPageState extends State<SignUpPage> {
                               color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(
+                            suffixIcon: Icon(
                               // FontAwesomeIcons.user,
-                              Icons.access_alarm,
+                              FontAwesomeIcons.userGraduate,
                               color: Colors.black,
                             ),
-                            hintText: "Name",
+                            hintText: "نام کاربرری",
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold",
                               fontSize: MediaQuery.of(context).size.width * 0.03,),
@@ -87,7 +89,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainAnimation: true,
                           maintainState: true,
                           child: Text(
-                            "Username should be 6 caracter",
+                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
                               fontSize: MediaQuery.of(context).size.width * 0.023,
@@ -102,8 +105,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 5.0, left: 25.0, right: 25.0),
+                            top: 15.0, bottom: 0.0, left: 25.0, right: 25.0),
                         child: TextField(
+                          textAlign: TextAlign.right,
                           focusNode: myFocusNodeEmailSignup,
                           controller: signupEmailController,
                           keyboardType: TextInputType.emailAddress,
@@ -113,12 +117,12 @@ class _SignUpPageState extends State<SignUpPage> {
                               color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(
+                            suffixIcon: Icon(
                               //FontAwesomeIcons.envelope,
-                              Icons.access_alarm,
+                              FontAwesomeIcons.solidEnvelope,
                               color: Colors.black,
                             ),
-                            hintText: "Email Address",
+                            hintText: "آدرس ایمیل",
                             hintStyle: TextStyle(
                                 fontFamily: "WorkSansSemiBold", fontSize: MediaQuery.of(context).size.width * 0.03),
                           ),
@@ -132,7 +136,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainState: true,
                           visible: _emailAlarmVisible,
                           child: Text(
-                            "Username should be 6 caracter",
+                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
                               fontSize: MediaQuery.of(context).size.width * 0.023,
@@ -147,8 +152,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 5.0, left: 25.0, right: 25.0),
+                            top: 20.0, bottom: 0.0, left: 25.0, right: 25.0),
                         child: TextField(
+                          textAlign: TextAlign.right,
                           focusNode: myFocusNodePasswordSignup,
                           controller: signupPasswordController,
                           obscureText: _obscureTextSignup,
@@ -158,24 +164,23 @@ class _SignUpPageState extends State<SignUpPage> {
                               color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(
-                              // FontAwesomeIcons.lock,
-                              Icons.alarm,
+                            suffixIcon: Icon(
+                              FontAwesomeIcons.lock,
                               color: Colors.black,
                             ),
-                            hintText: "Password",
+                            hintText: "رمز عبور",
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold", fontSize: MediaQuery.of(context).size.width * 0.03,),
-                            // suffixIcon: GestureDetector(
-                            //   onTap: _toggleSignup,
-                            //   child: Icon(
-                            //     _obscureTextSignup
-                            //         ? FontAwesomeIcons.eye
-                            //         : FontAwesomeIcons.eyeSlash,
-                            //     size: 15.0,
-                            //     color: Colors.black,
-                            //   ),
-                            // ),
+                            icon: GestureDetector(
+                              //onTap: _toggleSignup,
+                              child: Icon(
+                                _obscureTextSignup
+                                    ? FontAwesomeIcons.eye
+                                    : FontAwesomeIcons.eyeSlash,
+                                size: MediaQuery.of(context).size.width * 0.03,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -187,7 +192,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainState: true,
                           visible: _passwordAlarmVisible,
                           child: Text(
-                            "Username should be 6 caracter",
+                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
                               fontSize: MediaQuery.of(context).size.width * 0.023,
@@ -202,8 +208,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 5.0, left: 25.0, right: 25.0),
+                            top: 20.0, bottom: 0.0, left: 25.0, right: 25.0),
                         child: TextField(
+                          textAlign: TextAlign.right,
                           controller: signupConfirmPasswordController,
                           obscureText: _obscureTextSignupConfirm,
                           style: TextStyle(
@@ -212,24 +219,24 @@ class _SignUpPageState extends State<SignUpPage> {
                               color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            icon: Icon(
+                            suffixIcon: Icon(
                               // FontAwesomeIcons.lock,
-                              Icons.alarm,
+                              FontAwesomeIcons.lock,
                               color: Colors.black,
                             ),
-                            hintText: "Confirmation",
+                            hintText: "تکرار رمز عبور",
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold", fontSize: MediaQuery.of(context).size.width * 0.03,),
-                            // suffixIcon: GestureDetector(
-                            //   onTap: _toggleSignupConfirm,
-                            //   child: Icon(
-                            //     _obscureTextSignupConfirm
-                            //         ? FontAwesomeIcons.eye
-                            //         : FontAwesomeIcons.eyeSlash,
-                            //     size: 15.0,
-                            //     color: Colors.black,
-                            //   ),
-                            // ),
+                            icon: GestureDetector(
+                              //onTap: _toggleSignupConfirm,
+                              child: Icon(
+                                _obscureTextSignupConfirm
+                                    ? FontAwesomeIcons.eye
+                                    : FontAwesomeIcons.eyeSlash,
+                                size: MediaQuery.of(context).size.width * 0.03,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -241,7 +248,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainState: true,
                           visible: _repeatPasswordAlarmVisible,
                           child: Text(
-                            "Username should be 6 caracter",
+                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
                               fontSize: MediaQuery.of(context).size.width * 0.023,
@@ -259,7 +267,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 400.0),
+                margin: EdgeInsets.only(top: 450.0),
                 width: MediaQuery.of(context).size.width * 0.5,
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -297,7 +305,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 42.0),
                     child: Text(
-                      "SIGN UP",
+                      "ثبت نام",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: MediaQuery.of(context).size.width * 0.045,

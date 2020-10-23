@@ -34,7 +34,7 @@ class _MenuBarState extends State<MenuBar> {
                 highlightColor: Colors.transparent,
                 onPressed: _onSignInButtonPress,
                 child: Text(
-                  "Existing",
+                  "ورود",
                   style: TextStyle(
                       color: LoginPage.left,
                       fontSize: 16.0,
@@ -49,7 +49,7 @@ class _MenuBarState extends State<MenuBar> {
                 highlightColor: Colors.transparent,
                 onPressed: _onSignUpButtonPress,
                 child: Text(
-                  "New",
+                  "جدید",
                   style: TextStyle(
                       color: LoginPage.right,
                       fontSize: 16.0,
