@@ -28,7 +28,9 @@ class _SignUpPageState extends State<SignUpPage> {
   void initState() {
     super.initState();
     signupUsernameController.addListener(_signupUsernameController);
-    // myFocusNodeEmailLogin.attach(context,onKey: _testAttach());
+    signupEmailController.addListener(_signupEmailController);
+    signupPasswordController.addListener(_signupPasswordController);
+    signupConfirmPasswordController.addListener(_signupConfirmPasswordController);
   }
 
   @override
@@ -136,7 +138,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainState: true,
                           visible: _emailAlarmVisible,
                           child: Text(
-                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            "فرمت ایمیل صحیح نمیباشد",
                             textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
@@ -172,7 +174,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold", fontSize: MediaQuery.of(context).size.width * 0.03,),
                             icon: GestureDetector(
-                              //onTap: _toggleSignup,
+                              onTap: _toggleSignup,
                               child: Icon(
                                 _obscureTextSignup
                                     ? FontAwesomeIcons.eye
@@ -192,7 +194,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainState: true,
                           visible: _passwordAlarmVisible,
                           child: Text(
-                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            "رمز عبور باید حداقل ۶ کاراکتر باشد",
                             textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
@@ -228,7 +230,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             hintStyle: TextStyle(
                               fontFamily: "WorkSansSemiBold", fontSize: MediaQuery.of(context).size.width * 0.03,),
                             icon: GestureDetector(
-                              //onTap: _toggleSignupConfirm,
+                              onTap: _toggleSignupConfirm,
                               child: Icon(
                                 _obscureTextSignupConfirm
                                     ? FontAwesomeIcons.eye
@@ -248,7 +250,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           maintainState: true,
                           visible: _repeatPasswordAlarmVisible,
                           child: Text(
-                            "نام کاربری باید حداقل ۶ کاراکتر باشد",
+                            "تکرار رمز عبور صحیح نمیباشد",
                             textAlign: TextAlign.right,
                             style: TextStyle(
                               color: Colors.red,
@@ -328,7 +330,54 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() {
         _usernameAlarmVisible = true;
       });
+    }
+    else{
+      setState(() {
+        _usernameAlarmVisible = false;
+      });
+    }
+  }
+
+  void _signupEmailController() {
+  }
+
+  void _signupPasswordController() {
+    if(signupPasswordController.text.length < 6){
+      setState(() {
+        _passwordAlarmVisible = true;
+      });
+    }
+    else{
+      setState(() {
+        _passwordAlarmVisible = false;
+      });
 
     }
+  }
+
+  void _signupConfirmPasswordController() {
+    if(signupPasswordController.text != signupConfirmPasswordController.text){
+      setState(() {
+        _repeatPasswordAlarmVisible = true;
+      });
+    }
+    else{
+      setState(() {
+        _repeatPasswordAlarmVisible = false;
+      });
+
+    }
+  }
+
+  void _toggleSignup() {
+    setState(() {
+      _obscureTextSignup = !_obscureTextSignup;
+    });
+  }
+
+  void _toggleSignupConfirm() {
+    setState(() {
+      _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
+    });
   }
 }

@@ -97,7 +97,7 @@ class _SignInPageState extends State<SignInPage> {
                               fontSize: MediaQuery.of(context).size.width * 0.035,
                             ),
                             icon: GestureDetector(
-                              // onTap: _toggleLogin,
+                              onTap: _toggleLogin,
                               child: Icon(
                                 _obscureTextLogin
                                     ? FontAwesomeIcons.eye
@@ -186,5 +186,11 @@ class _SignInPageState extends State<SignInPage> {
         ],
       ),
     );
+  }
+
+  void _toggleLogin() {
+    setState(() {
+      _obscureTextLogin = !_obscureTextLogin;
+    });
   }
 }
