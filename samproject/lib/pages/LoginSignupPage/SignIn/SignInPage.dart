@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -7,14 +8,16 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  String _signInURL = "http://parham-backend.herokuapp.com/user/login";
 
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
-
-  final TextEditingController loginEmailController = TextEditingController();
+  final TextEditingController loginUsernameController = TextEditingController();
   final TextEditingController loginPasswordController = TextEditingController();
 
   bool _obscureTextLogin = true;
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,7 +47,7 @@ class _SignInPageState extends State<SignInPage> {
                         child: TextField(
                           textAlign: TextAlign.right,
                           focusNode: myFocusNodeEmailLogin,
-                          controller: loginEmailController,
+                          controller: loginUsernameController,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
                               fontFamily: "WorkSansSemiBold",
@@ -152,7 +155,7 @@ class _SignInPageState extends State<SignInPage> {
                   child: MaterialButton(
                     // highlightColor: Colors.transparent,
                     // splashColor: Theme.Colors.loginGradientEnd,
-                    //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
@@ -164,8 +167,7 @@ class _SignInPageState extends State<SignInPage> {
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    // onPressed: () =>
-                    //     showInSnackBar("Login button pressed"),
+                    onPressed: _pressLogin,
                   )
               ),
             ],
@@ -192,5 +194,13 @@ class _SignInPageState extends State<SignInPage> {
     setState(() {
       _obscureTextLogin = !_obscureTextLogin;
     });
+  }
+
+  void _pressLogin() async{
+    var body = Map<String,String>();
+    body["username"] = loginUsernameController.text;
+    body["password"] = loginPasswordController.text;
+    Response response = await post(_signInURL , body: body);
+    print(response.body);
   }
 }

@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
 class SignUpPage extends StatefulWidget {
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  String _signUpURL = "http://parham-backend.herokuapp.com/user/signup";
+
   final FocusNode myFocusNodePasswordSignup = FocusNode();
   final FocusNode myFocusNodeEmailSignup = FocusNode();
   final FocusNode myFocusNodeUsernameSignup = FocusNode();
-
 
   final TextEditingController signupUsernameController = TextEditingController();
   final TextEditingController signupEmailController = TextEditingController();
   final TextEditingController signupPasswordController = TextEditingController();
   final TextEditingController signupConfirmPasswordController = TextEditingController();
-
 
   bool _obscureTextSignup = true;
   bool _obscureTextSignupConfirm = true;
@@ -302,7 +305,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: MaterialButton(
                   highlightColor: Colors.transparent,
                   // splashColor: Theme.Colors.loginGradientEnd,
-                  //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 42.0),
@@ -314,8 +317,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           fontFamily: "WorkSansBold"),
                     ),
                   ),
-                  // onPressed: () =>
-                  //     showInSnackBar("SignUp button pressed")),
+                  onPressed:_pressSignUp,
                 ),
               ),
             ],
@@ -326,7 +328,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signupUsernameController(){
-    if(signupUsernameController.text.length < 6) {
+    if(!_checkUsername(signupUsernameController.text)) {
       setState(() {
         _usernameAlarmVisible = true;
       });
@@ -342,7 +344,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signupPasswordController() {
-    if(signupPasswordController.text.length < 6){
+    if(!_checkPassword(signupPasswordController.text)){
       setState(() {
         _passwordAlarmVisible = true;
       });
@@ -356,7 +358,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signupConfirmPasswordController() {
-    if(signupPasswordController.text != signupConfirmPasswordController.text){
+    if(!_checkConfirmPassword(signupConfirmPasswordController.text)){
       setState(() {
         _repeatPasswordAlarmVisible = true;
       });
@@ -379,5 +381,62 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() {
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
     });
+  }
+
+  void _pressSignUp() async{
+    var body = Map<String,String>();
+    if(!_checkUsername(signupUsernameController.text) || !_checkEmail(signupEmailController.text)
+    || !_checkPassword(signupPasswordController.text) || !_checkConfirmPassword(signupConfirmPasswordController.text)){
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "ورودی ها را چک کنید",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "حله",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.deepPurple,
+            ),
+          ],
+        ).show();
+      });
+    }
+
+    else {
+      body["username"] = signupUsernameController.text;
+      body["email"] = signupEmailController.text;
+      body["password"] = signupPasswordController.text;
+      Response response = await post(_signUpURL,body: body);
+      print(response.body);
+    }
+  }
+
+  bool _checkUsername(String username) {
+    if (username.length < 6)
+      return false;
+    else
+      return true;
+  }
+
+  bool _checkEmail(String text) {
+    return true;
+  }
+
+  bool _checkPassword(String text) {
+    if(text.length < 6)
+      return false;
+    else
+      return true;
+  }
+
+  bool _checkConfirmPassword(String text) {
+    if(signupPasswordController.text != text)
+      return false;
+    else
+      return true;
   }
 }
