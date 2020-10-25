@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
@@ -341,6 +343,16 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signupEmailController() {
+    if(!_checkEmail(signupEmailController.text)){
+      setState(() {
+        _emailAlarmVisible = true;
+      });
+    }
+    else{
+      setState(() {
+        _emailAlarmVisible = false;
+      });
+    }
   }
 
   void _signupPasswordController() {
@@ -384,7 +396,6 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _pressSignUp() async{
-    var body = Map<String,String>();
     if(!_checkUsername(signupUsernameController.text) || !_checkEmail(signupEmailController.text)
     || !_checkPassword(signupPasswordController.text) || !_checkConfirmPassword(signupConfirmPasswordController.text)){
       setState(() {
@@ -405,13 +416,37 @@ class _SignUpPageState extends State<SignUpPage> {
         ).show();
       });
     }
-
     else {
-      body["username"] = signupUsernameController.text;
-      body["email"] = signupEmailController.text;
-      body["password"] = signupPasswordController.text;
-      Response response = await post(_signUpURL,body: body);
-      print(response.body);
+      var body = jsonEncode(<String,String>{
+        'username' : signupUsernameController.text,
+        'email' : signupEmailController.text,
+        'password':signupPasswordController.text,
+      });
+      Response response = await post(_signUpURL,
+          headers:<String,String>{'Content-Type': 'application/json; charset=UTF-8',},
+          body: body);
+      if(response.statusCode != 201){
+        setState(() {
+          Alert(
+            context: context,
+            type: AlertType.error,
+            title: "نام کاربری یا ایمیل تکراری است",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "حله",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () => Navigator.pop(context),
+                color: Colors.deepPurple,
+              ),
+            ],
+          ).show();
+        });
+      }
+      else{
+
+      }
     }
   }
 
@@ -423,7 +458,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   bool _checkEmail(String text) {
-    return true;
+    String emailRegex = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regExp = new RegExp(emailRegex);
+    return !regExp.hasMatch(text) ? false:true;
   }
 
   bool _checkPassword(String text) {

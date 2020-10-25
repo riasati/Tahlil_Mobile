@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
@@ -198,12 +200,14 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _pressLogin() async{
-    var body = Map<String,String>();
-    print(loginUsernameController.text);
-      body["username"] = loginUsernameController.text;
-      body["password"] = loginPasswordController.text;
-      Response response = await post(_signInURL , body: body);
-      if(response == null || response.statusCode != 200){
+    var body = jsonEncode(<String,String>{
+      'username' : loginUsernameController.text,
+      'password':loginPasswordController.text,
+    });
+    Response response = await post(_signInURL,
+        headers:<String,String>{'Content-Type': 'application/json; charset=UTF-8',},
+        body: body);
+    if(response == null || response.statusCode != 200){
         setState(() {
           Alert(
             context: context,
@@ -223,6 +227,9 @@ class _SignInPageState extends State<SignInPage> {
           ).show();
         });
       }
+    else{
+      print(response.body);
+    }
 
   }
 }
