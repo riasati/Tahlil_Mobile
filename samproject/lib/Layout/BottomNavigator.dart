@@ -29,10 +29,22 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
                       size: 40,
-                      color: Colors.deepPurple,
+                      color: _customIcon == 0
+                          ?Colors.deepPurple
+                          :Colors.white,
                     ),
+                    onPressed: _pressProfileIcon,
                   ),
-                  Icon(Icons.supervised_user_circle_outlined , size: 40, color: Colors.deepPurple,),
+                  MaterialButton(
+                    child: Icon(
+                      Icons.supervised_user_circle_outlined ,
+                      size: 40,
+                      color: _customIcon == 1
+                          ?Colors.deepPurple
+                          :Colors.white,
+                    ),
+                    onPressed: _pressProfileIcon,
+                  ),
                 ],
               ),
             ),
@@ -40,8 +52,26 @@ class _BottomNavigatorState extends State<BottomNavigator> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(Icons.supervised_user_circle_outlined),
-                  Icon(Icons.supervised_user_circle_outlined),
+                  MaterialButton(
+                    child: Icon(
+                      Icons.supervised_user_circle_outlined ,
+                      size: 40,
+                      color: _customIcon == 2
+                          ?Colors.deepPurple
+                          :Colors.white,
+                    ),
+                    onPressed: _pressProfileIcon,
+                  ),
+                  MaterialButton(
+                    child: Icon(
+                      Icons.supervised_user_circle_outlined ,
+                      size: 40,
+                      color: _customIcon == 3
+                          ?Colors.deepPurple
+                          :Colors.white,
+                    ),
+                    onPressed: _pressProfileIcon,
+                  ),
                 ],
               ),
             ),
@@ -49,5 +79,11 @@ class _BottomNavigatorState extends State<BottomNavigator> {
         ),
       ),
     );
+  }
+
+  void _pressProfileIcon() {
+    setState(() {
+      _customIcon = 0;
+    });
   }
 }
