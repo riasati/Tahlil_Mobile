@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BottomNavigator extends StatefulWidget {
+  static int customIcon = 2;
   @override
   _BottomNavigatorState createState() => _BottomNavigatorState();
 }
 
 class _BottomNavigatorState extends State<BottomNavigator> {
-  int _customIcon = -1;
+
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +27,11 @@ class _BottomNavigatorState extends State<BottomNavigator> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  MaterialButton(
+                  FlatButton(
                     child: Icon(
-                      Icons.supervised_user_circle_outlined ,
+                      FontAwesomeIcons.userAlt,
                       size: 40,
-                      color: _customIcon == 0
+                      color: BottomNavigator.customIcon == 0
                           ?Colors.deepPurple
                           :Colors.white,
                     ),
@@ -39,7 +41,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
                       size: 40,
-                      color: _customIcon == 1
+                      color: BottomNavigator.customIcon == 1
                           ?Colors.deepPurple
                           :Colors.white,
                     ),
@@ -56,7 +58,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
                       size: 40,
-                      color: _customIcon == 2
+                      color: BottomNavigator.customIcon == 3
                           ?Colors.deepPurple
                           :Colors.white,
                     ),
@@ -66,7 +68,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
                       size: 40,
-                      color: _customIcon == 3
+                      color: BottomNavigator.customIcon == 4
                           ?Colors.deepPurple
                           :Colors.white,
                     ),
@@ -83,7 +85,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
 
   void _pressProfileIcon() {
     setState(() {
-      _customIcon = 0;
+      BottomNavigator.customIcon = 0;
     });
   }
 }
