@@ -1,6 +1,6 @@
 # samproject
 
-A Flutter application about examining
+A new Flutter application.
 
 ## Getting Started
 
