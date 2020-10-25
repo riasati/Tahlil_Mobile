@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:samproject/widgets/editProfileFormWidget.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -7,8 +10,23 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  File _image;
+  final picker = ImagePicker();
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool _imageSelcted = false;
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -40,8 +58,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 margin: EdgeInsets.all(25),
-                shadowColor: Colors.red,
-                child: EditProfileFormWidget(),
+                shadowColor: Colors.lightBlue,
+                child: Column(
+                  children: [
+                    EditProfileFormWidget(),
+                  ],
+                )
             ),
             ],
           ),

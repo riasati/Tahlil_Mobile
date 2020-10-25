@@ -1,9 +1,10 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:samproject/classes/personProfile.dart';
+import 'package:samproject/domain/personProfile.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 
 
@@ -14,7 +15,7 @@ class EditProfileFormWidget extends StatefulWidget {
 
 class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
-  PersonProfile _newPerson = PersonProfile();
+  Person _newPerson = Person();
 
   TextEditingController _textFormFirstNameController = new TextEditingController();
   TextEditingController _textFormLastNameController = new TextEditingController();
@@ -22,6 +23,8 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   TextEditingController _textFormEmailController = new TextEditingController();
   TextEditingController _textFormPasswordController = new TextEditingController();
   TextEditingController _textFormBirthdayController = new TextEditingController();
+
+
 
   /*Future<String> loadAsset () async
   {
@@ -72,7 +75,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     //_newPerson.password = user['password'];
   }
 
-  void sendData(PersonProfile person) async
+  void sendData(Person person) async
   {
     print("in sendData");
     /* final response = await http.post('https://parham-backend.herokuapp.com/user/signup',
@@ -177,8 +180,22 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     }
   }
 
+  File _ProfileImage;
+  final picker = ImagePicker();
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _ProfileImage = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    //bool _imageSelcted = false;
     return Form(
       key: _formStateKey,
       autovalidate: true,
@@ -187,7 +204,20 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Icon(Icons.person_rounded,size: 80,), //CircleAvatar() ,
+            FlatButton(
+                onPressed: () => getImage(),
+                 child: CircleAvatar(
+                   radius: 70,
+                   backgroundColor: Colors.white,
+                   child: Stack(
+                     children: [
+                       Image(image: AssetImage("assets/images/unnamed.png"),alignment: Alignment.bottomLeft,),
+                       _ProfileImage != null ? ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),) :Container()
+                     ],
+                   ),
+                 )
+            ),
+
             Directionality(
               textDirection: TextDirection.rtl,
               child: TextFormField(
@@ -296,22 +326,27 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             ),
 
             Divider(height: 32.0,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RaisedButton(
-                  child: Text('انصراف'),
-                  color: Colors.red,
-                  onPressed: () => {} ,//Navigator.pop(context),
-                ),
-                RaisedButton(
-                  child: Text('تغییرات'),
-                  color: Colors.lightGreen,
-                  onPressed: () => _submitUser(),
-                ),
-              ],
-            )
+                // RaisedButton(
+                //   child: Text('انصراف'),
+                //   color: Colors.red,
+                //   onPressed: () => {} ,//Navigator.pop(context),
+                // ),
+                FractionallySizedBox(
+                  widthFactor: 1,
+                  child: RaisedButton(
+                    child:Text('تغییرات',style: TextStyle(color: Colors.white),),
 
+                    //child: SizedBox(child: Text('تغییرات',style: TextStyle(color: Colors.white),),),
+                    // child: Row(
+                    //   children : [Text('تغییرات',style: TextStyle(color: Colors.white),),],
+                    //   mainAxisSize: MainAxisSize.max,
+                    //   crossAxisAlignment: CrossAxisAlignment.center,
+                    //
+                    // ),
+                    color: Colors.lightBlue,
+                    onPressed: () => _submitUser(),
+                  ),
+                ),
           ],
         ),
       ),
