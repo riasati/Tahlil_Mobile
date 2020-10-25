@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -198,9 +199,30 @@ class _SignInPageState extends State<SignInPage> {
 
   void _pressLogin() async{
     var body = Map<String,String>();
-    body["username"] = loginUsernameController.text;
-    body["password"] = loginPasswordController.text;
-    Response response = await post(_signInURL , body: body);
-    print(response.body);
+    print(loginUsernameController.text);
+      body["username"] = loginUsernameController.text;
+      body["password"] = loginPasswordController.text;
+      Response response = await post(_signInURL , body: body);
+      if(response == null || response.statusCode != 200){
+        setState(() {
+          Alert(
+            context: context,
+            type: AlertType.error,
+            title: "خطا",
+            desc: "نام کاربری یا رمز عبور اشتباه است",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "حله",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () => Navigator.pop(context),
+                color: Colors.deepPurple,
+              ),
+            ],
+          ).show();
+        });
+      }
+
   }
 }
