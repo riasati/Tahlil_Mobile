@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class EditProfileFormWidget extends StatefulWidget {
@@ -40,32 +40,38 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     _newPerson.password = user['password'];
   }
 
-  TextEditingController _textFormNameController = new TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    getProfileInfo();
-    _textFormNameController.text = _newPerson.name;
-    print(_textFormNameController.text);
-  }
-
-  void _changeTextFormName(String value)
-  {
-    //  _textFormNameController.text = utf8.decode(_textFormNameController.text.codeUnits);
-  }
-
 
    */
 
   void getProfileInfo() async
   {
-    final response = await http.get('https://parham-backend.herokuapp.com/test');
-    setState(() {
-      _textFormFirstNameController.text = response.statusCode.toString();
-      print("correct : " + response.body);
-      print(response.body);
-    });
+    final prefs = await SharedPreferences.getInstance();
+   // prefs.setString("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk");
+    String token = prefs.getString("token");
+    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk";
+
+    final response = await http.put('https://parham-backend.herokuapp.com/user/update',
+        headers: {HttpHeaders.authorizationHeader: token},
+    );
+
+    if (response.statusCode == 200)
+    {
+      final responseJson = jsonDecode(response.body);
+      _newPerson.firstname = responseJson['user']['firstname'];
+      _newPerson.lastname = responseJson['user']['lastname'];
+      _newPerson.username = responseJson['user']['username'];
+      _newPerson.email = responseJson['user']['email'];
+      //_newPerson.password = responseJson['user']['password'];
+      _textFormFirstNameController.text = _newPerson.firstname;
+      _textFormLastNameController.text = _newPerson.lastname;
+      _textFormUsernameController.text = _newPerson.username;
+      _textFormEmailController.text = _newPerson.email;
+
+    }
+    else
+    {
+      print("false : " + response.body);
+    }
 
     //Future<String> jsonFile = loadAsset();
     //var user = json.decode(jsonFile.toString());
@@ -75,9 +81,29 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     //_newPerson.password = user['password'];
   }
 
-  void sendData(Person person) async
+  void sendData() async
   {
-    print("in sendData");
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.setString("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk");
+    String token = prefs.getString("token");
+   // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk";
+
+    final response = await http.put('https://parham-backend.herokuapp.com/user/update',
+      headers: {HttpHeaders.authorizationHeader: token},
+      body: jsonEncode(<String,String>{
+        "username": "riasat2",
+         "password": "12345678",
+         "firstname": "reza",
+         "lastname": "soori",
+         "email": "mohammadmahdisoori.10@gmail.com"
+      }),
+    );
+    if (response.statusCode == 200){
+      print("correct : " + response.body);
+    }
+    else
+      {print("false : " + response.body);}
+   // print("in sendData");
     /* final response = await http.post('https://parham-backend.herokuapp.com/user/signup',
         headers: <String, String>{
         'Content-Type': 'application/json'},
@@ -92,37 +118,44 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     );
 
     */
-    print(person.username);
-    final response = await http.put("https://parham-backend.herokuapp.com/user/login",
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'firstname': person.firstname,
-        'lastname' : person.lastname,
-        'username' : person.username,
-        'email' : person.email,
-      }),
-    );
-    /* final response = await http.post("https://parham-backend.herokuapp.com/user/login",
-        headers: <String, String>{
-          'Content-Type': 'application/json'},
-        body: jsonEncode(<String,String>{
-          //   'user' : new PersonProfile()
-          "username" : "riasatfgfdss",
-          "password": "123456sdfasdsd",
-        }),
-    );*/
-    if (response.statusCode == 200)
-    {
-      _textFormFirstNameController.text = response.statusCode.toString();
-      print("correct : " + response.body);
-      //   print(response.body);
-    }
-    else
-    {
-      print("false : " + response.body);
-    }
+    // print(person.username);
+    // final response = await http.put("https://parham-backend.herokuapp.com/user/login",
+    //   headers: <String, String>{
+    //     'Content-Type': 'application/json; charset=UTF-8',
+    //   },
+    //   body: jsonEncode(<String, String>{
+    //     'firstname': person.firstname,
+    //     'lastname' : person.lastname,
+    //     'username' : person.username,
+    //     'email' : person.email,
+    //   }),
+    // );
+
+    //  final response = await http.post("https://parham-backend.herokuapp.com/user/signup",
+    //     headers: <String, String>{
+    //       'Content-Type': 'application/json'},
+    //     body: jsonEncode(<String,String>{
+    //       //   'user' : new PersonProfile()
+    //       "username": "riasat2",
+    //       "firstname": "mohammadmahdi",
+    //       "lastname": "soori",
+    //       "password": "12345678",
+    //       "email": "mohammadmahdisoori.10@gmail.com"
+    //     }),
+    // );
+    //  String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk";
+
+    //  final response = await http.post("https://parham-backend.herokuapp.com/user/login",
+    //     headers: <String, String>{
+    //       'Content-Type': 'application/json'},
+    //     body: jsonEncode(<String,String>{
+    //       //   'user' : new PersonProfile()
+    //       "username": "riasat2",
+    //       "password": "12345678",
+    //     }),
+    // );
+
+
     // else
     //   {
     //     setState(() {
@@ -151,11 +184,61 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
 
 
   }*/
+  void getImageUrl() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.setString("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk");
+    String token = prefs.getString("token");
+    // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk";
+    final response = await http.get('https://parham-backend.herokuapp.com/user/avatar',
+      headers: {HttpHeaders.authorizationHeader: token},
+    );
+    if (response.statusCode == 200){
+      final responseJson = jsonDecode(response.body);
+      print("correct : " + response.body);
+      setState(() {
+        _newPerson.avatarUrl = responseJson['avatar'];
+      });
+    }
+    else
+    {print("false : " + response.body);}
+  }
+  void setImageToServer(File profileImage) async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.setString("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk");
+    String token = prefs.getString("token");
+    // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk";
+    if (profileImage == null) return;
+    String base64Image = base64Encode(profileImage.readAsBytesSync());
+    String fileName = profileImage.path.split("/").last;
+
+    // final response = await http.put('https://parham-backend.herokuapp.com/user/update/avatar',
+    //   headers: <String, String>{
+    //       'Content-Type': 'multipart/form-data',
+    //       'Authorization' : token,
+    //       'accept': 'application/json',
+    //     },
+    //   body: {
+    //     'image' : base64Image,
+    //     'name' : fileName,
+    //   }
+    // );
+    // if (response.statusCode == 200){
+    //   print("correct : " + response.body);
+    //   final responseJson = jsonDecode(response.body);
+    //   _newPerson.avatarUrl = responseJson['user']['avatar'];
+    // }
+    // else
+    // {print("false : " + response.body);}
+
+  }
   @override
   void initState() {
     super.initState();
     //  getProfileInfo();
     // sendData();
+    //getImageUrl();
     //getToken();
   }
 
@@ -176,6 +259,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   void _submitUser() {
     if(_formStateKey.currentState.validate()) {
       _formStateKey.currentState.save();
+   //   setImageToServer(_ProfileImage);
       // sendData(_newPerson);
     }
   }
@@ -211,8 +295,15 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                    backgroundColor: Colors.white,
                    child: Stack(
                      children: [
-                       Image(image: AssetImage("assets/images/unnamed.png"),alignment: Alignment.bottomLeft,),
-                       _ProfileImage != null ? ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),) :Container()
+                       // Image(image: AssetImage("assets/images/unnamed.png"),alignment: Alignment.bottomLeft,),
+                       // _ProfileImage != null ? ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),) :Container()
+                       if (_ProfileImage == null && _newPerson.avatarUrl == null) Image(image: AssetImage("assets/images/unnamed.png"),alignment: Alignment.bottomLeft,)
+                       else if (_ProfileImage != null  && _newPerson.avatarUrl == null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),)
+                       else if (_ProfileImage == null  && _newPerson.avatarUrl != null) ClipOval(child : Image.network(_newPerson.avatarUrl,fit: BoxFit.cover,alignment: Alignment.center,width: 200,))
+                       else if (_ProfileImage != null && _newPerson.avatarUrl != null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),),
+                       // _newPerson.avatarUrl==null ? (_ProfileImage != null ? ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),) :Container())
+                       //     : ClipOval(child : Image.network(_newPerson.avatarUrl,fit: BoxFit.cover,alignment: Alignment.center,width: 200,))
+
                      ],
                    ),
                  )

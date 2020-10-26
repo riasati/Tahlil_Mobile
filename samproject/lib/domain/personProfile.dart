@@ -6,6 +6,12 @@ class Person
   String _email;
   String _birthday;
   String _password;
+  String _avatarUrl;
+
+  String get avatarUrl => _avatarUrl;
+  set avatarUrl(String value) {
+    _avatarUrl = value;
+  }
 
   String get firstname => _firstname;
   set firstname(String value) {
