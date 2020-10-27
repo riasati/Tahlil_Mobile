@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:samproject/Layout/BottomNavigator.dart';
+import 'package:samproject/widgets/drawerWidget.dart';
 
 class HomePage extends StatefulWidget {
   static final PageController homePageController = PageController(
@@ -16,6 +17,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
     return Scaffold(
+      appBar: AppBar(),
+      endDrawer: DrawerWidget(),
       bottomNavigationBar: BottomNavigator(),
       floatingActionButton: Container(
         child: FloatingActionButton(
