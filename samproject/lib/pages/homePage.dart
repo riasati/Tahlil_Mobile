@@ -17,7 +17,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigator(),
-      floatingActionButton: FloatingActionButton(child: Icon(FontAwesomeIcons.home),backgroundColor: Colors.deepPurple,),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(FontAwesomeIcons.home),
+        backgroundColor: Colors.deepPurple,
+        onPressed: _pressHomeButton,
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: SingleChildScrollView(
         child: Container(
@@ -42,6 +46,11 @@ class _HomePageState extends State<HomePage> {
                         BottomNavigator.customIcon = 1;
                       });
                     }
+                    else if (i == 2) {
+                      setState(() {
+                        BottomNavigator.customIcon = 2;
+                      });
+                    }
                     else if (i == 3) {
                       setState(() {
                         BottomNavigator.customIcon = 3;
@@ -56,23 +65,23 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      child: Container(color: Colors.red,),
+                      //child: Container(color: Colors.red,),
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      child: Container(color: Colors.deepPurple,),
+                      //child: Container(color: Colors.deepPurple,),
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      child: Container(color: Colors.green,),
+                      //child: Container(color: Colors.green,),
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      child: Container(color: Colors.yellow,),
+                      //child: Container(color: Colors.yellow,),
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      child: Container(color: Colors.black,),
+                      //child: Container(color: Colors.black,),
                     ),
                   ],
                 ),
@@ -82,5 +91,10 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void _pressHomeButton() {
+    HomePage.homePageController.animateToPage(2,
+        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 }

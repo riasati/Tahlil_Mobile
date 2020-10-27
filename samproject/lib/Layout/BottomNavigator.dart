@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:samproject/pages/homePage.dart';
 
 class BottomNavigator extends StatefulWidget {
   static int customIcon = 2;
@@ -13,7 +14,6 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color: Colors.blue[200],
       elevation: 50,
       shape: CircularNotchedRectangle(),
       notchMargin: 10.0,
@@ -79,13 +79,25 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             ),
           ],
         ),
+        decoration: new BoxDecoration(
+          gradient: new LinearGradient(
+              colors: [
+                // Theme.Colors.loginGradientEnd,
+                // Theme.Colors.loginGradientStart
+                Colors.teal,
+                Colors.blue,
+              ],
+              begin: const FractionalOffset(0.2, 0.2),
+              end: const FractionalOffset(1.0, 1.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp),
+        ),
       ),
-    );
+      );
   }
 
   void _pressProfileIcon() {
-    setState(() {
-      BottomNavigator.customIcon = 0;
-    });
+    HomePage.homePageController.animateToPage(0,
+        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 }
