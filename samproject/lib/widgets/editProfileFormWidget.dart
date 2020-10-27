@@ -89,14 +89,19 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
    // String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1Zjk2ODY5ZjA1NDVjOTAwMTc4NDU3OWIiLCJpYXQiOjE2MDM3MDAzODN9.oGFAZsQOAFVeDUuFLPVnIxi_ywgym4l4JcpSgikCIqk";
 
     final response = await http.put('https://parham-backend.herokuapp.com/user/update',
-      headers: {HttpHeaders.authorizationHeader: token},
-      body: jsonEncode(<String,String>{
-        "username": "riasat2",
-         "password": "12345678",
-         "firstname": "reza",
-         "lastname": "soori",
-         "email": "mohammadmahdisoori.10@gmail.com"
-      }),
+      headers: {
+        'accept': 'application/json',
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+      // "Bearer" + " " + token
+       body: jsonEncode(<String,String>{
+      //   "username": "riasat3",
+      //   "password": "12345678",
+      //   "firstname": "mohammadmahdi",
+      //   "lastname": "soori",
+      //   "email": "mohammadmahdisoori.10@gmail.com"
+       })
     );
     if (response.statusCode == 200){
       print("correct : " + response.body);
@@ -238,7 +243,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     super.initState();
     //  getProfileInfo();
     // sendData();
-    //getImageUrl();
+    getImageUrl();
     //getToken();
   }
 
@@ -330,7 +335,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(0.0),
                 child: TextFormField(
                   controller: _textFormLastNameController,
                   keyboardType: TextInputType.name,
@@ -350,7 +355,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(0.0),
                 child: TextFormField(
                   controller: _textFormEmailController,
                   keyboardType: TextInputType.emailAddress,
@@ -367,7 +372,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(0.0),
                 child: TextFormField(
                   controller: _textFormBirthdayController,
                   keyboardType: TextInputType.datetime,
@@ -384,7 +389,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(0.0),
                 child: TextFormField(
                   controller: _textFormUsernameController,
                   keyboardType: TextInputType.text,
@@ -400,7 +405,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             Directionality(
               textDirection: TextDirection.rtl,
               child: Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: const EdgeInsets.all(0.0),
                 child: TextFormField(
                   controller: _textFormPasswordController,
                   keyboardType: TextInputType.visiblePassword,
