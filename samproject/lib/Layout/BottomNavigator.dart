@@ -9,17 +9,16 @@ class BottomNavigator extends StatefulWidget {
 }
 
 class _BottomNavigatorState extends State<BottomNavigator> {
-
-
   @override
   Widget build(BuildContext context) {
+    double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
     return BottomAppBar(
       elevation: 50,
       shape: CircularNotchedRectangle(),
       notchMargin: 10.0,
       clipBehavior: Clip.antiAlias,
       child: Container(
-        height: 60,
+        height: 60 / responsiveDivision,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -30,7 +29,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                   FlatButton(
                     child: Icon(
                       FontAwesomeIcons.userAlt,
-                      size: 40,
+                      size: 40 / responsiveDivision,
                       color: BottomNavigator.customIcon == 0
                           ?Colors.deepPurple
                           :Colors.white,
@@ -40,7 +39,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                   MaterialButton(
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
-                      size: 40,
+                      size: 40 / responsiveDivision,
                       color: BottomNavigator.customIcon == 1
                           ?Colors.deepPurple
                           :Colors.white,
@@ -57,7 +56,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                   MaterialButton(
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
-                      size: 40,
+                      size: 40 / responsiveDivision,
                       color: BottomNavigator.customIcon == 3
                           ?Colors.deepPurple
                           :Colors.white,
@@ -67,7 +66,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                   MaterialButton(
                     child: Icon(
                       Icons.supervised_user_circle_outlined ,
-                      size: 40,
+                      size: 40 / responsiveDivision,
                       color: BottomNavigator.customIcon == 4
                           ?Colors.deepPurple
                           :Colors.white,

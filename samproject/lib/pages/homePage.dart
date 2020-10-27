@@ -12,15 +12,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
+    double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
     return Scaffold(
       bottomNavigationBar: BottomNavigator(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(FontAwesomeIcons.home),
-        backgroundColor: Colors.deepPurple,
-        onPressed: _pressHomeButton,
+      floatingActionButton: Container(
+        child: FloatingActionButton(
+          child: Icon(
+            FontAwesomeIcons.home,
+          ),
+          backgroundColor: Colors.deepPurple,
+          onPressed: _pressHomeButton,
+        ),
+        width: 60 / responsiveDivision,
+        height: 60 / responsiveDivision,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: SingleChildScrollView(
