@@ -16,15 +16,16 @@ class MenuBar extends StatefulWidget {
 class _MenuBarState extends State<MenuBar> {
   @override
   Widget build(BuildContext context) {
+    double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
     return Container(
-      width: 300.0,
-      height: 50.0,
+      width: 300.0 / responsiveDivision,
+      height: 50.0 / responsiveDivision,
       decoration: BoxDecoration(
         color: Color(0x552B2B2B),
         borderRadius: BorderRadius.all(Radius.circular(25.0)),
       ),
       child: CustomPaint(
-        painter: TabIndicationPainter(pageController: LoginPage.pageController),
+        painter: TabIndicationPainter(125.0 / responsiveDivision , 25.0 / responsiveDivision , 21.0 , 25.0 / responsiveDivision , LoginPage.pageController),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -37,7 +38,7 @@ class _MenuBarState extends State<MenuBar> {
                   "ورود",
                   style: TextStyle(
                       color: LoginPage.left,
-                      fontSize: 16.0,
+                      fontSize: 16.0 /responsiveDivision,
                       fontFamily: "WorkSansSemiBold"),
                 ),
               ),
@@ -52,7 +53,7 @@ class _MenuBarState extends State<MenuBar> {
                   "جدید",
                   style: TextStyle(
                       color: LoginPage.right,
-                      fontSize: 16.0,
+                      fontSize: 16.0 /responsiveDivision,
                       fontFamily: "WorkSansSemiBold"),
                 ),
               ),

@@ -27,19 +27,18 @@ class _LoginPageState extends State<LoginPage> {
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height >= 775.0
               ? MediaQuery.of(context).size.height
-              : 775.0,
+              : 775.0 ,
           decoration: new BoxDecoration(
             gradient: new LinearGradient(
                 colors: [
                   // Theme.Colors.loginGradientStart,
                   // Theme.Colors.loginGradientEnd
-                  Colors.red,
-                  Colors.blue,
-                  Colors.yellow,
+                  Colors.teal,
+                  Colors.blue
                 ],
                 begin: const FractionalOffset(0.0, 0.0),
                 end: const FractionalOffset(1.0, 1.0),
-                stops: [0.0, 0.5 , 1.0],
+                stops: [0.0, 1.0],
                 tileMode: TileMode.clamp),
           ),
 

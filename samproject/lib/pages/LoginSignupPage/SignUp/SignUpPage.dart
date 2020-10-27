@@ -40,6 +40,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    double responsiveDivision = MediaQuery.of(context).devicePixelRatio >1.5? 1.3:1;
     return Container(
       padding: EdgeInsets.only(top: 23.0),
       child: Column(
@@ -58,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.height * 0.43,
+                  height: MediaQuery.of(context).size.height * 0.43 * responsiveDivision,
                   child: Column(
                     children: <Widget>[
                       Padding(
@@ -274,7 +275,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 450.0),
+                margin: EdgeInsets.only(top: 450.0 / responsiveDivision),
                 width: MediaQuery.of(context).size.width * 0.5,
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),

@@ -23,6 +23,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    double responsiveDivision = MediaQuery.of(context).devicePixelRatio >1.5? 1.3:1;
     return Container(
       padding: EdgeInsets.only(top: 23.0),
       child: Column(
@@ -41,7 +42,7 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.7,
-                  height: MediaQuery.of(context).size.height * 0.2,
+                  height: MediaQuery.of(context).size.height * 0.2 * responsiveDivision,
                   child: Column(
                     children: <Widget>[
                       Padding(
@@ -73,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width * 0.6,
+                        width: MediaQuery.of(context).size.width * 0.6 ,
                         height: 1.0,
                         color: Colors.grey[900],
                       ),
@@ -116,7 +117,7 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width * 0.6,
+                        width: MediaQuery.of(context).size.width * 0.6 ,
                         height: 1.0,
                         color: Colors.grey[900],
                       ),
@@ -126,7 +127,7 @@ class _SignInPageState extends State<SignInPage> {
               ),
               Container(
                   width: MediaQuery.of(context).size.width * 0.5,
-                  margin: EdgeInsets.only(top: 200.0),
+                  margin: EdgeInsets.only(top: 200.0 / responsiveDivision),
                   decoration: new BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     boxShadow: <BoxShadow>[
