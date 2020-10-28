@@ -212,7 +212,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                    backgroundColor: Colors.white,
                    child: Stack(
                      children: [
-                       if (_ProfileImage == null && _newPerson.avatarUrl == null) Image(image: AssetImage("assets/images/unnamed.png"),alignment: Alignment.bottomLeft,)
+                       if (_ProfileImage == null && _newPerson.avatarUrl == null) Image(image: AssetImage("assets/img/unnamed.png"),alignment: Alignment.bottomLeft,)
                        else if (_ProfileImage != null  && _newPerson.avatarUrl == null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),)
                        else if (_ProfileImage == null  && _newPerson.avatarUrl != null) ClipOval(child : Image.network(_newPerson.avatarUrl,fit: BoxFit.cover,alignment: Alignment.center,width: 200,))
                        else if (_ProfileImage != null && _newPerson.avatarUrl != null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),),

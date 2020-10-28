@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 
 class DrawerListTile extends StatelessWidget {
@@ -24,12 +25,12 @@ class DrawerListTile extends StatelessWidget {
           ),
           onTap: () {
             Navigator.pop(context);
-            //Navigator.push(
-            //  context,
-            //  MaterialPageRoute(
-            //    builder: (context) => Birthdays(),
-            //  ),
-            //);
+            Navigator.push(
+             context,
+             MaterialPageRoute(
+               builder: (context) => LoginPage(),
+             ),
+            );
           },
         ),
         ListTile(

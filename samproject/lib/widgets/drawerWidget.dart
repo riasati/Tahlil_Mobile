@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/widgets/drawerListTile.dart';
 import 'package:samproject/domain/personProfile.dart';
 
 class DrawerWidget extends StatelessWidget {
-  Person person = null ;
   DrawerWidget({
     Key key,
-    @required this.person
   }) : super(key: key);
 
   @override
@@ -19,13 +18,14 @@ class DrawerWidget extends StatelessWidget {
             textDirection: TextDirection.rtl,
             child: UserAccountsDrawerHeader(
               onDetailsPressed: () => {},
-              currentAccountPicture: Icon(
-                Icons.face,
-                size: 48.0,
-                color: Colors.white,
-              ),
-              accountName: person == null ? Text('نام شما') : Text(person.firstname + " " + person.lastname),
-              accountEmail: person == null ? Text('آدرس ایمیل شما') : Text(person.email),
+              currentAccountPicture: (HomePage.user.avatarUrl != null)?Image.network(
+                HomePage.user.avatarUrl,
+                fit: BoxFit.cover
+              ):Icon(Icons.face , size: 48.0 , color: Colors.white,),
+              // currentAccountPicture:Icon(Icons.face , size: 48.0 , color: Colors.white,),
+              // accountName: HomePage.user == null ? Text('نام شما') : Text(HomePage.user.firstname + " " + HomePage.user.lastname),
+              accountName: HomePage.user == null ? Text('نام شما') : Text(HomePage.user.username),
+              accountEmail: HomePage.user == null ? Text('آدرس ایمیل شما') : Text(HomePage.user.email),
               otherAccountsPictures: <Widget>[
                 Icon(
                   Icons.bookmark_border,

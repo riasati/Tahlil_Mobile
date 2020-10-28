@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -449,14 +450,15 @@ class _SignUpPageState extends State<SignUpPage> {
       }
       else{
           final personInfo = jsonDecode(response.body);
-          Person _newPerson = Person();
-          _newPerson.firstname = "";
-          _newPerson.lastname = "";
-          _newPerson.username = personInfo['user']['username'];
-          _newPerson.email = personInfo['user']['email'];
-          _newPerson.password = signupPasswordController.text;
+          HomePage.user = Person();
+          HomePage.user.firstname = "****";
+          HomePage.user.lastname = "****";
+          HomePage.user.username = personInfo['user']['username'];
+          HomePage.user.email = personInfo['user']['email'];
+          HomePage.user.avatarUrl = personInfo['user']['avatar'];
+          HomePage.user.password = signupPasswordController.text;
           _saveToken(personInfo['token']);
-
+          Navigator.pop(context);
       }
     }
   }

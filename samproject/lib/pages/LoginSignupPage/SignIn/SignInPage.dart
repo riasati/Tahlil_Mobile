@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInPage extends StatefulWidget {
@@ -26,7 +27,6 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     super.initState();
-    _getToken();
   }
 
   @override
@@ -239,13 +239,15 @@ class _SignInPageState extends State<SignInPage> {
       }
     else{
       final personInfo = jsonDecode(response.body);
-      Person _newPerson = Person();
-      _newPerson.firstname = "";
-      _newPerson.lastname = "";
-      _newPerson.username = personInfo['user']['username'];
-      _newPerson.email = personInfo['user']['email'];
-      _newPerson.password = loginPasswordController.text;
+      HomePage.user = Person();
+      HomePage.user.firstname = personInfo['user']['firstname'];
+      HomePage.user.lastname = personInfo['user']['lastname'];
+      HomePage.user.username = personInfo['user']['username'];
+      HomePage.user.email = personInfo['user']['email'];
+      HomePage.user.avatarUrl = personInfo['user']['avatar'];
+      HomePage.user.password = loginPasswordController.text;
       _saveToken(personInfo['token']);
+      Navigator.pop(context);
     }
 
   }
@@ -255,17 +257,6 @@ class _SignInPageState extends State<SignInPage> {
     prefs.setString("token", token);
   }
 
-  void _getToken() async{
-    final prefs = await SharedPreferences.getInstance();
-    print(prefs.getString("token"));
-    final response = await post(_signInURL,
-        headers: {
-        'accept': 'application/json',
-        'Authorization': prefs.getString("token"),
-        'Content-Type': 'application/json',
-        });
-    print(response.statusCode);
-  }
 
   // void _showInSnackBar(String value) {
   //   FocusScope.of(context).requestFocus(new FocusNode());
