@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/widgets/drawerListTile.dart';
-import 'package:samproject/classes/personProfile.dart';
+import 'package:samproject/domain/personProfile.dart';
 
 class DrawerWidget extends StatelessWidget {
-  PersonProfile person = null ;
+  Person person = null ;
   DrawerWidget({
     Key key,
     @required this.person
