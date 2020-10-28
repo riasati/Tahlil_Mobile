@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:samproject/domain/personProfile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -13,6 +15,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   String _signInURL = "http://parham-backend.herokuapp.com/user/login";
 
+  // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
   final TextEditingController loginUsernameController = TextEditingController();
@@ -20,6 +23,11 @@ class _SignInPageState extends State<SignInPage> {
 
   bool _obscureTextLogin = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _getToken();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +209,7 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _pressLogin() async{
+    // _showInSnackBar("منتظر باشید");
     var body = jsonEncode(<String,String>{
       'username' : loginUsernameController.text,
       'password':loginPasswordController.text,
@@ -229,8 +238,49 @@ class _SignInPageState extends State<SignInPage> {
         });
       }
     else{
-      print(response.body);
+      final personInfo = jsonDecode(response.body);
+      Person _newPerson = Person();
+      _newPerson.firstname = "";
+      _newPerson.lastname = "";
+      _newPerson.username = personInfo['user']['username'];
+      _newPerson.email = personInfo['user']['email'];
+      _newPerson.password = loginPasswordController.text;
+      _saveToken(personInfo['token']);
     }
 
   }
+
+  void _saveToken(String token) async{
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("token", token);
+  }
+
+  void _getToken() async{
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    final response = await post(_signInURL,
+        headers: {
+        'accept': 'application/json',
+        'Authorization': prefs.getString("token"),
+        'Content-Type': 'application/json',
+        });
+    print(response.statusCode);
+  }
+
+  // void _showInSnackBar(String value) {
+  //   FocusScope.of(context).requestFocus(new FocusNode());
+  //   _scaffoldKey.currentState?.removeCurrentSnackBar();
+  //   _scaffoldKey.currentState.showSnackBar(new SnackBar(
+  //     content: new Text(
+  //       value,
+  //       textAlign: TextAlign.center,
+  //       style: TextStyle(
+  //           color: Colors.white,
+  //           fontSize: 16.0,
+  //           fontFamily: "WorkSansSemiBold"),
+  //     ),
+  //     backgroundColor: Colors.blue,
+  //     duration: Duration(seconds: 3),
+  //   ));
+  // }
 }
