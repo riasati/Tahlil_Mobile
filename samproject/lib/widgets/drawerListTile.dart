@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 
 class DrawerListTile extends StatelessWidget {
@@ -35,7 +36,7 @@ class DrawerListTile extends StatelessWidget {
           title: Row(
             textDirection: TextDirection.rtl,
             children: [
-              Icon(Icons.cake),
+              Icon(FontAwesomeIcons.userGraduate),
               Padding(
                 padding: const EdgeInsets.only(right: 5.0),
                 child: Text('تغییر مشخصات کاربری'),

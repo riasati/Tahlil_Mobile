@@ -21,12 +21,18 @@ class _HomePageState extends State<HomePage> {
       endDrawer: DrawerWidget(),
       bottomNavigationBar: BottomNavigator(),
       floatingActionButton: Container(
-        child: FloatingActionButton(
-          child: Icon(
-            FontAwesomeIcons.home,
+        child: Center(
+          child: FloatingActionButton(
+            child: Center(
+              child: Icon(
+                FontAwesomeIcons.home,
+              ),
+            ),
+            backgroundColor: BottomNavigator.customIcon == 2
+                ?Colors.deepPurple
+                :Colors.black,
+            onPressed: _pressHomeButton,
           ),
-          backgroundColor: Colors.deepPurple,
-          onPressed: _pressHomeButton,
         ),
         width: 60 / responsiveDivision,
         height: 60 / responsiveDivision,

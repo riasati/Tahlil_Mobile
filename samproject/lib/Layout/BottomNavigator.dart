@@ -14,11 +14,8 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
     return BottomAppBar(
       elevation: 50,
-      shape: CircularNotchedRectangle(),
-      notchMargin: 10.0,
-      clipBehavior: Clip.antiAlias,
       child: Container(
-        height: 60 / responsiveDivision,
+        height: 80 / responsiveDivision,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -29,20 +26,20 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                   FlatButton(
                     child: Icon(
                       FontAwesomeIcons.userAlt,
-                      size: 40 / responsiveDivision,
+                      size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 0
                           ?Colors.deepPurple
-                          :Colors.white,
+                          :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
                   ),
-                  MaterialButton(
+                  FlatButton(
                     child: Icon(
-                      Icons.supervised_user_circle_outlined ,
-                      size: 40 / responsiveDivision,
+                      FontAwesomeIcons.userAlt,
+                      size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 1
                           ?Colors.deepPurple
-                          :Colors.white,
+                          :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
                   ),
@@ -53,23 +50,23 @@ class _BottomNavigatorState extends State<BottomNavigator> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  MaterialButton(
+                  FlatButton(
                     child: Icon(
-                      Icons.supervised_user_circle_outlined ,
-                      size: 40 / responsiveDivision,
+                      FontAwesomeIcons.userAlt,
+                      size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 3
                           ?Colors.deepPurple
-                          :Colors.white,
+                          :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
                   ),
-                  MaterialButton(
+                  FlatButton(
                     child: Icon(
-                      Icons.supervised_user_circle_outlined ,
-                      size: 40 / responsiveDivision,
+                      FontAwesomeIcons.userAlt,
+                      size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 4
                           ?Colors.deepPurple
-                          :Colors.white,
+                          :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
                   ),
@@ -78,19 +75,19 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             ),
           ],
         ),
-        decoration: new BoxDecoration(
-          gradient: new LinearGradient(
-              colors: [
-                // Theme.Colors.loginGradientEnd,
-                // Theme.Colors.loginGradientStart
-                Colors.teal,
-                Colors.blue,
-              ],
-              begin: const FractionalOffset(0.2, 0.2),
-              end: const FractionalOffset(1.0, 1.0),
-              stops: [0.0, 1.0],
-              tileMode: TileMode.clamp),
-        ),
+        // decoration: new BoxDecoration(
+        //   gradient: new LinearGradient(
+        //       colors: [
+        //         // Theme.Colors.loginGradientEnd,
+        //         // Theme.Colors.loginGradientStart
+        //         Colors.teal,
+        //         Colors.blue,
+        //       ],
+        //       begin: const FractionalOffset(0.2, 0.2),
+        //       end: const FractionalOffset(1.0, 1.0),
+        //       stops: [0.0, 1.0],
+        //       tileMode: TileMode.clamp),
+        // ),
       ),
       );
   }
