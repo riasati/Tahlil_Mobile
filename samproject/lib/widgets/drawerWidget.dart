@@ -17,15 +17,16 @@ class DrawerWidget extends StatelessWidget {
           Directionality(
             textDirection: TextDirection.rtl,
             child: UserAccountsDrawerHeader(
-              onDetailsPressed: () => {},
-              currentAccountPicture: (HomePage.user.avatarUrl != null)?Image.network(
+            //  onDetailsPressed: () => {},
+              currentAccountPicture: (HomePage.user.avatarUrl == null) ? Icon(Icons.face , size: 48.0 , color: Colors.white,)
+                  :Image.network(
                 HomePage.user.avatarUrl,
                 fit: BoxFit.cover
-              ):Icon(Icons.face , size: 48.0 , color: Colors.white,),
+              ),
               // currentAccountPicture:Icon(Icons.face , size: 48.0 , color: Colors.white,),
               // accountName: HomePage.user == null ? Text('نام شما') : Text(HomePage.user.firstname + " " + HomePage.user.lastname),
-              accountName: HomePage.user == null ? Text('نام شما') : Text(HomePage.user.username),
-              accountEmail: HomePage.user == null ? Text('آدرس ایمیل شما') : Text(HomePage.user.email),
+              accountName: HomePage.user.username == null ? Text('نام شما') : Text(HomePage.user.username),
+              accountEmail: HomePage.user.email == null ? Text('آدرس ایمیل شما') : Text(HomePage.user.email),
               otherAccountsPictures: <Widget>[
                 Icon(
                   Icons.bookmark_border,

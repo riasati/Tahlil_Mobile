@@ -140,17 +140,12 @@ class _HomePageState extends State<HomePage> {
             'Content-Type': 'application/json',
           });
       if(response.statusCode == 200){
-        print(response.body);
         final personInfo = jsonDecode(response.body);
         HomePage.user.firstname = personInfo['user']['firstname'];
         HomePage.user.lastname = personInfo['user']['lastname'];
         HomePage.user.username = personInfo['user']['username'];
         HomePage.user.email = personInfo['user']['email'];
         HomePage.user.avatarUrl = personInfo['user']['avatar'];
-
-      }
-      else{
-        HomePage.user = null;
       }
     }
   }

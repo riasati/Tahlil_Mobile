@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:samproject/domain/personProfile.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -16,7 +16,6 @@ class EditProfileFormWidget extends StatefulWidget {
 
 class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
-  Person _newPerson = Person();
 
   TextEditingController _textFormFirstNameController = new TextEditingController();
   TextEditingController _textFormLastNameController = new TextEditingController();
@@ -25,42 +24,34 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   TextEditingController _textFormPasswordController = new TextEditingController();
   TextEditingController _textFormBirthdayController = new TextEditingController();
 
-  void getProfileInfo() async
+  void sendData(File profileImage) async
   {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     if (token == null) {_showMyDialog(false);return;}
     String tokenplus = "Bearer" + " " + token;
+    dynamic data;
 
-    final response = await http.get('https://parham-backend.herokuapp.com/user/',
-        headers: {HttpHeaders.authorizationHeader: tokenplus},
-    );
-
-    if (response.statusCode == 200)
+    if (profileImage == null)
     {
-      final responseJson = jsonDecode(response.body);
-      _newPerson.firstname = responseJson['user']['firstname'];
-      _newPerson.lastname = responseJson['user']['lastname'];
-      _newPerson.username = responseJson['user']['username'];
-      _newPerson.email = responseJson['user']['email'];
-
-      _textFormFirstNameController.text = _newPerson.firstname;
-      _textFormLastNameController.text = _newPerson.lastname;
-      _textFormUsernameController.text = _newPerson.username;
-      _textFormEmailController.text = _newPerson.email;
+      data = jsonEncode(<String,String>{"username": HomePage.user.username,
+        "password": HomePage.user.password,
+        "firstname": HomePage.user.firstname,
+        "lastname": HomePage.user.lastname,
+        "email": HomePage.user.email,});
     }
-    else{
-      _showMyDialog(false);
-    }
-  }
-
-  void sendData() async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    if (token == null) {_showMyDialog(false);return;}
-
-    String tokenplus = "Bearer" + " " + token;
+    else
+      {
+        String base64Image = base64Encode(profileImage.readAsBytesSync());
+        data = jsonEncode(<String,String>{
+          "username": HomePage.user.username,
+          "password": HomePage.user.password,
+          "firstname": HomePage.user.firstname,
+          "lastname": HomePage.user.lastname,
+          "email": HomePage.user.email,
+          "avatar" : base64Image,
+        });
+      }
 
     final response = await http.put('https://parham-backend.herokuapp.com/user/update',
       headers: {
@@ -69,69 +60,34 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
         'Content-Type': 'application/json',
       },
       //
-       body: jsonEncode(<String,String>{
-        "username": _newPerson.username,
-        "password": _newPerson.password,
-        "firstname": _newPerson.firstname,
-        "lastname": _newPerson.lastname,
-        "email": _newPerson.email
-       })
+       body: data
     );
     if (response.statusCode == 200){
-       _showMyDialog(true);
+      final responseJson = jsonDecode(response.body);
+      HomePage.user.avatarUrl = responseJson['user']['avatar'];
+      _showMyDialog(true);
     }
     else{
       _showMyDialog(false);
     }
   }
-  void getImageUrl() async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    if (token == null) return;
-    String tokenplus = "Bearer" + " " + token;
-    final response = await http.get('https://parham-backend.herokuapp.com/user/avatar',
-      headers: {HttpHeaders.authorizationHeader: tokenplus},
-    );
-    if (response.statusCode == 200){
-      final responseJson = jsonDecode(response.body);
-      setState(() {
-        _newPerson.avatarUrl = responseJson['avatar'];
-      });
-    }
-  }
-  void setImageToServer(File profileImage) async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    if (token == null) return;
-    if (profileImage == null) {return;}
-    String tokenplus = "Bearer" + " " + token;
 
-    String base64Image = base64Encode(profileImage.readAsBytesSync());
-    //String fileName = profileImage.path.split("/").last;
 
-    final response = await http.put('https://parham-backend.herokuapp.com/user/update',
-      headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization' : tokenplus,
-          'accept': 'application/json',
-        },
-      body: jsonEncode(<String,String>{
-        'avatar' : base64Image,
-      //  'avatarname' : fileName,
-      }
-    ));
-    if (response.statusCode == 200){
-      final responseJson = jsonDecode(response.body);
-      _newPerson.avatarUrl = responseJson['user']['avatar'];
-    }
-  }
   @override
   void initState() {
     super.initState();
-    getProfileInfo();
-    getImageUrl();
+    initializeTextForm();
+  }
+
+  void initializeTextForm()
+  {
+    if (HomePage.user.username == null || HomePage.user.email == null) return;
+    _textFormUsernameController.text = HomePage.user.username;
+    _textFormEmailController.text = HomePage.user.email;
+    if (HomePage.user.firstname == null) return;
+    _textFormFirstNameController.text = HomePage.user.firstname;
+    if (HomePage.user.lastname == null) return;
+    _textFormLastNameController.text = HomePage.user.lastname;
   }
 
   String _validateUsername(String value) {
@@ -151,12 +107,9 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   void _submitUser() {
     if(_formStateKey.currentState.validate()) {
       _formStateKey.currentState.save();
-    sendData();
-    setImageToServer(_ProfileImage);
+    sendData(_ProfileImage);
     }
   }
-
-
   Future<void> _showMyDialog(bool good) async {
     return showDialog<void>(
       context: context,
@@ -212,10 +165,10 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                    backgroundColor: Colors.white,
                    child: Stack(
                      children: [
-                       if (_ProfileImage == null && _newPerson.avatarUrl == null) Image(image: AssetImage("assets/img/unnamed.png"),alignment: Alignment.bottomLeft,)
-                       else if (_ProfileImage != null  && _newPerson.avatarUrl == null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),)
-                       else if (_ProfileImage == null  && _newPerson.avatarUrl != null) ClipOval(child : Image.network(_newPerson.avatarUrl,fit: BoxFit.cover,alignment: Alignment.center,width: 200,))
-                       else if (_ProfileImage != null && _newPerson.avatarUrl != null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),),
+                       if (_ProfileImage == null && HomePage.user.avatarUrl == null) Image(image: AssetImage("assets/img/unnamed.png"),alignment: Alignment.bottomLeft,)
+                       else if (_ProfileImage != null  && HomePage.user.avatarUrl == null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),)
+                       else if (_ProfileImage == null  && HomePage.user.avatarUrl != null) ClipOval(child:Image.network(HomePage.user.avatarUrl,fit: BoxFit.cover,alignment: Alignment.center,width: 200,))
+                       else if (_ProfileImage != null && HomePage.user.avatarUrl != null) ClipOval(child:Image.file(_ProfileImage,fit: BoxFit.cover,alignment: Alignment.center,width: 200,),),
                      ],
                    ),
                  )
@@ -232,7 +185,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 decoration: InputDecoration(
                   labelText: "نام",
                 ),
-                onSaved: (value) => _newPerson.firstname = value,
+                onSaved: (value) => HomePage.user.firstname = value,
               ),
             ),
             Directionality(
@@ -247,7 +200,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 decoration: InputDecoration(
                   labelText: "نام خانوادگی",
                 ),
-                onSaved: (value) => _newPerson.lastname = value,
+                onSaved: (value) => HomePage.user.lastname = value,
               ),
             ),
             Directionality(
@@ -260,7 +213,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                   labelText: "ایمیل",
                 ),
                 validator: (value) => _validateEmail(value),
-                onSaved: (value) => _newPerson.email = value,
+                onSaved: (value) => HomePage.user.email = value,
               ),
             ),
             Directionality(
@@ -272,7 +225,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 decoration: InputDecoration(
                   labelText: "تاریخ تولد",
                 ),
-                onSaved: (value) => _newPerson.birthday = value,
+                onSaved: (value) => HomePage.user.birthday = value,
               ),
             ),
             Directionality(
@@ -284,7 +237,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                   labelText: "نام کاربری",
                 ),
                 validator: (value) => _validateUsername(value),
-                onSaved: (value) => _newPerson.username = value,
+                onSaved: (value) => HomePage.user.username = value,
               ),
             ),
             Directionality(
@@ -298,7 +251,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                   labelText: "رمز ورود",
                 ),
                 validator: (value) => _validatePassword(value),
-                onSaved: (value) => _newPerson.password = value,
+                onSaved: (value) => HomePage.user.password = value,
               ),
             ),
 
