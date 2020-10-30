@@ -28,7 +28,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                       FontAwesomeIcons.userAlt,
                       size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 0
-                          ?Colors.deepPurple
+                          ?Color(0xFF3D5A80)
                           :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
@@ -38,7 +38,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                       FontAwesomeIcons.userAlt,
                       size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 1
-                          ?Colors.deepPurple
+                          ?Color(0xFF3D5A80)
                           :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
@@ -55,7 +55,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                       FontAwesomeIcons.userAlt,
                       size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 3
-                          ?Colors.deepPurple
+                          ?Color(0xFF3D5A80)
                           :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,
@@ -65,7 +65,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                       FontAwesomeIcons.userAlt,
                       size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 4
-                          ?Colors.deepPurple
+                          ?Color(0xFF3D5A80)
                           :Colors.black,
                     ),
                     onPressed: _pressProfileIcon,

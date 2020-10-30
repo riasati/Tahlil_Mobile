@@ -7,8 +7,8 @@ class LoginPage extends StatefulWidget {
   static final PageController pageController = PageController(
     initialPage: 0,
   );
-  static Color left = Colors.black;
-  static Color right = Colors.white;
+  static Color left = Colors.white;
+  static Color right = Colors.black;
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
                 colors: [
                   // Theme.Colors.loginGradientStart,
                   // Theme.Colors.loginGradientEnd
-                  Colors.teal,
+                  Color(0xFF3D5A80),
                   Colors.blue
                 ],
                 begin: const FractionalOffset(0.0, 0.0),
@@ -67,13 +67,13 @@ class _LoginPageState extends State<LoginPage> {
                   onPageChanged: (i) {
                     if (i == 0) {
                       setState(() {
-                        LoginPage.right = Colors.white;
-                        LoginPage.left = Colors.black;
+                        LoginPage.right = Colors.black;
+                        LoginPage.left = Colors.white;
                       });
                     } else if (i == 1) {
                       setState(() {
-                        LoginPage.right = Colors.black;
-                        LoginPage.left = Colors.white;
+                        LoginPage.right = Colors.white;
+                        LoginPage.left = Colors.black;
                       });
                     }
                   },

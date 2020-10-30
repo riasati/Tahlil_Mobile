@@ -260,7 +260,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                   widthFactor: 1,
                   child: RaisedButton(
                     child:Text('تغییرات',style: TextStyle(color: Colors.white),),
-                    color: Colors.lightBlue,
+                    color: Color(0xFF3D5A80),
                     onPressed: () => _submitUser(),
                   ),
                 ),

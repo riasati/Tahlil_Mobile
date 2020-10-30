@@ -11,6 +11,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFF3D5A80),
         title: Container(
           alignment: Alignment.center,
           child: Text(
@@ -40,7 +41,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 margin: EdgeInsets.all(25),
-                shadowColor: Colors.lightBlue,
+                shadowColor: Color(0xFF3D5A80),
                 child: Column(
                   children: [
                     EditProfileFormWidget(),

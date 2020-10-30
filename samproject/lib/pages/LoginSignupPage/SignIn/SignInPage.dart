@@ -138,26 +138,26 @@ class _SignInPageState extends State<SignInPage> {
                   margin: EdgeInsets.only(top: 200.0 / responsiveDivision),
                   decoration: new BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        // color: Theme.Colors.loginGradientStart,
-                        color: Colors.limeAccent,
-                        offset: Offset(1.0, 6.0),
-                        blurRadius: 20.0,
-                      ),
-                      BoxShadow(
-                        // color: Theme.Colors.loginGradientEnd,
-                        color: Colors.blue,
-                        offset: Offset(1.0, 6.0),
-                        blurRadius: 20.0,
-                      ),
-                    ],
+                    // boxShadow: <BoxShadow>[
+                    //   BoxShadow(
+                    //     // color: Theme.Colors.loginGradientStart,
+                    //     color: Colors.limeAccent,
+                    //     offset: Offset(1.0, 6.0),
+                    //     blurRadius: 20.0,
+                    //   ),
+                    //   BoxShadow(
+                    //     // color: Theme.Colors.loginGradientEnd,
+                    //     color: Colors.blue,
+                    //     offset: Offset(1.0, 6.0),
+                    //     blurRadius: 20.0,
+                    //   ),
+                    // ],
                     gradient: new LinearGradient(
                         colors: [
                           // Theme.Colors.loginGradientEnd,
                           // Theme.Colors.loginGradientStart
-                          Colors.red,
-                          Colors.blue,
+                          Colors.orange[900],
+                          Colors.orange[900],
                         ],
                         begin: const FractionalOffset(0.2, 0.2),
                         end: const FractionalOffset(1.0, 1.0),
@@ -192,7 +192,7 @@ class _SignInPageState extends State<SignInPage> {
                   "فراموشی رمز عبور؟",
                   style: TextStyle(
                       decoration: TextDecoration.underline,
-                      color: Colors.white,
+                      color: Colors.red,
                       fontSize: MediaQuery.of(context).size.width * 0.03,
                       fontFamily: "WorkSansMedium"),
                 )),
@@ -231,7 +231,7 @@ class _SignInPageState extends State<SignInPage> {
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 onPressed: () => Navigator.pop(context),
-                color: Colors.deepPurple,
+                color: Color(0xFF3D5A80),
               ),
             ],
           ).show();

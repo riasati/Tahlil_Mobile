@@ -31,7 +31,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Color(0xFF3D5A80),
+      ),
       endDrawer: DrawerWidget(),
       bottomNavigationBar: BottomNavigator(),
       floatingActionButton: Container(
@@ -43,7 +45,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             backgroundColor: BottomNavigator.customIcon == 2
-                ?Colors.deepPurple
+                ?Color(0xFF3D5A80)
                 :Colors.black,
             onPressed: _pressHomeButton,
           ),
