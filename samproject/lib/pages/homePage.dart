@@ -143,6 +143,7 @@ class _HomePageState extends State<HomePage> {
           });
       if(response.statusCode == 200){
         final personInfo = jsonDecode(response.body);
+        print(personInfo.toString());
         HomePage.user.firstname = personInfo['user']['firstname'];
         HomePage.user.lastname = personInfo['user']['lastname'];
         HomePage.user.username = personInfo['user']['username'];

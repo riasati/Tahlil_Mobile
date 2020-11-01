@@ -34,20 +34,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Card(
-                elevation: 2,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                margin: EdgeInsets.all(25),
-                shadowColor: Color(0xFF3D5A80),
-                child: Column(
-                  children: [
-                    EditProfileFormWidget(),
-                  ],
-                )
-            ),
+              Column(
+                children: [
+                  EditProfileFormWidget(),
+                ],
+              ),
             ],
           ),
         ),

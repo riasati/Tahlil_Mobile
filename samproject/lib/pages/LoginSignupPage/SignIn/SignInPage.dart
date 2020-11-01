@@ -239,6 +239,7 @@ class _SignInPageState extends State<SignInPage> {
       }
     else{
       final personInfo = jsonDecode(response.body);
+      print(personInfo.toString());
       HomePage.user = Person();
       HomePage.user.firstname = personInfo['user']['firstname'];
       HomePage.user.lastname = personInfo['user']['lastname'];

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/pages/homePage.dart';
@@ -182,9 +183,19 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 style: TextStyle(
                   locale: Locale('fa'),
                 ),
-                decoration: InputDecoration(
-                  labelText: "نام",
-                ),
+                textAlignVertical: TextAlignVertical.center,
+                //toolbarOptions: ToolbarOptions(copy: true,cut: true,paste: true,selectAll: true),
+                 decoration: InputDecoration(
+                  // filled: true,
+                   isCollapsed: true,
+                  // fillColor: Colors.amber,
+                   hintText: "نام",
+                    prefixIcon: Icon(FontAwesomeIcons.userGraduate),
+                    // labelText: "نام",
+                    // alignLabelWithHint: true,
+                   //border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.amber)),
+                   border: InputBorder.none
+                 ),
                 onSaved: (value) => HomePage.user.firstname = value,
               ),
             ),
@@ -211,6 +222,11 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 textAlign: TextAlign.right,
                 decoration: InputDecoration(
                   labelText: "ایمیل",
+                    filled: true,
+                    //isCollapsed: true,
+                    fillColor: Colors.amber,
+                //  isCollapsed: true,
+                    border: InputBorder.none
                 ),
                 validator: (value) => _validateEmail(value),
                 onSaved: (value) => HomePage.user.email = value,
@@ -222,8 +238,12 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 controller: _textFormBirthdayController,
                 keyboardType: TextInputType.datetime,
                 textAlign: TextAlign.right,
+                // style: TextStyle(
+                //   fontSize: 20,
+                // ),
                 decoration: InputDecoration(
                   labelText: "تاریخ تولد",
+                  border: OutlineInputBorder(),
                 ),
                 onSaved: (value) => HomePage.user.birthday = value,
               ),

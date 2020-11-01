@@ -1,3 +1,6 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
 class Person
 {
   String _firstname;
@@ -47,5 +50,34 @@ class Person
     _password = value;
   }
   Person();
+  void becomeNullPerson()
+  {
+    this.firstname = null;
+    this.lastname = null;
+    this.avatarUrl = null;
+    this.email = null;
+    this.username = null;
+    this.password = null;
+  }
+  void PersonLoggedout() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token');
+    if (token == null) return;
+    token = "Bearer " + token;
+    final response = await http.post('https://parham-backend.herokuapp.com/user/logout',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+    );
+    if (response.statusCode == 200){
+      print("OK");
+      prefs.setString("token", null);
+      becomeNullPerson();
+    }
+
+  }
 //PerosnProfile({this.name = null, this.username = null, this.password = null, this.email = null});
 }
