@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/pages/homePage.dart';
@@ -176,102 +175,122 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             ),
             Directionality(
               textDirection: TextDirection.rtl,
-              child: TextFormField(
-                controller: _textFormFirstNameController,
-                keyboardType: TextInputType.name,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  locale: Locale('fa'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                child: TextFormField(
+                  controller: _textFormFirstNameController,
+                  keyboardType: TextInputType.name,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    locale: Locale('fa'),
+                  ),
+                   decoration: InputDecoration(
+                     labelText: "نام",
+                     isCollapsed: true,
+                     contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+                     border: OutlineInputBorder(),
+                   ),
+                  onSaved: (value) => HomePage.user.firstname = value,
                 ),
-                textAlignVertical: TextAlignVertical.center,
-                //toolbarOptions: ToolbarOptions(copy: true,cut: true,paste: true,selectAll: true),
-                 decoration: InputDecoration(
-                  // filled: true,
-                   isCollapsed: true,
-                  // fillColor: Colors.amber,
-                   hintText: "نام",
-                    prefixIcon: Icon(FontAwesomeIcons.userGraduate),
-                    // labelText: "نام",
-                    // alignLabelWithHint: true,
-                   //border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.amber)),
-                   border: InputBorder.none
-                 ),
-                onSaved: (value) => HomePage.user.firstname = value,
               ),
             ),
             Directionality(
               textDirection: TextDirection.rtl,
-              child: TextFormField(
-                controller: _textFormLastNameController,
-                keyboardType: TextInputType.name,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  locale: Locale('fa'),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                child: TextFormField(
+                  controller: _textFormLastNameController,
+                  keyboardType: TextInputType.name,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    locale: Locale('fa'),
+                  ),
+                  decoration: InputDecoration(
+                    labelText: "نام خانوادگی",
+                    isCollapsed: true,
+                    contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+                    border: OutlineInputBorder(),
+                  ),
+                  onSaved: (value) => HomePage.user.lastname = value,
                 ),
-                decoration: InputDecoration(
-                  labelText: "نام خانوادگی",
-                ),
-                onSaved: (value) => HomePage.user.lastname = value,
               ),
             ),
             Directionality(
               textDirection: TextDirection.rtl,
-              child: TextFormField(
-                controller: _textFormEmailController,
-                keyboardType: TextInputType.emailAddress,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  labelText: "ایمیل",
-                    filled: true,
-                    //isCollapsed: true,
-                    fillColor: Colors.amber,
-                //  isCollapsed: true,
-                    border: InputBorder.none
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                child: TextFormField(
+                  controller: _textFormBirthdayController,
+                  keyboardType: TextInputType.datetime,
+                  textAlign: TextAlign.right,
+                  decoration: InputDecoration(
+                    labelText: "تاریخ تولد",
+                    isCollapsed: true,
+                    contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+                    border: OutlineInputBorder(),
+                  ),
+                  onSaved: (value) => HomePage.user.birthday = value,
                 ),
-                validator: (value) => _validateEmail(value),
-                onSaved: (value) => HomePage.user.email = value,
+              ),
+            ),
+            Divider(height: 10.0,),
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                child: TextFormField(
+                  controller: _textFormEmailController,
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.right,
+                  decoration: InputDecoration(
+                    labelText: "ایمیل",
+                    isCollapsed: true,
+                    contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => _validateEmail(value),
+                  onSaved: (value) => HomePage.user.email = value,
+                ),
+              ),
+            ),
+
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                child: TextFormField(
+                  controller: _textFormUsernameController,
+                  keyboardType: TextInputType.text,
+                  //scrollPadding:
+                  decoration: InputDecoration(
+                    isCollapsed: true,
+                    contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+                    labelText: "نام کاربری",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => _validateUsername(value),
+                  onSaved: (value) => HomePage.user.username = value,
+                ),
               ),
             ),
             Directionality(
               textDirection: TextDirection.rtl,
-              child: TextFormField(
-                controller: _textFormBirthdayController,
-                keyboardType: TextInputType.datetime,
-                textAlign: TextAlign.right,
-                // style: TextStyle(
-                //   fontSize: 20,
-                // ),
-                decoration: InputDecoration(
-                  labelText: "تاریخ تولد",
-                  border: OutlineInputBorder(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                child: TextFormField(
+                  controller: _textFormPasswordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
+                  textAlign: TextAlign.right,
+                  decoration: InputDecoration(
+                    labelText: "رمز ورود",
+                    isCollapsed: true,
+                    contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => _validatePassword(value),
+                  onSaved: (value) => HomePage.user.password = value,
                 ),
-                onSaved: (value) => HomePage.user.birthday = value,
-              ),
-            ),
-            Directionality(
-              textDirection: TextDirection.rtl,
-              child: TextFormField(
-                controller: _textFormUsernameController,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  labelText: "نام کاربری",
-                ),
-                validator: (value) => _validateUsername(value),
-                onSaved: (value) => HomePage.user.username = value,
-              ),
-            ),
-            Directionality(
-              textDirection: TextDirection.rtl,
-              child: TextFormField(
-                controller: _textFormPasswordController,
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: true,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  labelText: "رمز ورود",
-                ),
-                validator: (value) => _validatePassword(value),
-                onSaved: (value) => HomePage.user.password = value,
               ),
             ),
 
