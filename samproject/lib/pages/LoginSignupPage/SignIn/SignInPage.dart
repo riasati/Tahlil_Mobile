@@ -5,8 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -16,7 +18,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   String _signInURL = "http://parham-backend.herokuapp.com/user/login";
 
-  // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final RoundedLoadingButtonController btnController = new RoundedLoadingButtonController();
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
   final TextEditingController loginUsernameController = TextEditingController();
@@ -136,38 +138,24 @@ class _SignInPageState extends State<SignInPage> {
               Container(
                   width: MediaQuery.of(context).size.width * 0.5,
                   margin: EdgeInsets.only(top: 200.0 / responsiveDivision),
-                  decoration: new BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    // boxShadow: <BoxShadow>[
-                    //   BoxShadow(
-                    //     // color: Theme.Colors.loginGradientStart,
-                    //     color: Colors.limeAccent,
-                    //     offset: Offset(1.0, 6.0),
-                    //     blurRadius: 20.0,
-                    //   ),
-                    //   BoxShadow(
-                    //     // color: Theme.Colors.loginGradientEnd,
-                    //     color: Colors.blue,
-                    //     offset: Offset(1.0, 6.0),
-                    //     blurRadius: 20.0,
-                    //   ),
-                    // ],
-                    gradient: new LinearGradient(
-                        colors: [
-                          // Theme.Colors.loginGradientEnd,
-                          // Theme.Colors.loginGradientStart
-                          Colors.orange[900],
-                          Colors.orange[900],
-                        ],
-                        begin: const FractionalOffset(0.2, 0.2),
-                        end: const FractionalOffset(1.0, 1.0),
-                        stops: [0.0, 1.0],
-                        tileMode: TileMode.clamp),
-                  ),
-                  child: MaterialButton(
-                    // highlightColor: Colors.transparent,
-                    // splashColor: Theme.Colors.loginGradientEnd,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  // decoration: new BoxDecoration(
+                  //   borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  //   gradient: new LinearGradient(
+                  //       colors: [
+                  //         // Theme.Colors.loginGradientEnd,
+                  //         // Theme.Colors.loginGradientStart
+                  //         Colors.orange[900],
+                  //         Colors.orange[900],
+                  //       ],
+                  //       begin: const FractionalOffset(0.2, 0.2),
+                  //       end: const FractionalOffset(1.0, 1.0),
+                  //       stops: [0.0, 1.0],
+                  //       tileMode: TileMode.clamp),
+                  // ),
+                  child: RoundedLoadingButton(
+                    // curve: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                    color: Colors.orange[900],
+                    controller: btnController,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 42.0),
@@ -209,7 +197,6 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   void _pressLogin() async{
-    // _showInSnackBar("منتظر باشید");
     var body = jsonEncode(<String,String>{
       'username' : loginUsernameController.text,
       'password':loginPasswordController.text,
@@ -219,6 +206,7 @@ class _SignInPageState extends State<SignInPage> {
         body: body);
     if(response == null || response.statusCode != 200){
         setState(() {
+          btnController.stop();
           Alert(
             context: context,
             type: AlertType.error,
@@ -238,6 +226,7 @@ class _SignInPageState extends State<SignInPage> {
         });
       }
     else{
+      btnController.success();
       final personInfo = jsonDecode(response.body);
       print(personInfo.toString());
       HomePage.user = Person();
@@ -250,7 +239,6 @@ class _SignInPageState extends State<SignInPage> {
       _saveToken(personInfo['token']);
       Navigator.pop(context);
     }
-
   }
 
   void _saveToken(String token) async{
@@ -258,21 +246,4 @@ class _SignInPageState extends State<SignInPage> {
     prefs.setString("token", token);
   }
 
-
-  // void _showInSnackBar(String value) {
-  //   FocusScope.of(context).requestFocus(new FocusNode());
-  //   _scaffoldKey.currentState?.removeCurrentSnackBar();
-  //   _scaffoldKey.currentState.showSnackBar(new SnackBar(
-  //     content: new Text(
-  //       value,
-  //       textAlign: TextAlign.center,
-  //       style: TextStyle(
-  //           color: Colors.white,
-  //           fontSize: 16.0,
-  //           fontFamily: "WorkSansSemiBold"),
-  //     ),
-  //     backgroundColor: Colors.blue,
-  //     duration: Duration(seconds: 3),
-  //   ));
-  // }
 }

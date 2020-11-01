@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +17,8 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   String _signUpURL = "http://parham-backend.herokuapp.com/user/signup";
+
+  final RoundedLoadingButtonController btnController = new RoundedLoadingButtonController();
 
   final FocusNode myFocusNodePasswordSignup = FocusNode();
   final FocusNode myFocusNodeEmailSignup = FocusNode();
@@ -280,38 +284,40 @@ class _SignUpPageState extends State<SignUpPage> {
               Container(
                 margin: EdgeInsets.only(top: 450.0 / responsiveDivision),
                 width: MediaQuery.of(context).size.width * 0.5,
-                decoration: new BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  // boxShadow: <BoxShadow>[
-                  //   BoxShadow(
-                  //     color:Colors.red,
-                  //     // color: Theme.Colors.loginGradientStart,
-                  //     offset: Offset(1.0, 6.0),
-                  //     blurRadius: 20.0,
-                  //   ),
-                  //   BoxShadow(
-                  //     color:Colors.blue,
-                  //     // color: Theme.Colors.loginGradientEnd,
-                  //     offset: Offset(1.0, 6.0),
-                  //     blurRadius: 20.0,
-                  //   ),
-                  // ],
-                  gradient: new LinearGradient(
-                      colors: [
-                        // Theme.Colors.loginGradientEnd,
-                        // Theme.Colors.loginGradientStart
-                        Colors.orange[900],
-                        Colors.orange[900],
-                      ],
-                      begin: const FractionalOffset(0.2, 0.2),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
-                ),
-                child: MaterialButton(
-                  highlightColor: Colors.transparent,
-                  // splashColor: Theme.Colors.loginGradientEnd,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                // decoration: new BoxDecoration(
+                //   borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                //   // boxShadow: <BoxShadow>[
+                //   //   BoxShadow(
+                //   //     color:Colors.red,
+                //   //     // color: Theme.Colors.loginGradientStart,
+                //   //     offset: Offset(1.0, 6.0),
+                //   //     blurRadius: 20.0,
+                //   //   ),
+                //   //   BoxShadow(
+                //   //     color:Colors.blue,
+                //   //     // color: Theme.Colors.loginGradientEnd,
+                //   //     offset: Offset(1.0, 6.0),
+                //   //     blurRadius: 20.0,
+                //   //   ),
+                //   // ],
+                //   gradient: new LinearGradient(
+                //       colors: [
+                //         // Theme.Colors.loginGradientEnd,
+                //         // Theme.Colors.loginGradientStart
+                //         Colors.orange[900],
+                //         Colors.orange[900],
+                //       ],
+                //       begin: const FractionalOffset(0.2, 0.2),
+                //       end: const FractionalOffset(1.0, 1.0),
+                //       stops: [0.0, 1.0],
+                //       tileMode: TileMode.clamp),
+                // ),
+                child: RoundedLoadingButton(
+                  // highlightColor: Colors.transparent,
+                  // // splashColor: Theme.Colors.loginGradientEnd,
+                  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                  color: Colors.orange[900],
+                  controller: btnController,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 42.0),
@@ -403,6 +409,7 @@ class _SignUpPageState extends State<SignUpPage> {
     if(!_checkUsername(signupUsernameController.text) || !_checkEmail(signupEmailController.text)
     || !_checkPassword(signupPasswordController.text) || !_checkConfirmPassword(signupConfirmPasswordController.text)){
       setState(() {
+        btnController.stop();
         Alert(
           context: context,
           type: AlertType.error,
@@ -431,6 +438,7 @@ class _SignUpPageState extends State<SignUpPage> {
           body: body);
       if(response.statusCode != 201){
         setState(() {
+          btnController.stop();
           Alert(
             context: context,
             type: AlertType.error,
@@ -449,6 +457,7 @@ class _SignUpPageState extends State<SignUpPage> {
         });
       }
       else{
+          btnController.success();
           final personInfo = jsonDecode(response.body);
           HomePage.user = Person();
           HomePage.user.firstname = "****";
