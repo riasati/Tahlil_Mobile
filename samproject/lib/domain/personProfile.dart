@@ -73,7 +73,6 @@ class Person
         },
     );
     if (response.statusCode == 200){
-      print("OK");
       prefs.setString("token", null);
       becomeNullPerson();
     }

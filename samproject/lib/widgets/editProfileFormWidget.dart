@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 
 class EditProfileFormWidget extends StatefulWidget {
@@ -23,6 +24,8 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   TextEditingController _textFormEmailController = new TextEditingController();
   TextEditingController _textFormPasswordController = new TextEditingController();
   TextEditingController _textFormBirthdayController = new TextEditingController();
+
+  final RoundedLoadingButtonController _btnController = new RoundedLoadingButtonController();
 
   void sendData(File profileImage) async
   {
@@ -66,9 +69,11 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
       final responseJson = jsonDecode(response.body);
       HomePage.user.avatarUrl = responseJson['user']['avatar'];
       _showMyDialog(true);
+      _btnController.stop();
     }
     else{
       _showMyDialog(false);
+      _btnController.stop();
     }
   }
 
@@ -297,11 +302,19 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
             Divider(height: 32.0,),
                 FractionallySizedBox(
                   widthFactor: 1,
-                  child: RaisedButton(
+                  child: RoundedLoadingButton(
+                    child: Text('تغییرات',style: TextStyle(color: Colors.white),),
+                    borderRadius: 0,
+                    controller: _btnController,
+                    color: Color(0xFF3D5A80),
+                    onPressed: () => _submitUser(),
+                  )
+                  /*RaisedButton(
+
                     child:Text('تغییرات',style: TextStyle(color: Colors.white),),
                     color: Color(0xFF3D5A80),
                     onPressed: () => _submitUser(),
-                  ),
+                  ),*/
                 ),
           ],
         ),
