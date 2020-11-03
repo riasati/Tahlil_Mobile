@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddQuestionPage extends StatefulWidget {
   @override
@@ -8,12 +10,41 @@ class AddQuestionPage extends StatefulWidget {
 class _AddQuestionPageState extends State<AddQuestionPage> {
   TextEditingController QuestionTextController = new TextEditingController();
   FocusNode _focusNodeQuestionText = FocusNode();
+
+  // bool hasfocus = true;
+  // void _focusChange(bool isChange)
+  // {
+  //   print(isChange);
+  //   if(isChange)
+  //   {
+  //     setState(() {
+  //       hasfocus = true;
+  //     });
+  //   }
+  //   else
+  //     {
+  //       setState(() {
+  //         hasfocus = false;
+  //       });
+  //     }
+  //
+  // }
+
    bool showQuestionTextForm = true;
   void _showQuestionTextForm()
   {
       setState(() {
         showQuestionTextForm = true;
       });
+  }
+  void _deleteImage(bool ImageOne)
+  {
+    setState(() {
+      if (ImageOne)
+      _ImageOne = null;
+      else
+        _ImageTwo = null;
+    });
   }
   @override
   void initState() {
@@ -40,6 +71,26 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
   void dispose() {
     _focusNodeQuestionText.dispose();
     super.dispose();
+  }
+  File _ImageOne;
+  File _ImageTwo;
+
+  final picker = ImagePicker();
+
+  void getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null ) {
+        if (_ImageOne == null)
+        {
+          _ImageOne = File(pickedFile.path);
+        }
+        else
+          {
+            _ImageTwo = File(pickedFile.path);
+          }
+      }
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -79,7 +130,12 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Text("متن سوال"),
+                      child: Column(
+                        children: [
+                          Text("متن سوال"),
+                          IconButton(icon: Icon(Icons.camera),onPressed: getImage,tooltip: "می توان فقط عکس هم فرستاد",)
+                        ],
+                      ),
                     ),
                     Container(
                       width: 5,
@@ -96,8 +152,8 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                           )
-                      ) //TopicTextFormField(true)
-                          : GestureDetector(
+                      )
+                          : InkWell(
                         onTap: () => _showQuestionTextForm() ,
                             child: Container(
                         //      decoration: BoxShape.rectangle(),
@@ -105,11 +161,24 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                       ),
                           ) ,
                     ),
-                    //Rect.largest,
-                    //BoxShape.rectangle()
                   ],
                 ),
                 TextFormField(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    (_ImageOne != null) ? Container(child: InkWell(onTap:() => _deleteImage(true),child: Image.file(_ImageOne,fit: BoxFit.cover)),height: 200,alignment: Alignment.centerLeft,padding: EdgeInsets.all(8.0),)
+                        : Container(),
+                    (_ImageTwo != null) ? Container(child: InkWell(onTap:() => _deleteImage(false),child: Image.file(_ImageTwo,fit: BoxFit.cover)),alignment: Alignment.centerRight,height: 200,padding: EdgeInsets.all(8.0),)
+                    //,fit: BoxFit.cover,alignment: Alignment.center,width: 200,)
+                        : Container(),
+                  ],
+                ),
+                // InkWell(
+                //   child: (hasfocus) ? TextFormField(controller: QuestionTextController,decoration: InputDecoration(border: OutlineInputBorder()),):  TextFormField(controller: QuestionTextController,readOnly: true,decoration: InputDecoration(border: InputBorder.none),),
+                //   onFocusChange: (value) => _focusChange(value),
+                // )
+
               ],
             ),
           ),
