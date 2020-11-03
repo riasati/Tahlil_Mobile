@@ -316,7 +316,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   // highlightColor: Colors.transparent,
                   // // splashColor: Theme.Colors.loginGradientEnd,
                   // shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                  color: Colors.orange[900],
+                  color: Color(0xFF3D5A80),
                   controller: btnController,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

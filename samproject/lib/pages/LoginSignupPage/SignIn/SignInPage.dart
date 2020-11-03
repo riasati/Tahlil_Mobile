@@ -154,7 +154,7 @@ class _SignInPageState extends State<SignInPage> {
                   // ),
                   child: RoundedLoadingButton(
                     // curve: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    color: Colors.orange[900],
+                    color: Color(0xFF3D5A80),
                     controller: btnController,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

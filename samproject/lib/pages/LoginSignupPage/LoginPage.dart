@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
                   colors: [
                     // Theme.Colors.loginGradientStart,
                     // Theme.Colors.loginGradientEnd
-                    Color(0xFF3D5A80),
+                    Colors.white,
                     Colors.blue
                   ],
                   begin: const FractionalOffset(0.0, 0.0),
