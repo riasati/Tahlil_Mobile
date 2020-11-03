@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/pages/addQuestionPage.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,7 +10,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Starter Template',
-      home: HomePage(),
+      home: AddQuestionPage(),
     );
   }
 }
