@@ -9,6 +9,8 @@ import 'package:samproject/pages/ClassesListPage/LoginPersonPage/LoginOrSignup.d
 import 'package:samproject/widgets/drawerWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ClassesListPage/ShowClassesListPage/ShowClassesListPage.dart';
+
 class HomePage extends StatefulWidget {
   static Person user = Person();
   static final PageController homePageController = PageController(
@@ -105,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      child: LoginOrSignup(),
+                      child: ClassesList(),
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
