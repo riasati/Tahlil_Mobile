@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:samproject/Layout/BottomNavigator.dart';
 import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/pages/ClassesListPage/LoginPersonPage/LoginOrSignup.dart';
 import 'package:samproject/widgets/drawerWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -104,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),
-                      //child: Container(color: Colors.green,),
+                      child: LoginOrSignup(),
                     ),
                     new ConstrainedBox(
                       constraints: const BoxConstraints.expand(),

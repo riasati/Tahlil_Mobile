@@ -5,7 +5,7 @@ import 'SignIn/SignInPage.dart';
 import 'SignUp/SignUpPage.dart';
 
 class LoginPage extends StatefulWidget {
-  static final PageController pageController = PageController(
+  static PageController pageController = PageController(
     initialPage: 0,
   );
   static Color left = Colors.white;
