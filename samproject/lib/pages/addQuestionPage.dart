@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class AddQuestionPage extends StatefulWidget {
   @override
@@ -10,6 +11,169 @@ class AddQuestionPage extends StatefulWidget {
 class _AddQuestionPageState extends State<AddQuestionPage> {
   TextEditingController QuestionTextController = new TextEditingController();
   TextEditingController TashrihiTextController = new TextEditingController();
+  TextEditingController BlankTextController = new TextEditingController();
+  TextEditingController TestText1Controller = new TextEditingController();
+  TextEditingController TestText2Controller = new TextEditingController();
+  TextEditingController TestText3Controller = new TextEditingController();
+  TextEditingController TestText4Controller = new TextEditingController();
+  TextEditingController MultiOptionText1Controller = new TextEditingController();
+  TextEditingController MultiOptionText2Controller = new TextEditingController();
+  TextEditingController MultiOptionText3Controller = new TextEditingController();
+  TextEditingController MultiOptionText4Controller = new TextEditingController();
+
+  bool focusOnMultiOption4 = true;
+  void _focusChangeOnMultiOption4(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnMultiOption4 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnMultiOption4 = false;
+      });
+    }
+  }
+
+  bool focusOnMultiOption3 = true;
+  void _focusChangeOnMultiOption3(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnMultiOption3 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnMultiOption3 = false;
+      });
+    }
+  }
+
+  bool focusOnMultiOption2 = true;
+  void _focusChangeOnMultiOption2(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnMultiOption2 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnMultiOption2 = false;
+      });
+    }
+  }
+
+  bool focusOnMultiOption1 = true;
+  void _focusChangeOnMultiOption1(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnMultiOption1 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnMultiOption1 = false;
+      });
+    }
+  }
+
+  bool focusOnTest4 = true;
+  void _focusChangeOnTest4(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnTest4 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnTest4 = false;
+      });
+    }
+  }
+
+  bool focusOnTest3 = true;
+  void _focusChangeOnTest3(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnTest3 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnTest3 = false;
+      });
+    }
+  }
+
+
+  bool focusOnTest2 = true;
+  void _focusChangeOnTest2(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnTest2 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnTest2 = false;
+      });
+    }
+  }
+
+  bool focusOnTest1 = true;
+  void _focusChangeOnTest1(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnTest1 = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnTest1 = false;
+      });
+    }
+  }
+
+  bool focusOnBlank = true;
+  void _focusChangeOnBlank(bool isChange)
+  {
+    if(isChange)
+    {
+      setState(() {
+        focusOnBlank = true;
+      });
+    }
+    else
+    {
+      setState(() {
+        focusOnBlank = false;
+      });
+    }
+  }
 
   bool focusOnTashrihi = true;
   void _focusChangeOnTashrihi(bool isChange)
@@ -73,6 +237,279 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
              ),
              onFocusChange: (value) => _focusChangeOnTashrihi(value),
            )
+        ),
+      ],
+    );
+  }
+  Widget blankWidget()
+  {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        Text("پاسخ سوال",textDirection: TextDirection.rtl,),
+        Container(
+          padding: EdgeInsets.all(8.0),
+          width: 120,
+          child: InkWell(
+            child: (focusOnBlank) ?  TextFormField(
+              textDirection: TextDirection.rtl,
+              controller: BlankTextController,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(border: OutlineInputBorder()),
+            )
+              :TextFormField(
+               textDirection: TextDirection.rtl,
+               controller: BlankTextController,
+               keyboardType: TextInputType.text,
+               readOnly: true,
+               decoration: InputDecoration(border: InputBorder.none),
+                ),
+            onFocusChange: (value) => _focusChangeOnBlank(value),
+          )
+        ),
+      ],
+    );
+  }
+  int _radioGroupValue = 0;
+  void _radioOnChanged(int index) {
+    setState(() {
+      _radioGroupValue = index;
+    });
+  }
+  Widget testWidget()
+  {
+    return Column(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Radio(value: 1, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+            Expanded(
+              child: InkWell(
+                child: (focusOnTest1) ? TextFormField(
+                  textDirection: TextDirection.rtl,
+                  controller: TestText1Controller,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                )
+                    :TextFormField(
+                  textDirection: TextDirection.rtl,
+                  controller: TestText1Controller,
+                  keyboardType: TextInputType.text,
+                  readOnly: true,
+                  decoration: InputDecoration(border: InputBorder.none),
+                ),
+                onFocusChange: (value) => _focusChangeOnTest1(value),
+              )
+            )
+          ],
+        ),
+       // Divider(),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Radio(value: 2, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnTest2) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: TestText2Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: TestText2Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnTest2(value),
+                )
+            )
+          ],
+        ),
+      //  Divider(),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Radio(value: 3, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnTest3) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: TestText3Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: TestText3Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnTest3(value),
+                )
+            )
+          ],
+        ),
+      //  Divider(),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Radio(value: 4, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnTest4) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: TestText4Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: TestText4Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnTest4(value),
+                )
+            )
+          ],
+        ),
+      ],
+    );
+  }
+  bool optionOne = false;
+  void optionOneChange(bool newValue) {
+    setState(() {
+      optionOne = newValue;
+    });
+  }
+  bool optionTwo = false;
+  void optionTwoChange(bool newValue) {
+    setState(() {
+      optionTwo = newValue;
+    });
+  }
+  bool optionThree = false;
+  void optionThreeChange(bool newValue) {
+    setState(() {
+      optionThree = newValue;
+    });
+  }
+  bool optionFour = false;
+  void optionFourChange(bool newValue) {
+    setState(() {
+      optionFour = newValue;
+    });
+  }
+
+  Widget multiOption()
+  {
+    return Column(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: optionOne, onChanged: optionOneChange),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnMultiOption1) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText1Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText1Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnMultiOption1(value),
+                )
+            )
+          ],
+        ),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: optionTwo, onChanged: optionTwoChange),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnMultiOption2) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText2Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText2Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnMultiOption2(value),
+                )
+            )
+          ],
+        ),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: optionThree, onChanged: optionThreeChange),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnMultiOption3) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText3Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText3Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnMultiOption3(value),
+                )
+            )
+          ],
+        ),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: optionFour, onChanged: optionFourChange),
+            Expanded(
+                child: InkWell(
+                  child: (focusOnMultiOption4) ? TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText4Controller,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+                      :TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: MultiOptionText4Controller,
+                    keyboardType: TextInputType.text,
+                    readOnly: true,
+                    decoration: InputDecoration(border: InputBorder.none),
+                  ),
+                  onFocusChange: (value) => _focusChangeOnMultiOption4(value),
+                )
+            )
+          ],
         ),
       ],
     );
@@ -529,11 +966,31 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                     ),
                   ],
                 ),
-                if (whichKind == 1) Container()
-                else if (whichKind == 2) Container()
-                else if (whichKind == 3) Container()
+                if (whichKind == 1) testWidget()
+                else if (whichKind == 2) blankWidget()
+                else if (whichKind == 3) multiOption()
                 else if (whichKind == 4) tashrihiWidget(),
 
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RoundedLoadingButton(
+                    child: Text('در بانک سوال هم ذخیره شود',style: TextStyle(color: Colors.white),),
+                    //  borderRadius: 0,
+                      //controller: _btnController,
+                      color: Color(0xFF3D5A80),
+                      onPressed: () => null,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RoundedLoadingButton(
+                    child: Text('فقط به سوالات من اضافه شود',style: TextStyle(color: Colors.white),),
+                    //  borderRadius: 0,
+                    //controller: _btnController,
+                    color: Color(0xFF3D5A80),
+                    onPressed: () => null,
+                  ),
+                )
               ],
             ),
           ),
