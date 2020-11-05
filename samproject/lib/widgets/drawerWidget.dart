@@ -3,11 +3,18 @@ import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/widgets/drawerListTile.dart';
 
 class DrawerWidget extends StatefulWidget {
+  final callHomePageBiuld;
+
+  DrawerWidget( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
   @override
-  _DrawerWidgetState createState() => _DrawerWidgetState();
+  _DrawerWidgetState createState() => _DrawerWidgetState(toggleCoinCallback: callHomePageBiuld);
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  final callHomePageBiuld;
+  _DrawerWidgetState( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -43,7 +50,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               // ),
             ),
           ),
-          DrawerListTile(),
+          DrawerListTile(toggleCoinCallback: callHomePageBiuld,),
         ],
       ),
     );

@@ -11,6 +11,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class SignInPage extends StatefulWidget {
+  final callHomePageBiuld;
+
+  SignInPage( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
   @override
   _SignInPageState createState() => _SignInPageState();
 }
@@ -239,6 +243,7 @@ class _SignInPageState extends State<SignInPage> {
       _saveToken(personInfo['token']);
       Navigator.pop(context);
     }
+    widget?.callHomePageBiuld();
   }
 
   void _saveToken(String token) async{

@@ -14,8 +14,8 @@ class _PersonInfoState extends State<PersonInfo> {
       child: Column(
         children: [
           Container(
-            width: 150,
-            height: 150,
+            width: 100,
+            height: 100,
             child: CircleAvatar(
               radius: 30.0,
               backgroundImage:(HomePage.user.avatarUrl != null)?
@@ -25,7 +25,10 @@ class _PersonInfoState extends State<PersonInfo> {
             ),
           ),
           Text(
-            "pldnvqj"
+            HomePage.user.username,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           )
         ],
       ),

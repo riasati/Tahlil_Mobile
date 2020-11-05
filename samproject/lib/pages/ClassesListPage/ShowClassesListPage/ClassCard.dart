@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -14,6 +15,7 @@ class _ClassCardState extends State<ClassCard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(30))
       ),
+      //color: Colors.black45,
       child: FlatButton(
         onPressed: (){},
         child: Center(
@@ -21,13 +23,16 @@ class _ClassCardState extends State<ClassCard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                child: Icon(FontAwesomeIcons.school,size: 50,color:Color(0xFF3D5A80)),
+                child: Icon(FontAwesomeIcons.atom,size: 50,color:Color(0xFF3D5A80)),
               ),
               Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Text(
                   "اسم کلاس",
-
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],

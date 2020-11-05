@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class DrawerListTile extends StatefulWidget {
-  @override
-  _DrawerListTileState createState() => _DrawerListTileState();
+  final callHomePageBiuld;
+
+  DrawerListTile( {@required void toggleCoinCallback() }):
+    callHomePageBiuld = toggleCoinCallback;
+    @override
+    _DrawerListTileState createState() => _DrawerListTileState(toggleCoinCallback: callHomePageBiuld);
 }
 class _DrawerListTileState extends State<DrawerListTile> {
+  final callHomePageBiuld;
+  _DrawerListTileState( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   String token;
-  void getToken() async
-  {
+  void getToken() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       this.token = prefs.getString("token");
@@ -24,6 +32,7 @@ class _DrawerListTileState extends State<DrawerListTile> {
   }
   @override
   Widget build(BuildContext context) {
+    print(callHomePageBiuld);
     return Column(
       children: <Widget>[
         (this.token == null) ? ListTile(
@@ -38,11 +47,12 @@ class _DrawerListTileState extends State<DrawerListTile> {
             ],
           ),
           onTap: () {
+            Widget loginPage = LoginPage(toggleCoinCallback: callBuild);
             Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => LoginPage(),
+                builder: (context) => loginPage,
               ),
             );
           },
@@ -119,11 +129,35 @@ class _DrawerListTileState extends State<DrawerListTile> {
             ],
           ),
           onTap: () {
-            HomePage.user.PersonLoggedout();
+            PersonLoggedout();
             Navigator.pop(context);
           },
         ): Container(),
       ],
     );
+  }
+
+  void PersonLoggedout() async {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token');
+    if (token == null) return;
+    token = "Bearer " + token;
+    final response = await post('https://parham-backend.herokuapp.com/user/logout',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200){
+      prefs.setString("token", null);
+      HomePage.user.becomeNullPerson();
+    }
+    widget?.callHomePageBiuld();
+
+  }
+
+  callBuild(){
+    widget?.callHomePageBiuld();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/pages/ClassesListPage/ShowClassesListPage/TopOfPage.dart';
 
+import 'BottomOfPage.dart';
 import 'MiddleOfPage.dart';
 
 class ClassesList extends StatefulWidget {
@@ -13,19 +14,25 @@ class _ClassesListState extends State<ClassesList> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 15.0 ),
-            child: PersonInfo()
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.only(top: 15.0 ),
+              child: PersonInfo()
+            ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 50.0),
+          Expanded(
+            flex: 1,
             child: CreateOrJoinClass(),
           ),
-          Container(color: Colors.white,),
+          Expanded(
+            flex: 4,
+            child: ListOfClasses(),
+          ),
         ],
       ),
+      // color: Colors.black45,
     );
   }
 }

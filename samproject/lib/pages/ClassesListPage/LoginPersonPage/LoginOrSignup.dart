@@ -4,17 +4,27 @@ import 'package:samproject/pages/ClassesListPage/Buttons/LoginButton.dart';
 import 'package:samproject/pages/ClassesListPage/Buttons/SignupButton.dart';
 
 class LoginOrSignup extends StatefulWidget {
+  final callHomePageBiuld;
+
+  LoginOrSignup( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   @override
-  _LoginOrSignupState createState() => _LoginOrSignupState();
+  _LoginOrSignupState createState() => _LoginOrSignupState(toggleCoinCallback: callHomePageBiuld);
 }
 
 class _LoginOrSignupState extends State<LoginOrSignup> {
+  final callHomePageBiuld;
+
+  _LoginOrSignupState( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 100,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
             padding: EdgeInsets.only(top: 75.0 ),
@@ -25,9 +35,9 @@ class _LoginOrSignupState extends State<LoginOrSignup> {
                 image: new AssetImage('assets/img/login_logo.png')),
           ),
           SizedBox(height: 30,),
-          LoginButton(),
+          LoginButton(toggleCoinCallback: callHomePageBiuld,),
           SizedBox(height: 10,),
-          SignupButton(),
+          SignupButton(toggleCoinCallback: callHomePageBiuld,),
         ],
       ),
     );

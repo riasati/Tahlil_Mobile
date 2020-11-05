@@ -3,6 +3,11 @@ import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 
 class LoginButton extends StatelessWidget {
+  final callHomePageBiuld;
+
+  LoginButton( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   @override
   Widget build(BuildContext context) {
     Gradient _gradient =
@@ -31,7 +36,7 @@ class LoginButton extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LoginPage(),
+                      builder: (context) => LoginPage(toggleCoinCallback: callHomePageBiuld,),
                     ),
                   );
                 },

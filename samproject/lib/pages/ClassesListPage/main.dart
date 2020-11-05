@@ -6,7 +6,7 @@ import 'package:samproject/pages/ClassesListPage/ShowClassesListPage/TopOfPage.d
 import 'package:samproject/pages/homePage.dart';
 
 import 'ShowClassesListPage/BottomOfPage.dart';
-import 'ShowClassesListPage/ShowClassesListPage.dart';
+import 'ShowClassesListPage/ClassesList.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,11 +14,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Starter Template',
-      home: Scaffold(
-        body: Center(child: ListOfClasses()),
-      ),
+        debugShowCheckedModeBanner: false,
+        title: 'Starter Template',
+        home: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xFF3D5A80),
+          ),
+          body: ClassesList(
+          )
+        )
     );
   }
 }

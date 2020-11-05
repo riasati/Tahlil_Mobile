@@ -11,6 +11,10 @@ import 'package:samproject/pages/homePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpPage extends StatefulWidget {
+  final callHomePageBiuld;
+
+  SignUpPage( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
@@ -470,6 +474,7 @@ class _SignUpPageState extends State<SignUpPage> {
           Navigator.pop(context);
       }
     }
+    widget?.callHomePageBiuld();
   }
 
   void _saveToken(String token) async{

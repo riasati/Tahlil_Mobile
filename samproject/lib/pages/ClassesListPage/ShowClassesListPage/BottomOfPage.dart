@@ -11,6 +11,7 @@ class _ListOfClassesState extends State<ListOfClasses> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      //color: Colors.black45,
       child: Padding(
         padding: EdgeInsets.all(15),
         child: GridView.count(
