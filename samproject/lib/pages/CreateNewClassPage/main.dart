@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:samproject/pages/CreateNewClassPage/CreateClassForm.dart';
+import 'package:samproject/pages/CreateNewClassPage/CreateClassPage.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Color(0xFF3D5A80),
         ),
-        body: CreateClassForm(),
+        body: CreateClassPage(),
       ),
     );
   }

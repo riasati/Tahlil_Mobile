@@ -30,6 +30,7 @@ dependencies:
   image_picker: ^0.6.7+12
   loading_overlay: ^0.2.1
   rounded_loading_button: ^1.0.0
+  popup_menu: 1.0.5
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
