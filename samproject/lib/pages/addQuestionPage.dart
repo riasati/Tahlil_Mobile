@@ -2,13 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-
+import 'package:samproject/domain/question.dart';
 class AddQuestionPage extends StatefulWidget {
   @override
   _AddQuestionPageState createState() => _AddQuestionPageState();
 }
 
 class _AddQuestionPageState extends State<AddQuestionPage> {
+  Question newQuestion = new Question();
+
   TextEditingController QuestionTextController = new TextEditingController();
   TextEditingController TashrihiTextController = new TextEditingController();
   TextEditingController BlankTextController = new TextEditingController();
@@ -210,64 +212,84 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
   }
   Widget tashrihiWidget()
   {
-    return Row(
-      textDirection: TextDirection.rtl,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Text("پاسخ سوال",textDirection: TextDirection.rtl,),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
+          children: [
+            Row(
+              textDirection: TextDirection.rtl,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Column(
+                    children: [
+                      Text("پاسخ سوال",textDirection: TextDirection.rtl,),
+                      IconButton(icon: Icon(Icons.camera),onPressed: getImage2,tooltip: "می توان فقط عکس هم فرستاد",)
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                     child: (focusOnTashrihi) ? TextFormField(
+                       textDirection: TextDirection.rtl,
+                       controller: TashrihiTextController,
+                       keyboardType: TextInputType.multiline,
+                       maxLines: 3,
+                       decoration: InputDecoration(border: OutlineInputBorder()),
+                     )
+                        :TextFormField(
+                        textDirection: TextDirection.rtl,
+                        controller: TashrihiTextController,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: 3,
+                        readOnly: true,
+                        decoration: InputDecoration(border: InputBorder.none),
+                     ),
+                     onFocusChange: (value) => _focusChangeOnTashrihi(value),
+                   )
+                ),
+              ],
+            ),
+            (_ImageThree != null) ? Container(child: InkWell(onTap:() => _deleteImage2(),child: Image.file(_ImageThree,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(4.0),)
+                : Container(),
+          ],
         ),
-        Expanded(
-          flex: 5,
-          child: InkWell(
-             child: (focusOnTashrihi) ? TextFormField(
-               textDirection: TextDirection.rtl,
-               controller: TashrihiTextController,
-               keyboardType: TextInputType.multiline,
-               maxLines: 3,
-               decoration: InputDecoration(border: OutlineInputBorder()),
-             )
-                :TextFormField(
-                textDirection: TextDirection.rtl,
-                controller: TashrihiTextController,
-                keyboardType: TextInputType.multiline,
-                maxLines: 3,
-                readOnly: true,
-                decoration: InputDecoration(border: InputBorder.none),
-             ),
-             onFocusChange: (value) => _focusChangeOnTashrihi(value),
-           )
-        ),
-      ],
+      ),
     );
   }
   Widget blankWidget()
   {
-    return Row(
-      textDirection: TextDirection.rtl,
-      children: [
-        Text("پاسخ سوال",textDirection: TextDirection.rtl,),
-        Container(
-          padding: EdgeInsets.all(8.0),
-          width: 120,
-          child: InkWell(
-            child: (focusOnBlank) ?  TextFormField(
-              textDirection: TextDirection.rtl,
-              controller: BlankTextController,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(border: OutlineInputBorder()),
-            )
-              :TextFormField(
-               textDirection: TextDirection.rtl,
-               controller: BlankTextController,
-               keyboardType: TextInputType.text,
-               readOnly: true,
-               decoration: InputDecoration(border: InputBorder.none),
-                ),
-            onFocusChange: (value) => _focusChangeOnBlank(value),
-          )
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Text("پاسخ سوال",textDirection: TextDirection.rtl,),
+            Container(
+              padding: EdgeInsets.all(4.0),
+              width: 120,
+              child: InkWell(
+                child: (focusOnBlank) ?  TextFormField(
+                  textDirection: TextDirection.rtl,
+                  controller: BlankTextController,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                )
+                  :TextFormField(
+                   textDirection: TextDirection.rtl,
+                   controller: BlankTextController,
+                   keyboardType: TextInputType.text,
+                   readOnly: true,
+                   decoration: InputDecoration(border: InputBorder.none),
+                    ),
+                onFocusChange: (value) => _focusChangeOnBlank(value),
+              )
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
   int _radioGroupValue = 0;
@@ -278,110 +300,127 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
   }
   Widget testWidget()
   {
-    return Column(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Row(
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
           textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Radio(value: 1, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
-            Expanded(
-              child: InkWell(
-                child: (focusOnTest1) ? TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: TestText1Controller,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                )
-                    :TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: TestText1Controller,
-                  keyboardType: TextInputType.text,
-                  readOnly: true,
-                  decoration: InputDecoration(border: InputBorder.none),
-                ),
-                onFocusChange: (value) => _focusChangeOnTest1(value),
-              )
-            )
-          ],
-        ),
-       // Divider(),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Radio(value: 2, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnTest2) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText2Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Radio(value: 1, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+                  Expanded(
+                    child: InkWell(
+                      child: (focusOnTest1) ? TextFormField(
+                        textDirection: TextDirection.rtl,
+                        controller: TestText1Controller,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(border: OutlineInputBorder()),
+                      )
+                          :TextFormField(
+                        textDirection: TextDirection.rtl,
+                        controller: TestText1Controller,
+                        keyboardType: TextInputType.text,
+                        readOnly: true,
+                        decoration: InputDecoration(border: InputBorder.none),
+                      ),
+                      onFocusChange: (value) => _focusChangeOnTest1(value),
+                    )
                   )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText2Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnTest2(value),
-                )
-            )
-          ],
-        ),
-      //  Divider(),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Radio(value: 3, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnTest3) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText3Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
+                ],
+              ),
+            ),
+           // Divider(),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Radio(value: 2, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnTest2) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: TestText2Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: TestText2Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnTest2(value),
+                      )
                   )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText3Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnTest3(value),
-                )
-            )
-          ],
-        ),
-      //  Divider(),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Radio(value: 4, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnTest4) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText4Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
+                ],
+              ),
+            ),
+          //  Divider(),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Radio(value: 3, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnTest3) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: TestText3Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: TestText3Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnTest3(value),
+                      )
                   )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText4Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnTest4(value),
-                )
-            )
+                ],
+              ),
+            ),
+          //  Divider(),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Radio(value: 4, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index)),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnTest4) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: TestText4Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: TestText4Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnTest4(value),
+                      )
+                  )
+                ],
+              ),
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
   bool optionOne = false;
@@ -411,107 +450,124 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
 
   Widget multiOption()
   {
-    return Column(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Row(
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
           textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Checkbox(value: optionOne, onChanged: optionOneChange),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnMultiOption1) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText1Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Checkbox(value: optionOne, onChanged: optionOneChange),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnMultiOption1) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText1Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText1Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnMultiOption1(value),
+                      )
                   )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText1Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnMultiOption1(value),
-                )
-            )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Checkbox(value: optionTwo, onChanged: optionTwoChange),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnMultiOption2) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText2Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText2Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnMultiOption2(value),
+                      )
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Checkbox(value: optionThree, onChanged: optionThreeChange),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnMultiOption3) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText3Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText3Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnMultiOption3(value),
+                      )
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Checkbox(value: optionFour, onChanged: optionFourChange),
+                  Expanded(
+                      child: InkWell(
+                        child: (focusOnMultiOption4) ? TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText4Controller,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(border: OutlineInputBorder()),
+                        )
+                            :TextFormField(
+                          textDirection: TextDirection.rtl,
+                          controller: MultiOptionText4Controller,
+                          keyboardType: TextInputType.text,
+                          readOnly: true,
+                          decoration: InputDecoration(border: InputBorder.none),
+                        ),
+                        onFocusChange: (value) => _focusChangeOnMultiOption4(value),
+                      )
+                  )
+                ],
+              ),
+            ),
           ],
         ),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Checkbox(value: optionTwo, onChanged: optionTwoChange),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnMultiOption2) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText2Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText2Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnMultiOption2(value),
-                )
-            )
-          ],
-        ),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Checkbox(value: optionThree, onChanged: optionThreeChange),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnMultiOption3) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText3Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText3Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnMultiOption3(value),
-                )
-            )
-          ],
-        ),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Checkbox(value: optionFour, onChanged: optionFourChange),
-            Expanded(
-                child: InkWell(
-                  child: (focusOnMultiOption4) ? TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText4Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-                      :TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText4Controller,
-                    keyboardType: TextInputType.text,
-                    readOnly: true,
-                    decoration: InputDecoration(border: InputBorder.none),
-                  ),
-                  onFocusChange: (value) => _focusChangeOnMultiOption4(value),
-                )
-            )
-          ],
-        ),
-      ],
+      ),
     );
   }
   String difficulty;
@@ -533,20 +589,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       });
     }
   }
-  var difficultyList = [
-    PopupMenuItem(
-        value: 1,
-        child: Container(alignment: Alignment.centerRight,child: Text('آسان',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 2,
-        child: Container(alignment: Alignment.centerRight,child: Text('متوسط',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 3,
-        child: Container(alignment: Alignment.centerRight,child: Text('سخت',textDirection: TextDirection.rtl,))
-    ),
-  ];
+  List<PopupMenuItem<int>> difficultyList = [];
   int whichKind = 0;
   String kind;
   void onSelectedKindMenu(int value)
@@ -576,24 +619,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       });
     }
   }
-  var kindList = [
-    PopupMenuItem(
-        value: 1,
-        child: Container(alignment: Alignment.centerRight,child: Text('تستی',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 2,
-        child: Container(alignment: Alignment.centerRight,child: Text('جایخالی',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 3,
-        child: Container(alignment: Alignment.centerRight,child: Text('چندگزینه ای',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 4,
-        child: Container(alignment: Alignment.centerRight,child: Text('تشریحی',textDirection: TextDirection.rtl,))
-    ),
-  ];
+  List<PopupMenuItem<int>> kindList = [];
   String chapter;
   void onSelectedChapterMenu(int value)
   {
@@ -654,52 +680,8 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       });
     }
   }
-  var chapterList = [
-    PopupMenuItem(
-        value: 1,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل اول',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 2,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل دوم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 3,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل سوم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 4,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل چهارم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 5,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل پنجم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 6,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل ششم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 7,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل هفتم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 8,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل هشتم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 9,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل نهم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 10,
-        child: Container(alignment: Alignment.centerRight,child: Text('فصل دهم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 11,
-        child: Container(alignment: Alignment.centerRight,child: Text('هیچکدام',textDirection: TextDirection.rtl,))
-    ),
-  ];
+  List<PopupMenuItem<int>> chapterList = [];
+
   String book;
   void onSelectedBookMenu(int value)
   {
@@ -730,28 +712,8 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       });
     }
   }
-  var bookList = [
-    PopupMenuItem(
-        value: 1,
-        child: Container(alignment: Alignment.centerRight,child: Text('ریاضی',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 2,
-        child: Container(alignment: Alignment.centerRight,child: Text('فیزیک',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 3,
-        child: Container(alignment: Alignment.centerRight,child: Text('شیمی',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 4,
-        child: Container(alignment: Alignment.centerRight,child: Text('زیست',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 5,
-        child: Container(alignment: Alignment.centerRight,child: Text('هیچکدام',textDirection: TextDirection.rtl,))
-    ),
-  ];
+  List<PopupMenuItem<int>> bookList = [];
+
   String paye;
   void onSelectedPayeMenu(int value)
   {
@@ -777,25 +739,47 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         });
       }
   }
-  var payeList = [
-    PopupMenuItem(
-        value: 1,
-        child: Container(alignment: Alignment.centerRight,child: Text('دهم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 2,
-        child: Container(alignment: Alignment.centerRight,child: Text('یازدهم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 3,
-        child: Container(alignment: Alignment.centerRight,child: Text('دوازدهم',textDirection: TextDirection.rtl,))
-    ),
-    PopupMenuItem(
-        value: 4,
-        child: Container(alignment: Alignment.centerRight,child: Text('هیچکدام',textDirection: TextDirection.rtl,))
-    ),
-  ];
+  List<PopupMenuItem<int>> payeList = [];
 
+  PopupMenuItem<int> popupMenuItem (int value,String text)
+  {
+    return PopupMenuItem(
+        value: value,
+        child: Container(alignment: Alignment.centerRight,child: Text(text,textDirection: TextDirection.rtl,))
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    payeList..add(popupMenuItem(1, "دهم"))
+    ..add(popupMenuItem(2, "یازدهم"))
+    ..add(popupMenuItem(3, "یازدهم"));
+    bookList..add(popupMenuItem(1, "ریاضی"))
+    ..add(popupMenuItem(2, "فیزیک"))
+    ..add(popupMenuItem(3, "شیمی"))
+    ..add(popupMenuItem(4, "زیست"));
+    chapterList..add(popupMenuItem(1, "اول"))
+    ..add(popupMenuItem(2, "دوم"))
+    ..add(popupMenuItem(3, "سوم"))
+    ..add(popupMenuItem(4, "چهارم"))
+    ..add(popupMenuItem(5, "پنجم"))
+    ..add(popupMenuItem(6, "ششم"))
+    ..add(popupMenuItem(7, "هفتم"))
+    ..add(popupMenuItem(8, "هشتم"))
+    ..add(popupMenuItem(9, "نهم"))
+    ..add(popupMenuItem(10, "دهم"));
+    kindList..add(popupMenuItem(1, "تستی"))
+    ..add(popupMenuItem(2, "جایخالی"))
+    ..add(popupMenuItem(3, "چند گزینه ای"))
+    ..add(popupMenuItem(4, "تشریحی"));
+    difficultyList..add(popupMenuItem(1, "آسان"))
+    ..add(popupMenuItem(2, "متوسط"))
+    ..add(popupMenuItem(3, "سخت"));
+
+
+
+  }
   void _deleteImage(bool ImageOne)
   {
     setState(() {
@@ -805,9 +789,17 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         _ImageTwo = null;
     });
   }
+  void _deleteImage2()
+  {
+    setState(() {
+      _ImageThree = null;
+    });
+  }
 
   File _ImageOne;
   File _ImageTwo;
+
+  File _ImageThree;
 
   final picker = ImagePicker();
 
@@ -825,6 +817,54 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
           }
       }
     });
+  }
+  void getImage2() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null ) {
+        _ImageThree = File(pickedFile.path);
+      }
+    });
+  }
+  void submit()
+  {
+    newQuestion.text = QuestionTextController.text;
+    //newQuestion.image1 =
+    //newQuestion.image2 =
+    newQuestion.paye = paye;
+    newQuestion.book = book;
+    newQuestion.chapter = chapter;
+    newQuestion.difficulty = difficulty;
+    newQuestion.kind = kind;
+    if (newQuestion.kind == "تستی")
+    {
+      newQuestion.optionOne = TestText1Controller.text;
+      newQuestion.optionTwo = TestText2Controller.text;
+      newQuestion.optionThree = TestText3Controller.text;
+      newQuestion.optionFour = TestText4Controller.text;
+      newQuestion.numberOne = _radioGroupValue;
+    }
+    else if (newQuestion.kind == "جایخالی")
+    {
+      newQuestion.answerString = BlankTextController.text;
+    }
+    else if (newQuestion.kind == "پند گزینه ای")
+    {
+      newQuestion.optionOne = MultiOptionText1Controller.text;
+      newQuestion.optionTwo = MultiOptionText2Controller.text;
+      newQuestion.optionThree = MultiOptionText3Controller.text;
+      newQuestion.optionFour = MultiOptionText4Controller.text;
+      newQuestion.numberOne = (optionOne) ? 1: 0;
+      newQuestion.numberTwo = (optionTwo) ? 1: 0;
+      newQuestion.numberThree = (optionThree) ? 1: 0;
+      newQuestion.numberFour = (optionFour) ? 1: 0;
+    }
+    else if (newQuestion.kind == "تشریحی")
+    {
+      //newQuestion.image2 =
+      newQuestion.answerString = TashrihiTextController.text;
+    }
+
   }
   @override
   Widget build(BuildContext context) {
@@ -847,124 +887,129 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(4.0),
             child: Column(
               textDirection: TextDirection.rtl,
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: Card(
-                    child: Text("سوال جدید"),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Column(
+                                children: [
+                                  Text("متن سوال",textDirection: TextDirection.rtl,),
+                                  IconButton(icon: Icon(Icons.camera),onPressed: getImage,tooltip: "می توان فقط عکس هم فرستاد",)
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: InkWell(
+                                child: (focusOnQuestionText) ? TextFormField(
+                                  autofocus: true,
+                                  textDirection: TextDirection.rtl,
+                                  controller: QuestionTextController,
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: 3,
+                                  decoration: InputDecoration(border: OutlineInputBorder()),
+                                )
+                                    :TextFormField(
+                                  textDirection: TextDirection.rtl,
+                                  controller: QuestionTextController,
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: 3,
+                                  readOnly: true,
+                                  decoration: InputDecoration(border: InputBorder.none),
+                                ),
+                                onFocusChange: (value) => _focusChangeOnQuestionText(value),
+                              )
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            (_ImageOne != null) ? Container(child: InkWell(onTap:() => _deleteImage(true),child: Image.file(_ImageOne,fit: BoxFit.cover)),height: 200,alignment: Alignment.centerLeft,padding: EdgeInsets.all(8.0),)
+                                : Container(),
+                            (_ImageTwo != null) ? Container(child: InkWell(onTap:() => _deleteImage(false),child: Image.file(_ImageTwo,fit: BoxFit.cover)),alignment: Alignment.centerRight,height: 200,padding: EdgeInsets.all(8.0),)
+                            //,fit: BoxFit.cover,alignment: Alignment.center,width: 200,)
+                                : Container(),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                Row(
-                  textDirection: TextDirection.rtl,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Column(
+                //TextFormField(),
+                Card(
+                  child: Column(
+                    children: [
+                      Row(
+                        textDirection: TextDirection.rtl,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text("متن سوال"),
-                          IconButton(icon: Icon(Icons.camera),onPressed: getImage,tooltip: "می توان فقط عکس هم فرستاد",)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: PopupMenuButton(
+                              //padding: EdgeInsets.all(50.0),
+                              child: (paye == null) ? Text("پایه تحصیلی") : Text(paye),
+                              onSelected: onSelectedPayeMenu,
+                              itemBuilder: (context) => payeList,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: PopupMenuButton(
+                              //padding: EdgeInsets.all(50.0),
+                              child: (book == null) ? Text("درس") : Text(book),
+                              onSelected: onSelectedBookMenu,
+                              itemBuilder: (context) => bookList,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: PopupMenuButton(
+                              //padding: EdgeInsets.all(50.0),
+                              child: (chapter == null) ? Text("فصل") : Text(chapter),
+                              onSelected: onSelectedChapterMenu,
+                              itemBuilder: (context) => chapterList,
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                    Container(
-                      width: 5,
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: InkWell(
-                        child: (focusOnQuestionText) ? TextFormField(
-                          autofocus: true,
-                          textDirection: TextDirection.rtl,
-                          controller: QuestionTextController,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 3,
-                          decoration: InputDecoration(border: OutlineInputBorder()),
-                        )
-                            :TextFormField(
-                          textDirection: TextDirection.rtl,
-                          controller: QuestionTextController,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 3,
-                          readOnly: true,
-                          decoration: InputDecoration(border: InputBorder.none),
-                        ),
-                        onFocusChange: (value) => _focusChangeOnQuestionText(value),
-                      )
-                    ),
-                  ],
-                ),
-                //TextFormField(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    (_ImageOne != null) ? Container(child: InkWell(onTap:() => _deleteImage(true),child: Image.file(_ImageOne,fit: BoxFit.cover)),height: 200,alignment: Alignment.centerLeft,padding: EdgeInsets.all(8.0),)
-                        : Container(),
-                    (_ImageTwo != null) ? Container(child: InkWell(onTap:() => _deleteImage(false),child: Image.file(_ImageTwo,fit: BoxFit.cover)),alignment: Alignment.centerRight,height: 200,padding: EdgeInsets.all(8.0),)
-                    //,fit: BoxFit.cover,alignment: Alignment.center,width: 200,)
-                        : Container(),
-                  ],
-                ),
-                Row(
-                  textDirection: TextDirection.rtl,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PopupMenuButton(
-                        //padding: EdgeInsets.all(50.0),
-                        child: (paye == null) ? Text("پایه تحصیلی") : Text(paye),
-                        onSelected: onSelectedPayeMenu,
-                        itemBuilder: (context) => payeList,
+                      Row(
+                        textDirection: TextDirection.rtl,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: PopupMenuButton(
+                              //padding: EdgeInsets.all(50.0),
+                              child: (kind == null) ? Text("نوع سوال") : Text(kind),
+                              onSelected: onSelectedKindMenu,
+                              itemBuilder: (context) => kindList,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: PopupMenuButton(
+                              //padding: EdgeInsets.all(50.0),
+                              child: (difficulty == null) ? Text("دشواری سوال") : Text(difficulty),
+                              onSelected: onSelectedDifficultyMenu,
+                              itemBuilder: (context) => difficultyList,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PopupMenuButton(
-                        //padding: EdgeInsets.all(50.0),
-                        child: (book == null) ? Text("درس") : Text(book),
-                        onSelected: onSelectedBookMenu,
-                        itemBuilder: (context) => bookList,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PopupMenuButton(
-                        //padding: EdgeInsets.all(50.0),
-                        child: (chapter == null) ? Text("فصل") : Text(chapter),
-                        onSelected: onSelectedChapterMenu,
-                        itemBuilder: (context) => chapterList,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  textDirection: TextDirection.rtl,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PopupMenuButton(
-                        //padding: EdgeInsets.all(50.0),
-                        child: (kind == null) ? Text("نوع سوال") : Text(kind),
-                        onSelected: onSelectedKindMenu,
-                        itemBuilder: (context) => kindList,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: PopupMenuButton(
-                        //padding: EdgeInsets.all(50.0),
-                        child: (difficulty == null) ? Text("دشواری سوال") : Text(difficulty),
-                        onSelected: onSelectedDifficultyMenu,
-                        itemBuilder: (context) => difficultyList,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 if (whichKind == 1) testWidget()
                 else if (whichKind == 2) blankWidget()
@@ -978,7 +1023,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                     //  borderRadius: 0,
                       //controller: _btnController,
                       color: Color(0xFF3D5A80),
-                      onPressed: () => null,
+                      onPressed: () => submit,
                   ),
                 ),
                 Padding(
@@ -988,7 +1033,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                     //  borderRadius: 0,
                     //controller: _btnController,
                     color: Color(0xFF3D5A80),
-                    onPressed: () => null,
+                    onPressed: () => submit,
                   ),
                 )
               ],
