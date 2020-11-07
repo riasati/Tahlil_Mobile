@@ -24,6 +24,13 @@ class Question
   String _optionTwo;
   String _optionThree;
   String _optionFour;
+  bool _isPublic;
+
+  bool get isPublic => _isPublic;
+
+  set isPublic(bool value) {
+    _isPublic = value;
+  }
 
   String get optionOne => _optionOne;
 

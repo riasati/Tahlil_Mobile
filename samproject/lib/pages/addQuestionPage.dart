@@ -225,7 +225,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                   child: Column(
                     children: [
                       Text("پاسخ سوال",textDirection: TextDirection.rtl,),
-                      IconButton(icon: Icon(Icons.camera),onPressed: getImage2,tooltip: "می توان فقط عکس هم فرستاد",)
+                      IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",)
                     ],
                   ),
                 ),
@@ -251,7 +251,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                 ),
               ],
             ),
-            (_ImageThree != null) ? Container(child: InkWell(onTap:() => _deleteImage2(),child: Image.file(_ImageThree,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(4.0),)
+            (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
                 : Container(),
           ],
         ),
@@ -780,49 +780,38 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
 
 
   }
-  void _deleteImage(bool ImageOne)
+  void _deleteQuestionImage()
   {
     setState(() {
-      if (ImageOne)
-      _ImageOne = null;
-      else
-        _ImageTwo = null;
+      _QuestionImage = null;
     });
   }
-  void _deleteImage2()
+  void _deleteAnswerImage()
   {
     setState(() {
-      _ImageThree = null;
+      _AnswerImage = null;
     });
   }
 
-  File _ImageOne;
-  File _ImageTwo;
+  File _QuestionImage;
 
-  File _ImageThree;
+  File _AnswerImage;
 
   final picker = ImagePicker();
 
-  void getImage() async {
+  void getQuestionImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null ) {
-        if (_ImageOne == null)
-        {
-          _ImageOne = File(pickedFile.path);
-        }
-        else
-          {
-            _ImageTwo = File(pickedFile.path);
-          }
+        _QuestionImage = File(pickedFile.path);
       }
     });
   }
-  void getImage2() async {
+  void getAnswerImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null ) {
-        _ImageThree = File(pickedFile.path);
+        _AnswerImage = File(pickedFile.path);
       }
     });
   }
@@ -836,6 +825,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     newQuestion.chapter = chapter;
     newQuestion.difficulty = difficulty;
     newQuestion.kind = kind;
+    newQuestion.isPublic = addQuestionBankOption;
     if (newQuestion.kind == "تستی")
     {
       newQuestion.optionOne = TestText1Controller.text;
@@ -864,7 +854,12 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       //newQuestion.image2 =
       newQuestion.answerString = TashrihiTextController.text;
     }
-
+  }
+  bool addQuestionBankOption = false;
+  void addQuestionBankOptionChange(bool newValue) {
+    setState(() {
+      addQuestionBankOption = newValue;
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -906,7 +901,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                               child: Column(
                                 children: [
                                   Text("متن سوال",textDirection: TextDirection.rtl,),
-                                  IconButton(icon: Icon(Icons.camera),onPressed: getImage,tooltip: "می توان فقط عکس هم فرستاد",)
+                                  IconButton(icon: Icon(Icons.camera),onPressed: getQuestionImage,tooltip: "می توان فقط عکس هم فرستاد",)
                                 ],
                               ),
                             ),
@@ -933,16 +928,8 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                             ),
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            (_ImageOne != null) ? Container(child: InkWell(onTap:() => _deleteImage(true),child: Image.file(_ImageOne,fit: BoxFit.cover)),height: 200,alignment: Alignment.centerLeft,padding: EdgeInsets.all(8.0),)
-                                : Container(),
-                            (_ImageTwo != null) ? Container(child: InkWell(onTap:() => _deleteImage(false),child: Image.file(_ImageTwo,fit: BoxFit.cover)),alignment: Alignment.centerRight,height: 200,padding: EdgeInsets.all(8.0),)
-                            //,fit: BoxFit.cover,alignment: Alignment.center,width: 200,)
-                                : Container(),
-                          ],
-                        ),
+                        (_QuestionImage != null) ? Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
+                            : Container(),
                       ],
                     ),
                   ),
@@ -1016,26 +1003,24 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                 else if (whichKind == 3) multiOption()
                 else if (whichKind == 4) tashrihiWidget(),
 
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: RoundedLoadingButton(
-                    child: Text('در بانک سوال هم ذخیره شود',style: TextStyle(color: Colors.white),),
-                    //  borderRadius: 0,
-                      //controller: _btnController,
-                      color: Color(0xFF3D5A80),
-                      onPressed: () => submit,
-                  ),
+                Row(
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
+                    Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
+                  ],
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: RoundedLoadingButton(
-                    child: Text('فقط به سوالات من اضافه شود',style: TextStyle(color: Colors.white),),
+                    height: 40,
+                    child: Text('اضافه کردن',style: TextStyle(color: Colors.white),),
                     //  borderRadius: 0,
                     //controller: _btnController,
                     color: Color(0xFF3D5A80),
                     onPressed: () => submit,
                   ),
-                )
+                ),
               ],
             ),
           ),
