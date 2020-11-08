@@ -1,13 +1,7 @@
 class Question
 {
+
   String _text;
-
-  String get text => _text;
-
-  set text(String value) {
-    _text = value;
-  }
-
   String _image1;
   String _image2;
   String _paye;
@@ -30,6 +24,12 @@ class Question
 
   set isPublic(bool value) {
     _isPublic = value;
+  }
+
+  String get text => _text;
+
+  set text(String value) {
+    _text = value;
   }
 
   String get optionOne => _optionOne;
