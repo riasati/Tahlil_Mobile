@@ -13,6 +13,7 @@ class ClassForm extends StatefulWidget {
 
 class _ClassFormState extends State<ClassForm> {
   String _selectionGrade;
+  String _selectionLesson;
 
   final TextEditingController classPasswordController = TextEditingController();
   final TextEditingController classDescriptionController = TextEditingController();
@@ -45,10 +46,12 @@ class _ClassFormState extends State<ClassForm> {
               child: Row(
                 //mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Expanded(child: _ClassGrade()),
+                  _ClassGrade(),
+                  _ClassLesson(),
                 ],
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
               ),
-              padding: EdgeInsets.only(left: 10, right: 10),
+              padding: EdgeInsets.only(top: 10 , bottom: 10),
             ),
             _ClassId(),
             _ClassPassword(),
@@ -234,8 +237,12 @@ class _ClassFormState extends State<ClassForm> {
         });
       },
       child: Container(
-        color: Color(0xFF3D5A80),
+        width: 150,
         height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50.0),
+          color: Color(0xFF3D5A80),
+        ),
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -243,14 +250,20 @@ class _ClassFormState extends State<ClassForm> {
               Padding(
                 padding: EdgeInsets.only(right: 10),
                 child: Icon(
-                  Icons.add_alarm,
+                  FontAwesomeIcons.angleDown,
+                  color: Colors.white,
                   //size: 1,
                   // onPressed: () {
                   //   print('Hello world');
                   // },
                 ),
               ),
-              Text(_selectionGrade == null ? 'پایه تحصیلی' : _selectionGrade.toString()),
+              Text(
+                _selectionGrade == null ? 'پایه تحصیلی' : _selectionGrade.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ],
             // subtitle: Column(
             //   children: <Widget>[
@@ -263,16 +276,79 @@ class _ClassFormState extends State<ClassForm> {
       ),
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
         const PopupMenuItem<String>(
-          value: 'Value1',
-          child: Text('Choose value 1'),
+          value: 'پایه دهم',
+          child: Text('پایه دهم'),
         ),
         const PopupMenuItem<String>(
-          value: 'Value2',
-          child: Text('Choose value 2'),
+          value: 'پایه یازدهم',
+          child: Text('پایه یلزدهم'),
         ),
         const PopupMenuItem<String>(
-          value: 'Value3',
-          child: Text('Choose value 3'),
+          value: 'پایه دوازدهم',
+          child: Text('پایه دوازدهم'),
+        ),
+      ],
+    );
+  }
+
+  // ignore: non_constant_identifier_names
+  Widget _ClassLesson(){
+    return PopupMenuButton<String>(
+      onSelected: (String value) {
+        setState(() {
+          _selectionLesson = value;
+        });
+      },
+      child: Container(
+        width: 150,
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50.0),
+          color: Color(0xFF3D5A80),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Icon(
+                  FontAwesomeIcons.angleDown,
+                  color: Colors.white,
+                  //size: 1,
+                  // onPressed: () {
+                  //   print('Hello world');
+                  // },
+                ),
+              ),
+              Text(
+                _selectionLesson == null ? 'درس کلاس' : _selectionLesson.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ],
+            // subtitle: Column(
+            //   children: <Widget>[
+            //     Text('Sub title'),
+            //     Text(),
+            //   ],
+            // ),
+          ),
+        ),
+      ),
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+        const PopupMenuItem<String>(
+          value: 'درس ریاضی',
+          child: Text('درس ریاضی'),
+        ),
+        const PopupMenuItem<String>(
+          value: 'درس فیزیک',
+          child: Text('درس فیزیک'),
+        ),
+        const PopupMenuItem<String>(
+          value: 'درس شیمی',
+          child: Text('درس شیمی'),
         ),
       ],
     );
