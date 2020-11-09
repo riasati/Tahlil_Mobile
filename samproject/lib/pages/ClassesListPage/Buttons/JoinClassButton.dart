@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class JoinButton extends StatefulWidget {
   @override
@@ -6,10 +9,12 @@ class JoinButton extends StatefulWidget {
 }
 
 class _JoinButtonState extends State<JoinButton> {
+  final TextEditingController classCodeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     Gradient _gradient =
-    LinearGradient(colors: [Color(0xFF3D5A80), Color(0xFF3D5A80)]);
+        LinearGradient(colors: [Color(0xFF3D5A80), Color(0xFF3D5A80)]);
     return Container(
       width: double.infinity,
       height: 40,
@@ -30,7 +35,7 @@ class _JoinButtonState extends State<JoinButton> {
             color: Colors.transparent,
             borderRadius: new BorderRadius.all(Radius.circular(40.0)),
             child: FlatButton(
-                onPressed: () {},
+                onPressed: joinBottomSheet,
                 child: Text(
                   "اضافه شدن به کلاس",
                   style: TextStyle(
@@ -43,4 +48,78 @@ class _JoinButtonState extends State<JoinButton> {
       ),
     );
   }
+
+  void joinBottomSheet() => showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        )
+      ),
+      barrierColor: Color(0xFF3D5A80).withOpacity(0.8),
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: Image.asset("assets/img/login_logo.png"), flex: 2,),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Container(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: TextField(
+                          textAlign: TextAlign.right,
+                          maxLines: 1,
+                          controller: classCodeController,
+                          keyboardType: TextInputType.text,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                              focusedBorder: new OutlineInputBorder(
+                                  borderSide: new BorderSide(
+                                      color: Color(0xFF3D5A80), width: 3)),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Color(0xFF3D5A80)),
+                              ),
+                              suffixIcon: Icon(
+                                FontAwesomeIcons.chalkboard,
+                                color: Colors.black,
+                              ),
+                              labelText: 'کد شش رقمی کلاس',
+                              labelStyle: TextStyle(color: Color(0xFF3D5A80))),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                  child: Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Container(
+                    child: RoundedLoadingButton(
+                  color: Colors.green,
+                  //controller: btnJoin,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 42.0),
+                    child: Text(
+                      "اضافه شدن",
+                      style: TextStyle(
+                        color: Colors.white,
+                        // fontSize: MediaQuery.of(context).size.width * 0.045,
+                        // fontFamily: "WorkSansBold"
+                      ),
+                    ),
+                  ),
+                  onPressed: _pressJoin,
+                )),
+              ))
+            ],
+          ));
+
+  void _pressJoin() {}
 }

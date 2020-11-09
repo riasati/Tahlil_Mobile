@@ -1,15 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:samproject/domain/Class.dart';
 
 class ClassCard extends StatefulWidget {
+  Class classCard;
+
+  // ClassCard(this.classCard);
+
   @override
-  _ClassCardState createState() => _ClassCardState();
+  _ClassCardState createState() => _ClassCardState(classCard);
 }
 
 class _ClassCardState extends State<ClassCard> {
+  Class classCard;
+
+  _ClassCardState(this.classCard);
+
   @override
   Widget build(BuildContext context) {
+    if(classCard == null)
+      return null;
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -28,7 +39,7 @@ class _ClassCardState extends State<ClassCard> {
               Padding(
                 padding: EdgeInsets.only(top: 15),
                 child: Text(
-                  "اسم کلاس",
+                  classCard.className,
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,

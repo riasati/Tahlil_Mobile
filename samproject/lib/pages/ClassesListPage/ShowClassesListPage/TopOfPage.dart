@@ -18,7 +18,8 @@ class _PersonInfoState extends State<PersonInfo> {
             height: 100,
             child: CircleAvatar(
               radius: 30.0,
-              backgroundImage:(HomePage.user.avatarUrl != null)?
+              backgroundImage:
+              (HomePage.user.avatarUrl != null && HomePage.user.avatarUrl.isNotEmpty)?
               NetworkImage(HomePage.user.avatarUrl):
               AssetImage('assets/img/unnamed.png'),
               backgroundColor: Colors.transparent,
