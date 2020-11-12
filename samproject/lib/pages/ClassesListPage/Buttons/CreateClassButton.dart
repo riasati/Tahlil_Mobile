@@ -1,16 +1,39 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:samproject/domain/Class.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../homePage.dart';
+
+// ignore: must_be_immutable
 class CreateClassButton extends StatefulWidget {
+  final classListWidgetSetState;
+  List<Class> userClasses;
+
+  CreateClassButton( {@required void classListWidgetSetState() , @required this.userClasses}):
+    classListWidgetSetState = classListWidgetSetState;
+
   @override
-  _CreateClassButtonState createState() => _CreateClassButtonState();
+  _CreateClassButtonState createState() => _CreateClassButtonState(classListWidgetSetState: classListWidgetSetState , userClasses: userClasses);
 }
 
 class _CreateClassButtonState extends State<CreateClassButton> {
+
+  final RoundedLoadingButtonController btnCreateController = new RoundedLoadingButtonController();
+  String _createClassURL = "http://parham-backend.herokuapp.com/class/";
   final TextEditingController classTitleController = TextEditingController();
   final TextEditingController classDescriptionController =
       TextEditingController();
+
+  final classListWidgetSetState;
+  List<Class> userClasses;
+
+  _CreateClassButtonState( {@required void classListWidgetSetState() , @required this.userClasses}):
+        classListWidgetSetState = classListWidgetSetState;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +161,7 @@ class _CreateClassButtonState extends State<CreateClassButton> {
                 child: Container(
                     child: RoundedLoadingButton(
                   color: Color(0xFF3D5A80),
-                  //controller: btnJoin,
+                  controller: btnCreateController,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10.0, horizontal: 42.0),
@@ -157,5 +180,35 @@ class _CreateClassButtonState extends State<CreateClassButton> {
             ],
           ));
 
-  void _pressCreate() {}
+  void _pressCreate() async {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        var body = jsonEncode(<String,String>{
+          'name' : classTitleController.text,
+          'description':classDescriptionController.text,
+        });
+        token = "Bearer " + token;
+        final response = await post(_createClassURL,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            }, body: body);
+        if(response.statusCode == 200 && response.body != null){
+          var newClassInfo = json.decode(utf8.decode(response.bodyBytes))["newClass"];
+          var newClass = Class(newClassInfo['name'], HomePage.user.firstname + " " + HomePage.user.lastname, newClassInfo['classId']);
+          print(newClass);
+          btnCreateController.success();
+          Navigator.pop(context);
+          this.userClasses.add(newClass);
+          widget?.classListWidgetSetState();
+        }
+      }
+    }on Exception catch(e){
+      print(e.toString());
+    }
+  }
+
 }

@@ -6,7 +6,7 @@ import 'package:samproject/domain/Class.dart';
 class ClassCard extends StatefulWidget {
   Class classCard;
 
-  // ClassCard(this.classCard);
+  ClassCard(this.classCard);
 
   @override
   _ClassCardState createState() => _ClassCardState(classCard);
@@ -19,22 +19,23 @@ class _ClassCardState extends State<ClassCard> {
 
   @override
   Widget build(BuildContext context) {
-    if(classCard == null)
-      return null;
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(30))
-      ),
+          borderRadius: BorderRadius.all(Radius.circular(30))),
       //color: Colors.black45,
       child: FlatButton(
-        onPressed: (){},
+        onPressed: () {},
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                child: Icon(FontAwesomeIcons.atom,size: 50,color:Color(0xFF3D5A80)),
+                child: Icon(
+                  FontAwesomeIcons.atom,
+                  size: 50,
+                  color: Color(0xFF3D5A80),
+                ),
               ),
               Padding(
                 padding: EdgeInsets.only(top: 15),

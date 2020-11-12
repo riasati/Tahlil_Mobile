@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:samproject/Layout/BottomNavigator.dart';
+import 'package:samproject/domain/Class.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:samproject/pages/ClassesListPage/LoginPersonPage/LoginOrSignup.dart';
 import 'package:samproject/widgets/drawerWidget.dart';
@@ -23,7 +24,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String _signInURL = "http://parham-backend.herokuapp.com/user";
+  String _signInURL = "https://parham-backend.herokuapp.com/user";
   bool _isLoading = true;
   @override
   void initState() {
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Color(0xFF3D5A80),
       ),
-      endDrawer: DrawerWidget(toggleCoinCallback: callBuild,),
+      endDrawer: DrawerWidget(toggleCoinCallback: stopLoading,),
       bottomNavigationBar: BottomNavigator(),
       floatingActionButton: Container(
         child: Center(
@@ -90,7 +91,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(color: Colors.red,),
             Container(color: Colors.deepPurple,),
-            HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: callBuild,),
+            HomePage.user.username != null?ClassesList(stopLoading: stopLoading,):LoginOrSignup(toggleCoinCallback: stopLoading,),
             Container(color: Colors.yellow,),
             Container(color: Colors.black,),
 
@@ -110,30 +111,46 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
-    if (token != null) {
-      token = "Bearer " + token;
-      final response = await get(_signInURL,
-          headers: {
-            'accept': 'application/json',
-            'Authorization': token,
-            'Content-Type': 'application/json',
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        final response = await get(_signInURL,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        if (response.statusCode == 200) {
+          final personInfo = jsonDecode(response.body);
+          print(personInfo.toString());
+          HomePage.user.firstname = personInfo['user']['firstname'];
+          HomePage.user.lastname = personInfo['user']['lastname'];
+          HomePage.user.username = personInfo['user']['username'];
+          HomePage.user.email = personInfo['user']['email'];
+          HomePage.user.avatarUrl = personInfo['user']['avatar'];
+          setState(() {
           });
-      if(response.statusCode == 200){
-        final personInfo = jsonDecode(response.body);
-        print(personInfo.toString());
-        HomePage.user.firstname = personInfo['user']['firstname'];
-        HomePage.user.lastname = personInfo['user']['lastname'];
-        HomePage.user.username = personInfo['user']['username'];
-        HomePage.user.email = personInfo['user']['email'];
-        HomePage.user.avatarUrl = personInfo['user']['avatar'];
+        }
       }
+      else{
+        stopLoading();
+      }
+    }on Exception catch(e){
+      print(e.toString());
+      stopLoading();
     }
-    callBuild();
   }
 
-  callBuild(){
+  stopLoading(){
     setState(() {
       _isLoading = false;
     });
   }
+
+  startLoading(){
+    setState(() {
+      _isLoading = true;
+    });
+  }
+
 }

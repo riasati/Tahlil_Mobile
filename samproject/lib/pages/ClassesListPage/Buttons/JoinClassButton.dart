@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JoinButton extends StatefulWidget {
   @override
@@ -9,6 +13,9 @@ class JoinButton extends StatefulWidget {
 }
 
 class _JoinButtonState extends State<JoinButton> {
+
+  final RoundedLoadingButtonController btnJoinController = new RoundedLoadingButtonController();
+  String _joinClassURL = "http://parham-backend.herokuapp.com/class/join";
   final TextEditingController classCodeController = TextEditingController();
 
   @override
@@ -121,5 +128,26 @@ class _JoinButtonState extends State<JoinButton> {
             ],
           ));
 
-  void _pressJoin() {}
+  void _pressJoin() async{
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        var body = jsonEncode(<String,String>{
+          'classId' : classCodeController.text,
+        });
+        token = "Bearer " + token;
+        final response = await post(_joinClassURL,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            }, body: body);
+        print(response.body);
+      }
+    }on Exception catch(e){
+      print(e.toString());
+    }
+
+  }
 }

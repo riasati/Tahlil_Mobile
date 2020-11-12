@@ -6,6 +6,9 @@ class Class{
   String _classDescription;
   String _classId;
   String _classPassword;
+  String _ownerFullName;
+
+  Class(this._className, this._ownerFullName, this._classId);
 
   String get className => _className;
 
@@ -41,5 +44,17 @@ class Class{
 
   set classGrade(String value) {
     _classGrade = value;
+  }
+
+
+  String get ownerFullName => _ownerFullName;
+
+  set ownerFullName(String value) {
+    _ownerFullName = value;
+  }
+
+  @override
+  String toString() {
+    return 'Class{_className: $_className, _ownerFullName: $_ownerFullName, _classId: $_classId}';
   }
 }
