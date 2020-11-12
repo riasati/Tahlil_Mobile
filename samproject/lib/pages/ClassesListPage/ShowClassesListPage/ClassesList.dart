@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:loading_overlay/loading_overlay.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:samproject/pages/ClassesListPage/ShowClassesListPage/TopOfPage.dart';
@@ -11,17 +12,14 @@ import 'BottomOfPage.dart';
 import 'MiddleOfPage.dart';
 
 class ClassesList extends StatefulWidget {
-  final stopHomePageLoading;
 
-  ClassesList( {@required void stopLoading() }):
-        stopHomePageLoading = stopLoading;
 
   @override
   _ClassesListState createState() => _ClassesListState();
 }
 
 class _ClassesListState extends State<ClassesList> {
-
+  bool isLoading = true;
   List<Class> userClasses = [];
   String _getClassesURL = "http://parham-backend.herokuapp.com/user/classes";
 
@@ -32,33 +30,38 @@ class _ClassesListState extends State<ClassesList> {
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.only(top: 15.0 ),
-              child: PersonInfo()
+    return LoadingOverlay(
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: EdgeInsets.only(top: 15.0 ),
+                child: PersonInfo()
+              ),
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: CreateOrJoinClass(classListWidgetSetState: callSetState, userClasses: userClasses,),
-          ),
-          Expanded(
-            flex: 4,
-            child: ListOfClasses(userClasses),
-          ),
-        ],
+            Expanded(
+              flex: 1,
+              child: CreateOrJoinClass(classListWidgetSetState: callSetState, userClasses: userClasses,),
+            ),
+            Expanded(
+              flex: 4,
+              child: ListOfClasses(userClasses),
+            ),
+          ],
+        ),
+        // color: Colors.black45,
       ),
-      // color: Colors.black45,
+      isLoading: isLoading,
     );
   }
 
 
   void _getUserClasses() async {
-    print("hslkhflskhfshfkljha");
+    setState(() {
+      isLoading = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
@@ -81,50 +84,11 @@ class _ClassesListState extends State<ClassesList> {
     }on Exception catch(e){
       print(e.toString());
     }
-    widget?.stopHomePageLoading();
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  void resultOfCreateClass(Class newClass, bool status){
-    if(!status){
-      setState(() {
-        Alert(
-          context: context,
-          type: AlertType.error,
-          title: "ساخت کلاس با موفقیت انجام نشد",
-          buttons: [
-            DialogButton(
-              child: Text(
-                "حله",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              color: Color(0xFF3D5A80),
-            ),
-          ],
-        ).show();
-      });
-    }
-    else{
-      setState(() {
-        userClasses.add(newClass);
-        Alert(
-          context: context,
-          type: AlertType.success,
-          title: "کلاس ساخته شد",
-          buttons: [
-            DialogButton(
-              child: Text(
-                "حله",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              color: Color(0xFF3D5A80),
-            ),
-          ],
-        ).show();
-      });
-    }
-  }
 
   void callSetState(){
     setState(() {

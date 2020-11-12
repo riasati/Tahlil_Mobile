@@ -3,10 +3,10 @@ import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 
 class LoginButton extends StatelessWidget {
-  final callHomePageBiuld;
+  final callClassesListBuild;
 
   LoginButton( {@required void toggleCoinCallback() }):
-        callHomePageBiuld = toggleCoinCallback;
+        callClassesListBuild = toggleCoinCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +33,11 @@ class LoginButton extends StatelessWidget {
             borderRadius: new BorderRadius.all(Radius.circular(40.0)),
             child: FlatButton(
                 onPressed: () {
+                  LoginPage.pageController =  PageController(initialPage: 0);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LoginPage(toggleCoinCallback: callHomePageBiuld,),
+                      builder: (context) => LoginPage(toggleCoinCallback: callClassesListBuild,),
                     ),
                   );
                 },

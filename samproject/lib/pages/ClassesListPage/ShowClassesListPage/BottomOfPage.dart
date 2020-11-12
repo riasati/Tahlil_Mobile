@@ -40,7 +40,7 @@ class _ListOfClassesState extends State<ListOfClasses> {
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
-        color: Color(0xFF3D5A80).withOpacity(0.5),
+        color: Colors.black45.withOpacity(0.3),
       ),
       child: Padding(
         padding: EdgeInsets.all(15),

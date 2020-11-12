@@ -10,7 +10,7 @@ class SignupButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Gradient _gradient =
-    LinearGradient(colors: [Colors.green, Colors.green]);
+    LinearGradient(colors: [Color.fromRGBO(14, 145, 140, 1), Color.fromRGBO(14, 145, 140, 1)]);
     return Container(
       width: double.infinity,
       height: 40,

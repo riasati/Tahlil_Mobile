@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +39,7 @@ class _CreateClassButtonState extends State<CreateClassButton> {
 
   @override
   Widget build(BuildContext context) {
-    Gradient _gradient = LinearGradient(colors: [Colors.green, Colors.green]);
+    Gradient _gradient = LinearGradient(colors: [Color.fromRGBO(14, 145, 140, 1), Color.fromRGBO(14, 145, 140, 1)]);
     return Container(
       width: double.infinity,
       height: 40,
@@ -76,21 +78,59 @@ class _CreateClassButtonState extends State<CreateClassButton> {
 
   void createBottomSheet() => showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
         topLeft: Radius.circular(25),
         topRight: Radius.circular(25),
       )),
-      barrierColor: Colors.green.withOpacity(0.8),
-      builder: (context) => Column(
-            children: [
-              Expanded(
-                child: Padding(padding: EdgeInsets.only(top: 10),child: Image.asset("assets/img/login_logo.png")),
+      barrierColor: Color.fromRGBO(14, 145, 140, 0.8),
+      builder: (context) => Container(
+        height: 450,
+        child: Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Padding(padding: EdgeInsets.only(top: 10),child: Image.asset("assets/img/login_logo.png")),
 
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(10),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 1,
+                            controller: classTitleController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder: new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color: Color(0xFF3D5A80), width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.chalkboard,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'عنوان کلاس',
+                                labelStyle: TextStyle(color: Color(0xFF3D5A80))),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                    child: Padding(
+                  padding: EdgeInsets.only(top: 10),
                   child: Container(
                     child: FractionallySizedBox(
                       widthFactor: 0.9,
@@ -98,8 +138,8 @@ class _CreateClassButtonState extends State<CreateClassButton> {
                         textDirection: TextDirection.rtl,
                         child: TextField(
                           textAlign: TextAlign.right,
-                          maxLines: 1,
-                          controller: classTitleController,
+                          maxLines: 2,
+                          controller: classDescriptionController,
                           keyboardType: TextInputType.text,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
@@ -107,78 +147,45 @@ class _CreateClassButtonState extends State<CreateClassButton> {
                                   borderSide: new BorderSide(
                                       color: Color(0xFF3D5A80), width: 3)),
                               enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xFF3D5A80)),
+                                borderSide: BorderSide(color: Color(0xFF3D5A80)),
                               ),
                               suffixIcon: Icon(
-                                FontAwesomeIcons.chalkboard,
+                                FontAwesomeIcons.fileSignature,
+                                // FontAwesomeIcons.envelope,
                                 color: Colors.black,
                               ),
-                              labelText: 'عنوان کلاس',
+                              labelText: 'توضیحات',
                               labelStyle: TextStyle(color: Color(0xFF3D5A80))),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                  child: Padding(
-                padding: EdgeInsets.all(10),
-                child: Container(
-                  child: FractionallySizedBox(
-                    widthFactor: 0.9,
-                    child: Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: TextField(
-                        textAlign: TextAlign.right,
-                        maxLines: 2,
-                        controller: classDescriptionController,
-                        keyboardType: TextInputType.text,
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
-                            focusedBorder: new OutlineInputBorder(
-                                borderSide: new BorderSide(
-                                    color: Color(0xFF3D5A80), width: 3)),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xFF3D5A80)),
-                            ),
-                            suffixIcon: Icon(
-                              FontAwesomeIcons.fileSignature,
-                              // FontAwesomeIcons.envelope,
-                              color: Colors.black,
-                            ),
-                            labelText: 'توضیحات',
-                            labelStyle: TextStyle(color: Color(0xFF3D5A80))),
-                      ),
-                    ),
-                  ),
-                ),
-              )),
-              Expanded(
-                  child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: Container(
-                    child: RoundedLoadingButton(
-                  color: Color(0xFF3D5A80),
-                  controller: btnCreateController,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 42.0),
-                    child: Text(
-                      "ساخت کلاس",
-                      style: TextStyle(
-                        color: Colors.white,
-                        // fontSize: MediaQuery.of(context).size.width * 0.045,
-                        // fontFamily: "WorkSansBold"
-                      ),
-                    ),
-                  ),
-                  onPressed: _pressCreate,
                 )),
-              ))
-            ],
-          ));
+                Expanded(
+                    child: Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Container(
+                      child: RoundedLoadingButton(
+                    color: Color(0xFF3D5A80),
+                    controller: btnCreateController,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 42.0),
+                      child: Text(
+                        "ساخت کلاس",
+                        style: TextStyle(
+                          color: Colors.white,
+                          // fontSize: MediaQuery.of(context).size.width * 0.045,
+                          // fontFamily: "WorkSansBold"
+                        ),
+                      ),
+                    ),
+                    onPressed: _pressCreate,
+                  )),
+                ))
+              ],
+            ),
+      ));
 
   void _pressCreate() async {
     final prefs = await SharedPreferences.getInstance();
@@ -199,15 +206,105 @@ class _CreateClassButtonState extends State<CreateClassButton> {
         if(response.statusCode == 200 && response.body != null){
           var newClassInfo = json.decode(utf8.decode(response.bodyBytes))["newClass"];
           var newClass = Class(newClassInfo['name'], HomePage.user.firstname + " " + HomePage.user.lastname, newClassInfo['classId']);
-          print(newClass);
           btnCreateController.success();
           Navigator.pop(context);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "",
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(":کد ورود به کلاس"),
+                  Text(newClassInfo['classId']),
+                ],
+              ),
+              buttons: [
+                DialogButton(
+                  child: Text(
+                    "کپی",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () => {
+                    Clipboard.setData(ClipboardData(text:newClassInfo['classId'])),
+
+                    Navigator.pop(context),
+                  },
+                  color: Color(0xFF3D5A80),
+                ),
+              ],
+            ).show();
+          });
           this.userClasses.add(newClass);
           widget?.classListWidgetSetState();
         }
+        else{
+          var errorMsg = json.decode(utf8.decode(response.bodyBytes))['error'];
+          btnCreateController.error();
+          Navigator.pop(context);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: errorMsg,
+              buttons: [
+                DialogButton(
+                  child: Text(
+                    "حله",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.red,
+                ),
+              ],
+            ).show();
+          });
+        }
+      }
+      else{
+        btnCreateController.error();
+        Navigator.pop(context);
+        setState(() {
+          Alert(
+            context: context,
+            type: AlertType.error,
+            title: "ابتدا به حساب خود وارد شوید",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "حله",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () => Navigator.pop(context),
+                color: Colors.red,
+              ),
+            ],
+          ).show();
+        });
       }
     }on Exception catch(e){
       print(e.toString());
+      btnCreateController.error();
+      Navigator.pop(context);
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "ساخت کلاس با موفقیت انجام نشد",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "حله",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.red,
+            ),
+          ],
+        ).show();
+      });
     }
   }
 

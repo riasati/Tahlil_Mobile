@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,6 +20,37 @@ class _ClassCardState extends State<ClassCard> {
 
   @override
   Widget build(BuildContext context) {
+    var classCardIcon;
+    if(classCard.className.contains("ریاضی"))
+      classCardIcon = Padding(
+        child: Icon(
+          FontAwesomeIcons.infinity,
+          size: 50,
+          color: Color(0xFF3D5A80),
+        ),
+        padding: EdgeInsets.only(right: 10),
+      );
+    else if(classCard.className.contains("فیزیک"))
+      classCardIcon = Icon(
+        FontAwesomeIcons.atom,
+        size: 50,
+        color: Color(0xFF3D5A80),
+      );
+    else if(classCard.className.contains("شیمی"))
+      classCardIcon = Icon(
+        FontAwesomeIcons.flask,
+        size: 50,
+        color: Color(0xFF3D5A80),
+      );
+    else
+      classCardIcon = Padding(
+        child: Icon(
+          FontAwesomeIcons.chalkboard,
+          size: 50,
+          color: Color(0xFF3D5A80),
+        ),
+        padding: EdgeInsets.only(right: 10),
+      );
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -31,19 +63,31 @@ class _ClassCardState extends State<ClassCard> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                child: Icon(
-                  FontAwesomeIcons.atom,
-                  size: 50,
-                  color: Color(0xFF3D5A80),
-                ),
+                child: classCardIcon,
+                alignment: Alignment.center,
               ),
               Padding(
                 padding: EdgeInsets.only(top: 15),
-                child: Text(
+                child: AutoSizeText(
                   classCard.className,
+                  maxLines: 1,
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Container(
+                  alignment: Alignment.centerRight,
+                  child: AutoSizeText(
+                    classCard.ownerFullName + " :استاد"  ,
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),

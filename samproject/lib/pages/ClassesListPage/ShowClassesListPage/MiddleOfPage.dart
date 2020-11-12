@@ -27,7 +27,7 @@ class _CreateOrJoinClassState extends State<CreateOrJoinClass> {
       child: Row(
         children: [
           Expanded(
-            child: JoinButton(),
+            child: JoinButton(classListWidgetSetState: classListWidgetSetState, userClasses: userClasses,),
           ),
           Expanded(
             child: CreateClassButton(classListWidgetSetState: classListWidgetSetState, userClasses: userClasses,),

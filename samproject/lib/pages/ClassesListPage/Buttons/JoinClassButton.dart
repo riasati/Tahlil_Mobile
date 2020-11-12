@@ -4,12 +4,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:samproject/domain/Class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../homePage.dart';
+
 class JoinButton extends StatefulWidget {
+  final classListWidgetSetState;
+  List<Class> userClasses;
+
+  JoinButton( {@required void classListWidgetSetState() , @required this.userClasses}):
+        classListWidgetSetState = classListWidgetSetState;
+
   @override
-  _JoinButtonState createState() => _JoinButtonState();
+  _JoinButtonState createState() => _JoinButtonState(classListWidgetSetState: classListWidgetSetState, userClasses: userClasses);
 }
 
 class _JoinButtonState extends State<JoinButton> {
@@ -17,6 +27,12 @@ class _JoinButtonState extends State<JoinButton> {
   final RoundedLoadingButtonController btnJoinController = new RoundedLoadingButtonController();
   String _joinClassURL = "http://parham-backend.herokuapp.com/class/join";
   final TextEditingController classCodeController = TextEditingController();
+
+  final classListWidgetSetState;
+  List<Class> userClasses;
+
+  _JoinButtonState( {@required void classListWidgetSetState() , @required this.userClasses}):
+        classListWidgetSetState = classListWidgetSetState;
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +124,7 @@ class _JoinButtonState extends State<JoinButton> {
                 padding: EdgeInsets.only(bottom: 20),
                 child: Container(
                     child: RoundedLoadingButton(
-                  color: Colors.green,
+                  color: Color.fromRGBO(14, 145, 140, 1),
                   //controller: btnJoin,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -143,10 +159,95 @@ class _JoinButtonState extends State<JoinButton> {
               'Authorization': token,
               'Content-Type': 'application/json',
             }, body: body);
-        print(response.body);
+        print("hie");
+        if(response.statusCode == 200 && response.body != null){
+          var joinedClassInfo = json.decode(utf8.decode(response.bodyBytes))["joinedClass"];
+          var joinedClass = Class(joinedClassInfo['name'], joinedClassInfo['ownerFullname'], joinedClassInfo['classId']);
+          Navigator.pop(context);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "به کلاس اضافه شدید",
+              buttons: [
+                DialogButton(
+                  child: Text(
+                    "حله",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () => {
+                    Navigator.pop(context),
+                  },
+                  color: Color(0xFF3D5A80),
+                ),
+              ],
+            ).show();
+          });
+          this.userClasses.add(joinedClass);
+          widget?.classListWidgetSetState();
+        }
+        else{
+          var errorMsg = json.decode(utf8.decode(response.bodyBytes))['error'];
+          Navigator.pop(context);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: errorMsg,
+              buttons: [
+                DialogButton(
+                  child: Text(
+                    "حله",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  color: Colors.red,
+                ),
+              ],
+            ).show();
+          });
+        }
+      }
+      else{
+        Navigator.pop(context);
+        setState(() {
+          Alert(
+            context: context,
+            type: AlertType.error,
+            title: "ابتدا به حساب خود وارد شوید",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "حله",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () => Navigator.pop(context),
+                color: Colors.red,
+              ),
+            ],
+          ).show();
+        });
       }
     }on Exception catch(e){
       print(e.toString());
+      Navigator.pop(context);
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "به کلاس اضافه نشدید",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "حله",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.red,
+            ),
+          ],
+        ).show();
+      });
     }
 
   }

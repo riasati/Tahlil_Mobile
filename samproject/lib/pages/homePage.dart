@@ -91,7 +91,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(color: Colors.red,),
             Container(color: Colors.deepPurple,),
-            HomePage.user.username != null?ClassesList(stopLoading: stopLoading,):LoginOrSignup(toggleCoinCallback: stopLoading,),
+            HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: stopLoading,),
             Container(color: Colors.yellow,),
             Container(color: Colors.black,),
 
@@ -129,6 +129,7 @@ class _HomePageState extends State<HomePage> {
           HomePage.user.email = personInfo['user']['email'];
           HomePage.user.avatarUrl = personInfo['user']['avatar'];
           setState(() {
+            stopLoading();
           });
         }
       }
