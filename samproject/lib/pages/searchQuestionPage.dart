@@ -1,6 +1,15 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/question.dart';
+import 'package:samproject/domain/popupMenuData.dart';
+import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/utils/showCorrectnessDialog.dart';
+import 'package:samproject/widgets/popumMenu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class SearchQuestionPage extends StatefulWidget {
   @override
@@ -50,7 +59,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
     newQuestion2.kind = "چند گزینه ای";
     newQuestion2.difficulty = "سخت";
     newQuestion2.text = "هر میکرو معادل با 10 به توان چند است؟";
-    newQuestion2.image1 = "عکس سوال";
+    newQuestion2.questinImage = "عکس سوال";
     newQuestion2.optionOne = "به توان یک";
     newQuestion2.optionTwo = "به توان دو";
     newQuestion2.optionThree = "به توان سه";
@@ -66,7 +75,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
     newQuestion3.kind = "تستی";
     newQuestion3.difficulty = "سخت";
     newQuestion3.text = "هر میکرو معادل با 10 به توان چند است؟";
-    newQuestion3.image1 = "عکس سوال";
+    newQuestion3.questinImage = "عکس سوال";
     newQuestion3.optionOne = "به توان یک";
     newQuestion3.optionTwo = "به توان دو";
     newQuestion3.optionThree = "به توان سه";
@@ -79,21 +88,135 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
     newQuestion4.kind = "جایخالی";
     newQuestion4.difficulty = "سخت";
     newQuestion4.text = "هر میکرو معادل با 10 به توان چند است؟";
-    newQuestion4.image1 = "عکس سوال";
+    newQuestion4.questinImage = "عکس سوال";
     newQuestion4.answerString = "منهای شش";
 
   }
 
-  void submit()
+  List<Question> questionList = [];
+  int totalpage = 0;
+  int thispage = 1;
+
+  void searchQuestion() async
   {
-    print(payeData.name);
-    print(bookData.name);
-    print(chapterData.name);
-    print(kindData.name);
-    print(difficultyData.name);
-    setState(() {
-      _btnController.stop();
+    final prefs = await SharedPreferences.getInstance();
+    // String token = prefs.getString("token");
+    print("in searchQuestion");
+
+    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': tokenplus,
+    };
+
+    var params = {
+      'page': thispage.toString(),
+      'limit': '1',
+    };
+    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
+    Question temporaryQuestion = new Question();
+    print("in searchQuestion 2");
+    temporaryQuestion.paye = payeData.name;
+    temporaryQuestion.book = bookData.name;
+    temporaryQuestion.chapter = chapterData.name;
+    temporaryQuestion.kind = kindData.name;
+    temporaryQuestion.difficulty = difficultyData.name;
+    print(temporaryQuestion.paye);
+    print(temporaryQuestion.book);
+    print(temporaryQuestion.chapter);
+    print(temporaryQuestion.kind);
+    print(temporaryQuestion.difficulty);
+    QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
+
+    print(qs.type);
+    print(qs.base);
+    print(qs.hardness);
+    print(qs.course);
+    dynamic data = jsonEncode(<String,dynamic>{
+      "type":[qs.type],
+      "base": [qs.base],
+      "hardness" : [qs.hardness],
+      "course": [qs.course],
+   //   "chapter" : [qs.chapter],
     });
+    questionList = [];
+    print("in searchQuestion 3");
+    var response = await http.post('https://parham-backend.herokuapp.com/bank?$query',
+        headers: headers,
+      body: data
+    );
+    if (response.statusCode == 200){
+      print("ok");
+      final responseJson = jsonDecode(response.body);
+      //print(responseJson.toString());
+
+      totalpage = responseJson["totalPages"];
+      print(responseJson["questions"].length);
+      for (int i=0;i<responseJson["questions"].length;i++)
+      {
+        QuestionServer qs = new QuestionServer();
+        qs.type = responseJson["questions"][i]["type"];
+        qs.question = responseJson["questions"][i]["question"];
+        qs.base = responseJson["questions"][i]["base"];
+       // qs.course = responseJson["questions"][i]["course"];
+        qs.chapter = responseJson["questions"][i]["chapter"];
+        qs.hardness = responseJson["questions"][i]["hardness"];
+        qs.answer = responseJson["questions"][i]["answers"].toString();
+        qs.options = responseJson["questions"][i]["options"];
+     //   qs.public = responseJson["questions"][i]["public"].toString();
+    //    qs.id = responseJson["questions"][i]["_id"];
+
+        // print(qs.type);
+        // print(qs.public);
+        // print(qs.question);
+        // //print(qs.answer);
+        // print(qs.base);
+        // print(qs.hardness);
+        // print(qs.course);
+        // print("---");
+        Question q = Question.QuestionServerToQuestion(qs);
+        print(q.kind);
+        print(q.isPublic);
+        print(q.text);
+        //print(qs.answer);
+        print(q.paye);
+        print(q.difficulty);
+        print(q.book);
+        questionList.add(q);
+      }
+      // for (int i=0;i<questionList.length;i++)
+      // {
+      //   print(questionList[i].text);
+      // }
+      _btnController.stop();
+      setState(() {
+
+      });
+    }
+    else{
+      print("nokey");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      ShowCorrectnessDialog(false,context);
+        _btnController.stop();
+      //_showMyDialog(false);
+      //_btnController.stop();
+    }
+
+
+
+
+    // print(payeData.name);
+    // print(bookData.name);
+    // print(chapterData.name);
+    // print(kindData.name);
+    // print(difficultyData.name);
+    // setState(() {
+    //   _btnController.stop();
+    // });
 
   }
   @override
@@ -166,8 +289,8 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                           child: Text('جستجو',style: TextStyle(color: Colors.white),),
                           //  borderRadius: 0,
                           controller: _btnController,
-                          color: Color.fromRGBO(238, 108,77 ,100), //Color.(0xFF3D5A80),
-                          onPressed: () => submit,
+                          color: Color.fromRGBO(238, 108,77 ,1.0), //Color.(0xFF3D5A80),
+                          onPressed: () => searchQuestion(),
                         ),
                       ),
 
@@ -175,35 +298,59 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                   ),
                 ),
               ),
-              MultiOptionView(question: newQuestion2,),
-              TestView(question: newQuestion3,),
-              AnswerString(question: newQuestion,),
-              AnswerString(question: newQuestion4,),
+              SingleChildScrollView(
+                physics: ScrollPhysics(),
+                child: ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: (questionList.length == 0)? 0:1,
+                    itemBuilder: (BuildContext context, int index)
+                    {
+                      if(questionList[index].kind == "جایخالی") return AnswerString(question: questionList[index]);
+                      else if (questionList[index].kind == "تشریحی") return AnswerString(question: questionList[index],);
+                      else if (questionList[index].kind == "تستی") return TestView(question: questionList[index],);
+                      else if (questionList[index].kind == "چند گزینه ای") return MultiOptionView(question: questionList[index],);
+                      else return Container();
+                    }
+                ),
+              ),
+              SizedBox(
+                height: 50,
+                child: ListView.builder(
+                    //physics: NeverScrollableScrollPhysics(),
+                    //shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 5,//totalpage,
+                    itemBuilder: (BuildContext context, int index)
+                    {
+                      int indexplus = index+1;
+                      return InkWell(
+                        onTap: ()
+                        {
+                          thispage = indexplus;
+                          searchQuestion();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
+                          // width: 20,
+                          // height: 20,
+                          color: Color(0xFF3D5A80),
+                          child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+                        ),
+                      );
+                    }
+                ),
+              ),
+              // MultiOptionView(question: newQuestion2,),
+              // TestView(question: newQuestion3,),
+              // AnswerString(question: newQuestion,),
+              // AnswerString(question: newQuestion4,),
             ],
           ),
         ),
       ),
     );
-  }
-}
-
-class popupMenuData
-{
-  String name;
-  String popupMenuBottonName;
-  List<PopupMenuItem<int>> list = [];
-  List<String> stringList = [];
-
-  popupMenuData(String PopupMenuBottonName)
-  {
-    this.popupMenuBottonName = PopupMenuBottonName;
-  }
-  void fillStringList(List<String> list)
-  {
-    for (int i=0;i<list.length;i++)
-    {
-      stringList.add(list[i]);
-    }
   }
 }
 
@@ -255,7 +402,7 @@ class _TestViewState extends State<TestView> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
-                  (widget.question.image1 != null) ? Text(widget.question.image1) : Container(),
+                  (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
             ),
@@ -392,7 +539,7 @@ class _MultiOptionViewState extends State<MultiOptionView> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
-                  (widget.question.image1 != null) ? Text(widget.question.image1) : Container(),
+                  (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
             ),
@@ -495,7 +642,7 @@ class _AnswerStringState extends State<AnswerString> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
-                  (widget.question.image1 != null) ? Text(widget.question.image1) : Container(),
+                  (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
             ),
@@ -506,7 +653,7 @@ class _AnswerStringState extends State<AnswerString> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(alignment: Alignment.centerRight,child: Text("جواب : "+ widget.question.answerString,textDirection: TextDirection.rtl)),
-                  (widget.question.image2 != null) ? Text(widget.question.image2) : Container(),
+                  (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
             ):Container(),
@@ -524,57 +671,6 @@ class _AnswerStringState extends State<AnswerString> {
           ],
         ),
       ),
-    );
-  }
-}
-
-
-class PopupMenu extends StatefulWidget {
-  popupMenuData Data;
-  PopupMenu({Key key, this.Data}) : super(key: key);
-  @override
-  _PopupMenuState createState() => _PopupMenuState();
-}
-
-class _PopupMenuState extends State<PopupMenu> {
-  void onSelectedMenu(int value)
-  {
-    for (int i = 0;i<widget.Data.stringList.length;i++)
-    {
-      if (value == i) {
-        setState(() {
-          widget.Data.name = widget.Data.stringList[i];
-        });
-      }
-    }
-    if(value == -1)
-    {
-      setState(() {
-        widget.Data.name = null;
-      });
-    }
-  }
-  PopupMenuItem<int> popupMenuItem (int value,String text)
-  {
-    return PopupMenuItem(
-        value: value,
-        child: Container(alignment: Alignment.centerRight,child: Text(text,textDirection: TextDirection.rtl,))
-    );
-  }
-  @override
-  void initState() {
-    super.initState();
-    for (int i = 0;i<widget.Data.stringList.length;i++)
-    {
-      widget.Data.list.add(popupMenuItem(i, widget.Data.stringList[i]));
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton(
-      child: (widget.Data.name == null) ? Text(widget.Data.popupMenuBottonName) : Text(widget.Data.name),
-      onSelected: onSelectedMenu,
-      itemBuilder: (context) => widget.Data.list,
     );
   }
 }

@@ -1,132 +1,188 @@
+import 'package:samproject/domain/quetionServer.dart';
+
 class Question
 {
-
-  String _text;
-  String _image1;
-  String _image2;
-  String _paye;
-  String _book;
-  String _chapter;
-  String _difficulty;
-  String _kind;
-  String _answerString;
-  int _numberOne;
-  int _numberTwo;
-  int _numberThree;
-  int _numberFour;
-  String _optionOne;
-  String _optionTwo;
-  String _optionThree;
-  String _optionFour;
-  bool _isPublic;
-
-  bool get isPublic => _isPublic;
-
-  set isPublic(bool value) {
-    _isPublic = value;
-  }
-
-  String get text => _text;
-
-  set text(String value) {
-    _text = value;
-  }
-
-  String get optionOne => _optionOne;
-
-  set optionOne(String value) {
-    _optionOne = value;
-  }
+  String text;
+  String questinImage;
+  String answerImage;
+  String paye;
+  String book;
+  String chapter;
+  String difficulty;
+  String kind;
+  String answerString;
+  int numberOne;
+  int numberTwo;
+  int numberThree;
+  int numberFour;
+  String optionOne;
+  String optionTwo;
+  String optionThree;
+  String optionFour;
+  bool isPublic;
+  String id;
 
   Question();
+  static Question QuestionServerToQuestion(QuestionServer QS)
+  {
+    Question Q = new Question();
+    Q.id = QS.id;
+    Q.text = QS.question;
 
-  String get image1 => _image1;
+    if ( QS.base == "10")
+    {
+      Q.paye = "دهم";
+    }
+    else if (QS.base == "11")
+    {
+      Q.paye = "یازدهم";
+    }
+    else if (QS.base == "12")
+    {
+      Q.paye = "دوازدهم";
+    }
 
-  set image1(String value) {
-    _image1 = value;
-  }
+    if(QS.course == "MATH")
+    {
+      Q.book = "ریاضی";
+    }
+    else if(QS.course == "PHYSIC")
+    {
+      Q.book = "فیزیک";
+    }
+    else if(QS.course == "CHEMISTRY")
+    {
+      Q.book = "شیمی";
+    }
+    else if(QS.course == "BIOLOGY")
+    {
+      Q.book = "زیست";
+    }
 
-  String get image2 => _image2;
+    if ( QS.chapter == "1")
+    {
+      Q.chapter = "اول";
+    }
+    else if (QS.chapter == "2")
+    {
+      Q.chapter = "دوم";
+    }
+    else if (QS.chapter == "3")
+    {
+      Q.chapter = "سوم";
+    }
+    else if (QS.chapter == "4")
+    {
+      Q.chapter = "چهارم";
+    }
+    else if (QS.chapter == "5")
+    {
+      Q.chapter = "پنجم";
+    }
+    else if (QS.chapter == "6")
+    {
+      Q.chapter = "ششم";
+    }
+    else if (QS.chapter == "7")
+    {
+      Q.chapter = "هفتم";
+    }
+    else if (QS.chapter == "8")
+    {
+      Q.chapter = "هشتم";
+    }
+    else if (QS.chapter == "9")
+    {
+      Q.chapter = "نهم";
+    }
+    else if (QS.chapter == "10")
+    {
+      Q.chapter = "دهم";
+    }
 
-  set image2(String value) {
-    _image2 = value;
-  }
+    if (QS.hardness == "LOW")
+    {
+      Q.difficulty = "آسان";
+    }
+    else if (QS.hardness == "MEDIUM")
+    {
+      Q.difficulty = "متوسط";
+    }
+    else if (QS.hardness == "HARD")
+    {
+      Q.difficulty = "سخت";
+    }
 
-  String get paye => _paye;
+    if (QS.type == "TEST")
+    {
+      Q.kind = "تستی";
+    }
+    else if (QS.type == "SHORTANSWER")
+    {
+      Q.kind = "جایخالی";
+    }
+    else if (QS.type == "MULTICHOISE")
+    {
+      Q.kind = "چند گزینه ای";
+    }
+    else if (QS.type == "LONGANSWER")
+    {
+      Q.kind = "تشریحی";
+    }
 
-  set paye(String value) {
-    _paye = value;
-  }
+    if (QS.public == "true")
+    {
+      Q.isPublic = true;
+    }
+    else
+    {
+      Q.isPublic = false;
+    }
 
-  String get book => _book;
+    if (QS.type == "SHORTANSWER")
+    {
+      Q.answerString = QS.answer;
+    }
+    else if (QS.type == "LONGANSWER")
+    {
+      Q.answerString = QS.answer;
+    }
+    else if (QS.type == "TEST")
+    {
+      Q.optionOne = QS.options[0]["option"];
+      Q.optionTwo = QS.options[1]["option"];
+      Q.optionThree = QS.options[2]["option"];
+      Q.optionFour = QS.options[3]["option"];
 
-  set book(String value) {
-    _book = value;
-  }
+    //  Q.numberOne = int.parse(QS.answer);
+    }
+    else if (QS.type == "MULTICHOISE")
+    {
+      Q.optionOne = QS.options[0]["option"];
+      Q.optionTwo = QS.options[1]["option"];
+      Q.optionThree = QS.options[2]["option"];
+      Q.optionFour = QS.options[3]["option"];
 
-  String get chapter => _chapter;
-
-  set chapter(String value) {
-    _chapter = value;
-  }
-
-  String get difficulty => _difficulty;
-
-  set difficulty(String value) {
-    _difficulty = value;
-  }
-
-  String get kind => _kind;
-
-  set kind(String value) {
-    _kind = value;
-  }
-
-  String get answerString => _answerString;
-
-  set answerString(String value) {
-    _answerString = value;
-  }
-
-  int get numberOne => _numberOne;
-
-  set numberOne(int value) {
-    _numberOne = value;
-  }
-
-  int get numberTwo => _numberTwo;
-
-  set numberTwo(int value) {
-    _numberTwo = value;
-  }
-
-  int get numberThree => _numberThree;
-
-  set numberThree(int value) {
-    _numberThree = value;
-  }
-
-  int get numberFour => _numberFour;
-
-  set numberFour(int value) {
-    _numberFour = value;
-  }
-
-  String get optionTwo => _optionTwo;
-
-  String get optionFour => _optionFour;
-
-  set optionFour(String value) {
-    _optionFour = value;
-  }
-
-  String get optionThree => _optionThree;
-
-  set optionThree(String value) {
-    _optionThree = value;
-  }
-
-  set optionTwo(String value) {
-    _optionTwo = value;
+      for (int i=0;i<QS.answer.length;i++)
+      {
+        if (QS.answer[i] == "1")
+        {
+          Q.numberOne = 1;
+        }
+        else if (QS.answer[i] == "2")
+        {
+          Q.numberTwo = 1;
+        }
+        else if (QS.answer[i] == "3")
+        {
+          Q.numberThree = 1;
+        }
+        else if (QS.answer[i] == "4")
+        {
+          Q.numberFour = 1;
+        }
+      }
+    }
+    return Q;
   }
 }

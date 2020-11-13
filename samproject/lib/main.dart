@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Starter Template',
-      home: MyQuestionPage(),
+      home: SearchQuestionPage(),
     );
   }
 }

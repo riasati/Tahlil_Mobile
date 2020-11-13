@@ -1,7 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/domain/question.dart';
+import 'package:samproject/domain/popupMenuData.dart';
+import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/utils/showCorrectnessDialog.dart';
+import 'package:samproject/widgets/popumMenu.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyQuestionPage extends StatefulWidget {
   @override
@@ -9,61 +16,141 @@ class MyQuestionPage extends StatefulWidget {
 }
 
 class _MyQuestionPageState extends State<MyQuestionPage> {
-  Question newQuestion = new Question();
-  Question newQuestion2 = new Question();
-  Question newQuestion3 = new Question();
-  Question newQuestion4 = new Question();
+  // Question newQuestion = new Question();
+  // Question newQuestion2 = new Question();
+  // Question newQuestion3 = new Question();
+  // Question newQuestion4 = new Question();
 
+  List<Question> questionList = [];
+  int totalpage = 0;
+  int thispage = 1;
+
+  void getMyQuestion() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    // String token = prefs.getString("token");
+
+    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': tokenplus,
+    };
+
+    var params = {
+      'page': thispage.toString(),
+      'limit': '2',
+    };
+    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
+
+    var response = await http.get('https://parham-backend.herokuapp.com/question?$query', headers: headers);
+    questionList = [];
+    if (response.statusCode == 200)
+    {
+      print("ok");
+      final responseJson = jsonDecode(response.body);
+      totalpage = responseJson["totalPages"];
+      for (int i=0;i<responseJson["questions"].length;i++)
+      {
+        QuestionServer qs = new QuestionServer();
+        qs.type = responseJson["questions"][i]["type"];
+        qs.question = responseJson["questions"][i]["question"];
+        qs.base = responseJson["questions"][i]["base"];
+        qs.course = responseJson["questions"][i]["course"];
+        qs.chapter = responseJson["questions"][i]["chapter"];
+        qs.hardness = responseJson["questions"][i]["hardness"];
+        qs.answer = responseJson["questions"][i]["answers"].toString();
+        qs.options = responseJson["questions"][i]["options"];
+        qs.public = responseJson["questions"][i]["public"].toString();
+        qs.id = responseJson["questions"][i]["_id"];
+
+        // print(qs.type);
+        // print(qs.public);
+        // print(qs.question);
+        // //print(qs.answer);
+        // print(qs.base);
+        // print(qs.hardness);
+        // print(qs.course);
+        // print("---");
+        Question q = Question.QuestionServerToQuestion(qs);
+        // print(q.kind);
+        // print(q.isPublic);
+        // print(q.text);
+        // //print(qs.answer);
+        // print(q.paye);
+        // print(q.difficulty);
+        // print(q.book);
+        questionList.add(q);
+      }
+      // for (int i=0;i<questionList.length;i++)
+      // {
+      //   print(questionList[i].text);
+      // }
+      setState(() {
+
+      });
+    }
+    else
+      {
+        print("nokey");
+      }
+
+  }
   @override
   void initState() {
     super.initState();
-    newQuestion.paye = "دهم";
-    newQuestion.book = "فیزیک";
-    newQuestion.chapter = "چهارم";
-    newQuestion.kind = "تشریحی";
-    newQuestion.difficulty = "سخت";
-    newQuestion.text = "هر میکرو معادل با 10 به توان چند است؟";
-    //newQuestion.image1 = "عکس سوال";
-    newQuestion.answerString = "منهای شش";
-    //newQuestion.image2 = "عکس پاسخ";
+    getMyQuestion();
 
-    newQuestion2.paye = "دهم";
-    newQuestion2.book = "فیزیک";
-    newQuestion2.chapter = "چهارم";
-    newQuestion2.kind = "چند گزینه ای";
-    newQuestion2.difficulty = "سخت";
-    newQuestion2.text = "هر میکرو معادل با 10 به توان چند است؟";
-    newQuestion2.image1 = "عکس سوال";
-    newQuestion2.optionOne = "به توان یک";
-    newQuestion2.optionTwo = "به توان دو";
-    newQuestion2.optionThree = "به توان سه";
-    newQuestion2.optionFour = "به توان چهار";
-    newQuestion2.numberOne = 0;
-    newQuestion2.numberTwo = 1;
-    newQuestion2.numberThree = 1;
-    newQuestion2.numberFour = 0;
-
-    newQuestion3.paye = "دهم";
-    newQuestion3.book = "فیزیک";
-    newQuestion3.chapter = "چهارم";
-    newQuestion3.kind = "تستی";
-    newQuestion3.difficulty = "سخت";
-    newQuestion3.text = "هر میکرو معادل با 10 به توان چند است؟";
-    newQuestion3.image1 = "عکس سوال";
-    newQuestion3.optionOne = "به توان یک";
-    newQuestion3.optionTwo = "به توان دو";
-    newQuestion3.optionThree = "به توان سه";
-    newQuestion3.optionFour = "به توان چهار";
-    newQuestion3.numberOne = 2;
-
-    newQuestion4.paye = "دهم";
-    newQuestion4.book = "فیزیک";
-    newQuestion4.chapter = "چهارم";
-    newQuestion4.kind = "جایخالی";
-    newQuestion4.difficulty = "سخت";
-    newQuestion4.text = "هر میکرو معادل با 10 به توان چند است؟";
-    newQuestion4.image1 = "عکس سوال";
-    newQuestion4.answerString = "منهای شش";
+    //
+    // newQuestion.paye = "دهم";
+    // newQuestion.book = "فیزیک";
+    // newQuestion.chapter = "چهارم";
+    // newQuestion.kind = "تشریحی";
+    // newQuestion.difficulty = "سخت";
+    // newQuestion.text = "هر میکرو معادل با 10 به توان چند است؟";
+    // //newQuestion.questionImage = "عکس سوال";
+    // newQuestion.answerString = "منهای شش";
+    // //newQuestion.image2 = "عکس پاسخ";
+    //
+    // newQuestion2.paye = "دهم";
+    // newQuestion2.book = "فیزیک";
+    // newQuestion2.chapter = "چهارم";
+    // newQuestion2.kind = "چند گزینه ای";
+    // newQuestion2.difficulty = "سخت";
+    // newQuestion2.text = "هر میکرو معادل با 10 به توان چند است؟";
+    // newQuestion2.questinImage = "عکس سوال";
+    // newQuestion2.optionOne = "به توان یک";
+    // newQuestion2.optionTwo = "به توان دو";
+    // newQuestion2.optionThree = "به توان سه";
+    // newQuestion2.optionFour = "به توان چهار";
+    // newQuestion2.numberOne = 0;
+    // newQuestion2.numberTwo = 1;
+    // newQuestion2.numberThree = 1;
+    // newQuestion2.numberFour = 0;
+    //
+    // newQuestion3.paye = "دهم";
+    // newQuestion3.book = "فیزیک";
+    // newQuestion3.chapter = "چهارم";
+    // newQuestion3.kind = "تستی";
+    // newQuestion3.difficulty = "سخت";
+    // newQuestion3.text = "هر میکرو معادل با 10 به توان چند است؟";
+    // newQuestion3.questinImage = "عکس سوال";
+    // newQuestion3.optionOne = "به توان یک";
+    // newQuestion3.optionTwo = "به توان دو";
+    // newQuestion3.optionThree = "به توان سه";
+    // newQuestion3.optionFour = "به توان چهار";
+    // newQuestion3.numberOne = 2;
+    //
+    // newQuestion4.paye = "دهم";
+    // newQuestion4.book = "فیزیک";
+    // newQuestion4.chapter = "چهارم";
+    // newQuestion4.kind = "جایخالی";
+    // newQuestion4.difficulty = "سخت";
+    // newQuestion4.text = "هر میکرو معادل با 10 به توان چند است؟";
+    // newQuestion4.questinImage = "عکس سوال";
+    // newQuestion4.answerString = "منهای شش";
   }
 
   @override
@@ -85,18 +172,54 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: //AnswerStringCard(question: questionList[0],)
+          Column(
             children: [
-              MultiOptionCard(question: newQuestion2,IsEditing: false,),
-              TestCard(question: newQuestion3,),
-              AnswerStringCard(question: newQuestion,),
-              AnswerStringCard(question: newQuestion4,),
+              Flexible(
+                flex: 11,
+                child: ListView.builder(
+                  itemCount: questionList.length,
+                  itemBuilder: (BuildContext context, int index)
+                  {
+                    if(questionList[index].kind == "جایخالی") return AnswerStringCard(question: questionList[index]);
+                    else if (questionList[index].kind == "تشریحی") return AnswerStringCard(question: questionList[index],);
+                    else if (questionList[index].kind == "تستی") return TestCard(question: questionList[index],);
+                    else if (questionList[index].kind == "چند گزینه ای") return MultiOptionCard(question: questionList[index],);
+                    else return Container();
+                  }
+                  ),
+              ),
+              Flexible(
+                flex: 1,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: totalpage,
+                  itemBuilder: (BuildContext context, int index)
+                  {
+                    int indexplus = index+1;
+                    return InkWell(
+                      onTap: ()
+                      {
+                        thispage = indexplus;
+                        getMyQuestion();
+                      },
+                      child: Container(
+                        margin: EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8.0),
+                       // width: 20,
+                       // height: 20,
+                        color: Color(0xFF3D5A80),
+                        child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+                      ),
+                    );
+                  }
+                ),
+              )
             ],
           ),
+
         ),
       ),
     );
@@ -105,14 +228,15 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
 
 class MultiOptionCard extends StatefulWidget {
   Question question;
-  bool IsEditing;
-  MultiOptionCard({Key key, this.question, this.IsEditing}) : super(key: key);
+ // bool IsEditing;
+  MultiOptionCard({Key key, this.question}) : super(key: key);
   @override
   _MultiOptionCardState createState() => _MultiOptionCardState();
 }
 
 class _MultiOptionCardState extends State<MultiOptionCard> {
-  bool isDelete = false;
+  bool IsDelete = false;
+  bool IsEditing = false;
    bool optionOne = false;
   void optionOneChange(bool newValue) {
     setState(() {
@@ -147,43 +271,151 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
       (widget.question.numberFour == 1) ? optionFour = true : optionFour = false;
     });
   }
-  void onEditButton()
+  void onEditButton() async
   {
-    if (widget.IsEditing == true)
+    if (IsEditing == true)
     {
-      widget.question.paye = payeData.name;
-      widget.question.book = bookData.name;
-      widget.question.chapter = chapterData.name;
-      widget.question.kind = kindData.name;
-      widget.question.difficulty = difficultyData.name;
+      final prefs = await SharedPreferences.getInstance();
+      // String token = prefs.getString("token");
+      String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+      if (token == null) {return;}
+      String tokenplus = "Bearer" + " " + token;
+      Question temporaryQuestion = new Question();
+      temporaryQuestion.paye = payeData.name;
+      temporaryQuestion.book = bookData.name;
+      temporaryQuestion.chapter = chapterData.name;
+      temporaryQuestion.kind = kindData.name;
+      temporaryQuestion.difficulty = difficultyData.name;
 
-      widget.question.text = QuestionTextController.text;
-      widget.question.optionOne = MultiOptionText1Controller.text;
-      widget.question.optionTwo = MultiOptionText2Controller.text;
-      widget.question.optionThree = MultiOptionText3Controller.text;
-      widget.question.optionFour = MultiOptionText4Controller.text;
+      temporaryQuestion.isPublic = addQuestionBankOption;
+      temporaryQuestion.id = widget.question.id;
 
-      widget.question.numberOne = (optionOne) ? 1 : 0;
-      widget.question.numberTwo = (optionTwo) ? 1 : 0;
-      widget.question.numberThree = (optionThree) ? 1 : 0;
-      widget.question.numberFour = (optionFour) ? 1 : 0;
+      temporaryQuestion.text = QuestionTextController.text;
+      temporaryQuestion.optionOne =  MultiOptionText1Controller.text;
+      temporaryQuestion.optionTwo = MultiOptionText2Controller.text;
+      temporaryQuestion.optionThree = MultiOptionText3Controller.text;
+      temporaryQuestion.optionFour = MultiOptionText4Controller.text;
+
+      temporaryQuestion.numberOne = (optionOne) ? 1 : 0;
+      temporaryQuestion.numberTwo = (optionTwo) ? 1 : 0;
+      temporaryQuestion.numberThree = (optionThree) ? 1 : 0;
+      temporaryQuestion.numberFour = (optionFour) ? 1 : 0;
+
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
+
+      dynamic data = jsonEncode(<String,dynamic>{
+        "questionId":qs.id,
+        "type": qs.type,
+        "public": qs.public,
+        "question": qs.question,
+        "answer": qs.answer.toString(),
+        "base": qs.base,
+        "hardness" : qs.hardness,
+        "course": qs.course,
+        "options" : qs.options.toString(),
+        "chapter" : qs.chapter,
+      });
+      final response = await http.put('https://parham-backend.herokuapp.com/question',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': tokenplus,
+            'Content-Type': 'application/json',
+          },
+          body: data
+      );
+      if (response.statusCode == 200){
+        ShowCorrectnessDialog(true,context);
+        print("Question Created in test");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
+        widget.question.paye = payeData.name;
+        widget.question.book = bookData.name;
+        widget.question.chapter = chapterData.name;
+        widget.question.kind = kindData.name;
+        widget.question.difficulty = difficultyData.name;
+
+        widget.question.text = QuestionTextController.text;
+        widget.question.optionOne = MultiOptionText1Controller.text;
+        widget.question.optionTwo = MultiOptionText2Controller.text;
+        widget.question.optionThree = MultiOptionText3Controller.text;
+        widget.question.optionFour = MultiOptionText4Controller.text;
+
+        widget.question.numberOne = (optionOne) ? 1 : 0;
+        widget.question.numberTwo = (optionTwo) ? 1 : 0;
+        widget.question.numberThree = (optionThree) ? 1 : 0;
+        widget.question.numberFour = (optionFour) ? 1 : 0;
+
+        //  _btnController.stop();
+        //final responseJson = jsonDecode(response.body);
+        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
+        //_showMyDialog(true);
+        //_btnController.stop();
+      }
+      else{
+        print("Question failed in test");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+        ShowCorrectnessDialog(false,context);
+        //  _btnController.stop();
+        //_showMyDialog(false);
+        //_btnController.stop();
+      }
 
       setState(() {
-        widget.IsEditing = false;
+        IsEditing = false;
       });
     }
     else
       {
         setState(() {
-          widget.IsEditing = true;
+          IsEditing = true;
         });
       }
   }
-  void onCloseButton()
+  void onCloseButton() async
   {
-    setState(() {
-      isDelete = true;
-    });
+    final prefs = await SharedPreferences.getInstance();
+    // String token = prefs.getString("token");
+    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+    print(widget.question.id);
+    final response = await http.delete('https://parham-backend.herokuapp.com/question',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': tokenplus,
+        'Content-Type': 'application/json',
+        'questionId' : widget.question.id,
+      },
+
+    );
+    if (response.statusCode == 200){
+      ShowCorrectnessDialog(true,context);
+      print("Question Created in test");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      setState(() {
+        IsDelete = true;
+      });
+      //  _btnController.stop();
+      //final responseJson = jsonDecode(response.body);
+      //HomePage.user.avatarUrl = responseJson['user']['avatar'];
+      //_showMyDialog(true);
+      //_btnController.stop();
+    }
+    else{
+      print("Question failed in test");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      ShowCorrectnessDialog(false,context);
+      setState(() {
+        IsDelete = false;
+      });
+      //  _btnController.stop();
+      //_showMyDialog(false);
+      //_btnController.stop();
+    }
   }
 
 
@@ -214,7 +446,7 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
-              (widget.question.image1 != null) ? Text(widget.question.image1) : Container(),
+              (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
             ],
           ),
         ),
@@ -292,6 +524,13 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
   TextEditingController MultiOptionText2Controller = new TextEditingController();
   TextEditingController MultiOptionText3Controller = new TextEditingController();
   TextEditingController MultiOptionText4Controller = new TextEditingController();
+
+  bool addQuestionBankOption = false;
+  void addQuestionBankOptionChange(bool newValue) {
+    setState(() {
+      addQuestionBankOption = newValue;
+    });
+  }
 
   Widget EditingCard()
   {
@@ -409,6 +648,13 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
             ],
           ),
         ),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
+            Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
+          ],
+        ),
       ],
     );
   }
@@ -441,12 +687,12 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
   }
   @override
   Widget build(BuildContext context) {
-    return (isDelete == false) ? Card(
+    return (IsDelete == false) ? Card(
       child: Padding(
         padding: EdgeInsets.all(4.0),
         child: Column(
           children: [
-            (widget.IsEditing == false) ? notEditingCard() : EditingCard(),
+            (IsEditing == false) ? notEditingCard() : EditingCard(),
             Row(
               textDirection: TextDirection.rtl,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -518,23 +764,91 @@ class _TestCardState extends State<TestCard> {
     });
   }
 
-  void onEditButton()
+  void onEditButton() async
   {
     if (IsEditing == true)
     {
-      widget.question.paye = payeData.name;
-      widget.question.book = bookData.name;
-      widget.question.chapter = chapterData.name;
-      widget.question.kind = kindData.name;
-      widget.question.difficulty = difficultyData.name;
+      final prefs = await SharedPreferences.getInstance();
+      // String token = prefs.getString("token");
+      String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+      if (token == null) {return;}
+      String tokenplus = "Bearer" + " " + token;
+      // print(widget.question.id);
+      Question temporaryQuestion = new Question();
+      temporaryQuestion.paye = payeData.name;
+      temporaryQuestion.book = bookData.name;
+      temporaryQuestion.chapter = chapterData.name;
+      temporaryQuestion.kind = kindData.name;
+      temporaryQuestion.difficulty = difficultyData.name;
 
-      widget.question.text = QuestionTextController.text;
-      widget.question.optionOne = TestText1Controller.text;
-      widget.question.optionTwo = TestText2Controller.text;
-      widget.question.optionThree = TestText3Controller.text;
-      widget.question.optionFour = TestText4Controller.text;
+      temporaryQuestion.isPublic = addQuestionBankOption;
+      temporaryQuestion.id = widget.question.id;
 
-      widget.question.numberOne = _radioGroupValue;
+      temporaryQuestion.text = QuestionTextController.text;
+      temporaryQuestion.optionOne = TestText1Controller.text;
+      temporaryQuestion.optionTwo = TestText2Controller.text;
+      temporaryQuestion.optionThree = TestText3Controller.text;
+      temporaryQuestion.optionFour = TestText4Controller.text;
+
+      temporaryQuestion.numberOne = _radioGroupValue;
+
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
+
+      dynamic data = jsonEncode(<String,dynamic>{
+        "questionId":qs.id,
+        "type": qs.type,
+        "public": qs.public,
+        "question": qs.question,
+        "answer": qs.answer.toString(),
+        "base": qs.base,
+        "hardness" : qs.hardness,
+        "course": qs.course,
+        "options" : qs.options.toString(),
+        "chapter" : qs.chapter,
+      });
+      final response = await http.put('https://parham-backend.herokuapp.com/question',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': tokenplus,
+            'Content-Type': 'application/json',
+          },
+          body: data
+      );
+      if (response.statusCode == 200){
+        ShowCorrectnessDialog(true,context);
+        print("Question Created in test");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
+        widget.question.paye = payeData.name;
+        widget.question.book = bookData.name;
+        widget.question.chapter = chapterData.name;
+        widget.question.kind = kindData.name;
+        widget.question.difficulty = difficultyData.name;
+
+        widget.question.text = QuestionTextController.text;
+        widget.question.optionOne = TestText1Controller.text;
+        widget.question.optionTwo = TestText2Controller.text;
+        widget.question.optionThree = TestText3Controller.text;
+        widget.question.optionFour = TestText4Controller.text;
+
+        widget.question.numberOne = _radioGroupValue;
+
+        //  _btnController.stop();
+        //final responseJson = jsonDecode(response.body);
+        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
+        //_showMyDialog(true);
+        //_btnController.stop();
+      }
+      else{
+        print("Question failed in test");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+        ShowCorrectnessDialog(false,context);
+        //  _btnController.stop();
+        //_showMyDialog(false);
+        //_btnController.stop();
+      }
 
       setState(() {
         IsEditing = false;
@@ -547,11 +861,49 @@ class _TestCardState extends State<TestCard> {
       });
     }
   }
-  void onCloseButton()
+  void onCloseButton() async
   {
-    setState(() {
-      IsDelete = true;
-    });
+    final prefs = await SharedPreferences.getInstance();
+    // String token = prefs.getString("token");
+    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+    print(widget.question.id);
+    final response = await http.delete('https://parham-backend.herokuapp.com/question',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': tokenplus,
+        'Content-Type': 'application/json',
+        'questionId' : widget.question.id,
+      },
+
+    );
+    if (response.statusCode == 200){
+      ShowCorrectnessDialog(true,context);
+      print("Question Created in test");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      setState(() {
+        IsDelete = true;
+      });
+      //  _btnController.stop();
+      //final responseJson = jsonDecode(response.body);
+      //HomePage.user.avatarUrl = responseJson['user']['avatar'];
+      //_showMyDialog(true);
+      //_btnController.stop();
+    }
+    else{
+      print("Question failed in test");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      ShowCorrectnessDialog(false,context);
+      setState(() {
+        IsDelete = false;
+      });
+      //  _btnController.stop();
+      //_showMyDialog(false);
+      //_btnController.stop();
+    }
   }
 
   int _radioGroupValue = 0;
@@ -588,7 +940,7 @@ class _TestCardState extends State<TestCard> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
-              (widget.question.image1 != null) ? Text(widget.question.image1) : Container(),
+              (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
             ],
           ),
         ),
@@ -631,6 +983,13 @@ class _TestCardState extends State<TestCard> {
         ),
       ],
     );
+  }
+
+  bool addQuestionBankOption = false;
+  void addQuestionBankOptionChange(bool newValue) {
+    setState(() {
+      addQuestionBankOption = newValue;
+    });
   }
 
   Widget EditingCard()
@@ -748,6 +1107,13 @@ class _TestCardState extends State<TestCard> {
               )
             ],
           ),
+        ),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
+            Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
+          ],
         ),
       ],
     );
@@ -869,18 +1235,81 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
     });
   }
 
-  void onEditButton()
+  void onEditButton() async
   {
     if (IsEditing == true)
     {
-      widget.question.paye = payeData.name;
-      widget.question.book = bookData.name;
-      widget.question.chapter = chapterData.name;
-      widget.question.kind = kindData.name;
-      widget.question.difficulty = difficultyData.name;
+      final prefs = await SharedPreferences.getInstance();
+      // String token = prefs.getString("token");
+      String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+      if (token == null) {return;}
+      String tokenplus = "Bearer" + " " + token;
+     // print(widget.question.id);
+      Question temporaryQuestion = new Question();
+      temporaryQuestion.paye = payeData.name;
+      temporaryQuestion.book = bookData.name;
+      temporaryQuestion.chapter = chapterData.name;
+      temporaryQuestion.kind = kindData.name;
+      temporaryQuestion.difficulty = difficultyData.name;
 
-      widget.question.text = QuestionTextController.text;
-      widget.question.answerString = TashrihiTextController.text;
+      temporaryQuestion.isPublic = addQuestionBankOption;
+      temporaryQuestion.id = widget.question.id;
+
+      temporaryQuestion.text = QuestionTextController.text;
+      temporaryQuestion.answerString = TashrihiTextController.text;
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
+
+      dynamic data = jsonEncode(<String,dynamic>{
+        "questionId":qs.id,
+        "type": qs.type,
+        "public": qs.public,
+        "question": qs.question,
+        "answer": qs.answer.toString(),
+        "base": qs.base,
+        "hardness" : qs.hardness,
+        "course": qs.course,
+        "chapter" : qs.chapter,
+      });
+      final response = await http.put('https://parham-backend.herokuapp.com/question',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': tokenplus,
+          'Content-Type': 'application/json',
+        },
+        body: data
+      );
+      if (response.statusCode == 200){
+        ShowCorrectnessDialog(true,context);
+        print("Question Created in test");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
+        widget.question.paye = payeData.name;
+        widget.question.book = bookData.name;
+        widget.question.chapter = chapterData.name;
+        widget.question.kind = kindData.name;
+        widget.question.difficulty = difficultyData.name;
+
+        widget.question.isPublic = addQuestionBankOption;
+
+        widget.question.text = QuestionTextController.text;
+        widget.question.answerString = TashrihiTextController.text;
+
+        //  _btnController.stop();
+        //final responseJson = jsonDecode(response.body);
+        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
+        //_showMyDialog(true);
+        //_btnController.stop();
+      }
+      else{
+        print("Question failed in test");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+        ShowCorrectnessDialog(false,context);
+        //  _btnController.stop();
+        //_showMyDialog(false);
+        //_btnController.stop();
+      }
 
       setState(() {
         IsEditing = false;
@@ -893,11 +1322,50 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
       });
     }
   }
-  void onCloseButton()
+  void onCloseButton() async
   {
-    setState(() {
-      IsDelete = true;
-    });
+    final prefs = await SharedPreferences.getInstance();
+    // String token = prefs.getString("token");
+    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+    print(widget.question.id);
+    final response = await http.delete('https://parham-backend.herokuapp.com/question',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': tokenplus,
+          'Content-Type': 'application/json',
+          'questionId' : widget.question.id,
+        },
+
+    );
+    if (response.statusCode == 200){
+      ShowCorrectnessDialog(true,context);
+      print("Question Created in test");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      setState(() {
+        IsDelete = true;
+      });
+    //  _btnController.stop();
+      //final responseJson = jsonDecode(response.body);
+      //HomePage.user.avatarUrl = responseJson['user']['avatar'];
+      //_showMyDialog(true);
+      //_btnController.stop();
+    }
+    else{
+      print("Question failed in test");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      ShowCorrectnessDialog(false,context);
+      setState(() {
+        IsDelete = false;
+      });
+    //  _btnController.stop();
+      //_showMyDialog(false);
+      //_btnController.stop();
+    }
+
   }
 
   Widget notEditingCard()
@@ -927,7 +1395,7 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(alignment: Alignment.centerRight,child: Text("سوال : "+widget.question.text,textDirection: TextDirection.rtl)),
-              (widget.question.image1 != null) ? Text(widget.question.image1) : Container(),
+              (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
             ],
           ),
         ),
@@ -938,7 +1406,7 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(alignment: Alignment.centerRight,child: Text("جواب : "+ widget.question.answerString,textDirection: TextDirection.rtl)),
-              (widget.question.image2 != null) ? Text(widget.question.image2) : Container(),
+              (widget.question.answerImage != null) ? Text(widget.question.answerImage) : Container(),
             ],
           ),
         ),
@@ -946,6 +1414,12 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
     );
   }
 
+  bool addQuestionBankOption = false;
+  void addQuestionBankOptionChange(bool newValue) {
+    setState(() {
+      addQuestionBankOption = newValue;
+    });
+  }
   Widget EditingCard()
   {
     return Column(
@@ -1029,6 +1503,13 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
         ),
         (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
             : Container(),
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
+            Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
+          ],
+        ),
       ],
     );
   }
@@ -1086,78 +1567,5 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
           )
       ),
     ) : Container();
-  }
-}
-
-class popupMenuData
-{
-  String name;
-  String popupMenuBottonName;
-  List<PopupMenuItem<int>> list = [];
-  List<String> stringList = [];
-
-  popupMenuData(String PopupMenuBottonName)
-  {
-    this.popupMenuBottonName = PopupMenuBottonName;
-  }
-  void fillStringList(List<String> list)
-  {
-    for (int i=0;i<list.length;i++)
-    {
-      stringList.add(list[i]);
-    }
-  }
-}
-
-class PopupMenu extends StatefulWidget {
-  popupMenuData Data;
-  PopupMenu({Key key, this.Data}) : super(key: key);
-  @override
-  _PopupMenuState createState() => _PopupMenuState();
-}
-
-class _PopupMenuState extends State<PopupMenu> {
-  void onSelectedMenu(int value)
-  {
-    for (int i = 0;i<widget.Data.stringList.length;i++)
-    {
-      if (value == i) {
-        setState(() {
-          widget.Data.name = widget.Data.stringList[i];
-        });
-      }
-    }
-    if(value == -1)
-    {
-      setState(() {
-        widget.Data.name = null;
-      });
-    }
-  }
-  PopupMenuItem<int> popupMenuItem (int value,String text)
-  {
-    return PopupMenuItem(
-        value: value,
-        child: Container(alignment: Alignment.centerRight,child: Text(text,textDirection: TextDirection.rtl,))
-    );
-  }
-  @override
-  void initState() {
-    super.initState();
-    if (widget.Data.list.length != widget.Data.stringList.length)
-    {
-      for (int i = 0;i<widget.Data.stringList.length;i++)
-      {
-        widget.Data.list.add(popupMenuItem(i, widget.Data.stringList[i]));
-      }
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton(
-      child: (widget.Data.name == null) ? Text(widget.Data.popupMenuBottonName,textDirection: TextDirection.rtl) : Text(widget.Data.name,textDirection: TextDirection.rtl),
-      onSelected: onSelectedMenu,
-      itemBuilder: (context) => widget.Data.list,
-    );
   }
 }
