@@ -8,15 +8,17 @@ import 'package:samproject/Layout/BottomNavigator.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:samproject/pages/ClassesListPage/LoginPersonPage/LoginOrSignup.dart';
+import 'package:samproject/pages/searchQuestionPage.dart';
 import 'package:samproject/widgets/drawerWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ClassesListPage/ShowClassesListPage/ClassesList.dart';
+import 'addQuestionPage.dart';
 
 class HomePage extends StatefulWidget {
   static Person user = Person();
   static final PageController homePageController = PageController(
-    initialPage: 2,
+    initialPage: 1,
   );
 
   @override
@@ -35,30 +37,35 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     double responsiveDivision = MediaQuery.of(context).devicePixelRatio / 1.2;
+    String appBarTitle;
+    if( BottomNavigator.customIcon == 0){
+      appBarTitle = "ایجاد سوال";
+    }else if( BottomNavigator.customIcon == 1 ){
+      appBarTitle = "کلاس ها";
+    }else{
+      appBarTitle = "بانک سوالات";
+    }
     return Scaffold(
-      appBar: AppBar(
+      appBar:  AppBar(
         backgroundColor: Color(0xFF3D5A80),
+        title: Padding(
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              appBarTitle,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          padding: EdgeInsets.only(left: 20),
+        ),
       ),
       endDrawer: DrawerWidget(toggleCoinCallback: stopLoading,),
       bottomNavigationBar: BottomNavigator(),
-      floatingActionButton: Container(
-        child: Center(
-          child: FloatingActionButton(
-            child: Center(
-              child: Icon(
-                FontAwesomeIcons.home,
-              ),
-            ),
-            backgroundColor: BottomNavigator.customIcon == 2
-                ?Color(0xFF3D5A80)
-                :Colors.black,
-            onPressed: _pressHomeButton,
-          ),
-        ),
-        width: 60 / responsiveDivision,
-        height: 60 / responsiveDivision,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: LoadingOverlay(
         child: PageView(
           controller: HomePage.homePageController,
@@ -77,34 +84,17 @@ class _HomePageState extends State<HomePage> {
                 BottomNavigator.customIcon = 2;
               });
             }
-            else if (i == 3) {
-              setState(() {
-                BottomNavigator.customIcon = 3;
-              });
-            }
-            else if (i == 4) {
-              setState(() {
-                BottomNavigator.customIcon = 4;
-              });
-            }
           },
           children: [
-            Container(color: Colors.red,),
-            Container(color: Colors.deepPurple,),
+            AddQuestionPage(),
             HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: stopLoading,),
-            Container(color: Colors.yellow,),
-            Container(color: Colors.black,),
+            SearchQuestionPage(),
 
           ],
         ),
         isLoading: _isLoading,
       ),
     );
-  }
-
-  void _pressHomeButton() {
-    HomePage.homePageController.animateToPage(2,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 
   void _getToken() async {
@@ -128,6 +118,11 @@ class _HomePageState extends State<HomePage> {
           HomePage.user.username = personInfo['user']['username'];
           HomePage.user.email = personInfo['user']['email'];
           HomePage.user.avatarUrl = personInfo['user']['avatar'];
+          setState(() {
+            stopLoading();
+          });
+        }
+        else{
           setState(() {
             stopLoading();
           });

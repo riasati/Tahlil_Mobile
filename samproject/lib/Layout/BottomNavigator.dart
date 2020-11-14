@@ -3,7 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:samproject/pages/homePage.dart';
 
 class BottomNavigator extends StatefulWidget {
-  static int customIcon = 2;
+  static int customIcon = 1;
+
   @override
   _BottomNavigatorState createState() => _BottomNavigatorState();
 }
@@ -15,33 +16,24 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     return BottomAppBar(
       elevation: 50,
       child: Container(
-        height: 80 / responsiveDivision,
+        height: 100 / responsiveDivision,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   FlatButton(
                     child: Icon(
-                      FontAwesomeIcons.userAlt,
+                      FontAwesomeIcons.questionCircle,
                       size: 50 / responsiveDivision,
                       color: BottomNavigator.customIcon == 0
-                          ?Color(0xFF3D5A80)
-                          :Colors.black,
+                          ? Color(0xFF3D5A80)
+                          : Colors.black,
                     ),
-                    onPressed: _pressProfileIcon,
-                  ),
-                  FlatButton(
-                    child: Icon(
-                      FontAwesomeIcons.userAlt,
-                      size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 1
-                          ?Color(0xFF3D5A80)
-                          :Colors.black,
-                    ),
-                    onPressed: _pressProfileIcon,
+                    onPressed: _pressCrateQuestionIcon,
                   ),
                 ],
               ),
@@ -52,48 +44,52 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                 children: [
                   FlatButton(
                     child: Icon(
-                      FontAwesomeIcons.userAlt,
+                      FontAwesomeIcons.chalkboard,
                       size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 3
-                          ?Color(0xFF3D5A80)
-                          :Colors.black,
+                      color: BottomNavigator.customIcon == 1
+                          ? Color(0xFF3D5A80)
+                          : Colors.black,
                     ),
-                    onPressed: _pressProfileIcon,
+                    onPressed: _pressClassListIcon,
                   ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
                   FlatButton(
                     child: Icon(
-                      FontAwesomeIcons.userAlt,
+                      FontAwesomeIcons.university,
                       size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 4
-                          ?Color(0xFF3D5A80)
-                          :Colors.black,
+                      color: BottomNavigator.customIcon == 2
+                          ? Color(0xFF3D5A80)
+                          : Colors.black,
                     ),
-                    onPressed: _pressProfileIcon,
+                    onPressed: _pressQuestionBankIcon,
                   ),
                 ],
               ),
             ),
           ],
         ),
-        // decoration: new BoxDecoration(
-        //   gradient: new LinearGradient(
-        //       colors: [
-        //         // Theme.Colors.loginGradientEnd,
-        //         // Theme.Colors.loginGradientStart
-        //         Colors.teal,
-        //         Colors.blue,
-        //       ],
-        //       begin: const FractionalOffset(0.2, 0.2),
-        //       end: const FractionalOffset(1.0, 1.0),
-        //       stops: [0.0, 1.0],
-        //       tileMode: TileMode.clamp),
-        // ),
       ),
-      );
+    );
   }
 
-  void _pressProfileIcon() {
+  void _pressCrateQuestionIcon() {
     HomePage.homePageController.animateToPage(0,
+        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
+  }
+
+  void _pressClassListIcon() {
+    HomePage.homePageController.animateToPage(1,
+        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
+  }
+
+  void _pressQuestionBankIcon() {
+    HomePage.homePageController.animateToPage(2,
         duration: Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 }

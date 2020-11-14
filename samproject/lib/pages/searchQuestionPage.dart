@@ -221,136 +221,122 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xFF3D5A80),
-        title: Container(
-          alignment: Alignment.center,
-          child: Text(
-            "جستجو سوال در بانک",
-            textDirection: TextDirection.rtl,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.0,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Column(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      Container(padding: const EdgeInsets.all(4.0),alignment: Alignment.centerRight,child: Text("جستجو بر اساس",textDirection: TextDirection.rtl,)),
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Row(
-                          textDirection: TextDirection.rtl,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
-                            SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                            Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
-                            SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                            Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,)))
-                          ],
+    return Container(
+      child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(4.0),
+            child: Column(
+              textDirection: TextDirection.rtl,
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Column(
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        Container(padding: const EdgeInsets.all(4.0),alignment: Alignment.centerRight,child: Text("جستجو بر اساس",textDirection: TextDirection.rtl,)),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
+                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
+                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,)))
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Row(
-                          textDirection: TextDirection.rtl,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: kindData,))),
-                            SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                            Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: kindData,))),
+                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child:
-                        // RaisedButton(
-                        //   child: Text("asdfads"),
-                        //   onPressed: submit,
-                        // )
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child:
+                          // RaisedButton(
+                          //   child: Text("asdfads"),
+                          //   onPressed: submit,
+                          // )
 
-                        RoundedLoadingButton(
-                          height: 30,
-                          child: Text('جستجو',style: TextStyle(color: Colors.white),),
-                          //  borderRadius: 0,
-                          controller: _btnController,
-                          color: Color.fromRGBO(238, 108,77 ,1.0), //Color.(0xFF3D5A80),
-                          onPressed: () => searchQuestion(),
+                          RoundedLoadingButton(
+                            height: 30,
+                            child: Text('جستجو',style: TextStyle(color: Colors.white),),
+                            //  borderRadius: 0,
+                            controller: _btnController,
+                            color: Color.fromRGBO(238, 108,77 ,1.0), //Color.(0xFF3D5A80),
+                            onPressed: () => searchQuestion(),
+                          ),
                         ),
-                      ),
 
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SingleChildScrollView(
-                physics: ScrollPhysics(),
-                child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: (questionList.length == 0)? 0:1,
-                    itemBuilder: (BuildContext context, int index)
-                    {
-                      if(questionList[index].kind == "جایخالی") return AnswerString(question: questionList[index]);
-                      else if (questionList[index].kind == "تشریحی") return AnswerString(question: questionList[index],);
-                      else if (questionList[index].kind == "تستی") return TestView(question: questionList[index],);
-                      else if (questionList[index].kind == "چند گزینه ای") return MultiOptionView(question: questionList[index],);
-                      else return Container();
-                    }
+                SingleChildScrollView(
+                  physics: ScrollPhysics(),
+                  child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: (questionList.length == 0)? 0:1,
+                      itemBuilder: (BuildContext context, int index)
+                      {
+                        if(questionList[index].kind == "جایخالی") return AnswerString(question: questionList[index]);
+                        else if (questionList[index].kind == "تشریحی") return AnswerString(question: questionList[index],);
+                        else if (questionList[index].kind == "تستی") return TestView(question: questionList[index],);
+                        else if (questionList[index].kind == "چند گزینه ای") return MultiOptionView(question: questionList[index],);
+                        else return Container();
+                      }
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-                child: ListView.builder(
-                    //physics: NeverScrollableScrollPhysics(),
-                    //shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 5,//totalpage,
-                    itemBuilder: (BuildContext context, int index)
-                    {
-                      int indexplus = index+1;
-                      return InkWell(
-                        onTap: ()
-                        {
-                          thispage = indexplus;
-                          searchQuestion();
-                        },
-                        child: Container(
-                          margin: EdgeInsets.all(8.0),
-                          padding: EdgeInsets.all(8.0),
-                          // width: 20,
-                          // height: 20,
-                          color: Color(0xFF3D5A80),
-                          child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
-                        ),
-                      );
-                    }
+                SizedBox(
+                  height: 50,
+                  child: ListView.builder(
+                      //physics: NeverScrollableScrollPhysics(),
+                      //shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 5,//totalpage,
+                      itemBuilder: (BuildContext context, int index)
+                      {
+                        int indexplus = index+1;
+                        return InkWell(
+                          onTap: ()
+                          {
+                            thispage = indexplus;
+                            searchQuestion();
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(8.0),
+                            // width: 20,
+                            // height: 20,
+                            color: Color(0xFF3D5A80),
+                            child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+                          ),
+                        );
+                      }
+                  ),
                 ),
-              ),
-              // MultiOptionView(question: newQuestion2,),
-              // TestView(question: newQuestion3,),
-              // AnswerString(question: newQuestion,),
-              // AnswerString(question: newQuestion4,),
-            ],
+                // MultiOptionView(question: newQuestion2,),
+                // TestView(question: newQuestion3,),
+                // AnswerString(question: newQuestion,),
+                // AnswerString(question: newQuestion4,),
+              ],
+            ),
           ),
         ),
-      ),
     );
+
   }
 }
 

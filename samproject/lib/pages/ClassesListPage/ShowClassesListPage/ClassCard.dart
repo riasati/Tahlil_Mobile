@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:samproject/domain/Class.dart';
+import 'package:samproject/pages/homePage.dart';
 
 class ClassCard extends StatefulWidget {
   Class classCard;
@@ -82,7 +83,7 @@ class _ClassCardState extends State<ClassCard> {
                 child: Container(
                   alignment: Alignment.centerRight,
                   child: AutoSizeText(
-                    classCard.ownerFullName + " :استاد"  ,
+                    "استاد:" + classCard.ownerFullName,
                     maxLines: 1,
                     style: TextStyle(
                       color: Colors.black,
