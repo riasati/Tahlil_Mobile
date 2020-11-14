@@ -28,9 +28,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
   void getMyQuestion() async
   {
     final prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString("token");
-
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
+     String token = prefs.getString("token");
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
 
@@ -41,7 +39,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
 
     var params = {
       'page': thispage.toString(),
-      'limit': '2',
+      'limit': '5',
     };
     var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
 
@@ -49,7 +47,6 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
     questionList = [];
     if (response.statusCode == 200)
     {
-      print("ok");
       final responseJson = jsonDecode(response.body);
       totalpage = responseJson["totalPages"];
       for (int i=0;i<responseJson["questions"].length;i++)
@@ -61,40 +58,21 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
         qs.course = responseJson["questions"][i]["course"];
         qs.chapter = responseJson["questions"][i]["chapter"];
         qs.hardness = responseJson["questions"][i]["hardness"];
-        qs.answer = responseJson["questions"][i]["answers"].toString();
+        qs.answer = responseJson["questions"][i]["answers"];
         qs.options = responseJson["questions"][i]["options"];
-        qs.public = responseJson["questions"][i]["public"].toString();
+        qs.public = responseJson["questions"][i]["public"];
         qs.id = responseJson["questions"][i]["_id"];
 
-        // print(qs.type);
-        // print(qs.public);
-        // print(qs.question);
-        // //print(qs.answer);
-        // print(qs.base);
-        // print(qs.hardness);
-        // print(qs.course);
-        // print("---");
         Question q = Question.QuestionServerToQuestion(qs);
-        // print(q.kind);
-        // print(q.isPublic);
-        // print(q.text);
-        // //print(qs.answer);
-        // print(q.paye);
-        // print(q.difficulty);
-        // print(q.book);
         questionList.add(q);
       }
-      // for (int i=0;i<questionList.length;i++)
-      // {
-      //   print(questionList[i].text);
-      // }
       setState(() {
 
       });
     }
     else
       {
-        print("nokey");
+        ShowCorrectnessDialog(false, context);
       }
 
   }
@@ -174,8 +152,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(4.0),
-          child: //AnswerStringCard(question: questionList[0],)
-          Column(
+          child: Column(
             children: [
               Flexible(
                 flex: 11,
@@ -208,8 +185,6 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
                       child: Container(
                         margin: EdgeInsets.all(8.0),
                         padding: EdgeInsets.all(8.0),
-                       // width: 20,
-                       // height: 20,
                         color: Color(0xFF3D5A80),
                         child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
                       ),
@@ -228,7 +203,6 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
 
 class MultiOptionCard extends StatefulWidget {
   Question question;
- // bool IsEditing;
   MultiOptionCard({Key key, this.question}) : super(key: key);
   @override
   _MultiOptionCardState createState() => _MultiOptionCardState();
@@ -276,8 +250,8 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
     if (IsEditing == true)
     {
       final prefs = await SharedPreferences.getInstance();
-      // String token = prefs.getString("token");
-      String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+       String token = prefs.getString("token");
+      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
       if (token == null) {return;}
       String tokenplus = "Bearer" + " " + token;
       Question temporaryQuestion = new Question();
@@ -308,11 +282,11 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer.toString(),
+        "answers": qs.answer,
         "base": qs.base,
         "hardness" : qs.hardness,
         "course": qs.course,
-        "options" : qs.options.toString(),
+        "options" : qs.options,
         "chapter" : qs.chapter,
       });
       final response = await http.put('https://parham-backend.herokuapp.com/question',
@@ -325,7 +299,7 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
       );
       if (response.statusCode == 200){
         ShowCorrectnessDialog(true,context);
-        print("Question Created in test");
+        print("Question changed in multichoice");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
 
@@ -346,20 +320,13 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
         widget.question.numberThree = (optionThree) ? 1 : 0;
         widget.question.numberFour = (optionFour) ? 1 : 0;
 
-        //  _btnController.stop();
-        //final responseJson = jsonDecode(response.body);
-        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-        //_showMyDialog(true);
-        //_btnController.stop();
       }
       else{
-        print("Question failed in test");
+        ShowCorrectnessDialog(false,context);
+        print("Question failed in multichoice");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
-        ShowCorrectnessDialog(false,context);
-        //  _btnController.stop();
-        //_showMyDialog(false);
-        //_btnController.stop();
+
       }
 
       setState(() {
@@ -376,45 +343,36 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
   void onCloseButton() async
   {
     final prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString("token");
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+    String token = prefs.getString("token");
+    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
-    print(widget.question.id);
-    final response = await http.delete('https://parham-backend.herokuapp.com/question',
+    String id = widget.question.id;
+    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
       headers: {
         'accept': 'application/json',
         'Authorization': tokenplus,
         'Content-Type': 'application/json',
-        'questionId' : widget.question.id,
       },
 
     );
     if (response.statusCode == 200){
       ShowCorrectnessDialog(true,context);
-      print("Question Created in test");
+      print("Question eliminated in multichoice");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       setState(() {
         IsDelete = true;
       });
-      //  _btnController.stop();
-      //final responseJson = jsonDecode(response.body);
-      //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-      //_showMyDialog(true);
-      //_btnController.stop();
     }
     else{
-      print("Question failed in test");
+      ShowCorrectnessDialog(false,context);
+      print("Question failed in multichoice");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-      ShowCorrectnessDialog(false,context);
       setState(() {
         IsDelete = false;
       });
-      //  _btnController.stop();
-      //_showMyDialog(false);
-      //_btnController.stop();
     }
   }
 
@@ -445,7 +403,7 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
+              Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
               (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
             ],
           ),
@@ -525,7 +483,7 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
   TextEditingController MultiOptionText3Controller = new TextEditingController();
   TextEditingController MultiOptionText4Controller = new TextEditingController();
 
-  bool addQuestionBankOption = false;
+  bool addQuestionBankOption;
   void addQuestionBankOptionChange(bool newValue) {
     setState(() {
       addQuestionBankOption = newValue;
@@ -684,6 +642,7 @@ class _MultiOptionCardState extends State<MultiOptionCard> {
     MultiOptionText3Controller.text = widget.question.optionThree;
     MultiOptionText4Controller.text = widget.question.optionFour;
 
+    addQuestionBankOption = widget.question.isPublic;
   }
   @override
   Widget build(BuildContext context) {
@@ -769,11 +728,10 @@ class _TestCardState extends State<TestCard> {
     if (IsEditing == true)
     {
       final prefs = await SharedPreferences.getInstance();
-      // String token = prefs.getString("token");
-      String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+      String token = prefs.getString("token");
+      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
       if (token == null) {return;}
       String tokenplus = "Bearer" + " " + token;
-      // print(widget.question.id);
       Question temporaryQuestion = new Question();
       temporaryQuestion.paye = payeData.name;
       temporaryQuestion.book = bookData.name;
@@ -799,11 +757,11 @@ class _TestCardState extends State<TestCard> {
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer.toString(),
+        "answers": qs.answer,
         "base": qs.base,
         "hardness" : qs.hardness,
         "course": qs.course,
-        "options" : qs.options.toString(),
+        "options" : qs.options,
         "chapter" : qs.chapter,
       });
       final response = await http.put('https://parham-backend.herokuapp.com/question',
@@ -816,7 +774,7 @@ class _TestCardState extends State<TestCard> {
       );
       if (response.statusCode == 200){
         ShowCorrectnessDialog(true,context);
-        print("Question Created in test");
+        print("Question changed in test");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
 
@@ -834,20 +792,12 @@ class _TestCardState extends State<TestCard> {
 
         widget.question.numberOne = _radioGroupValue;
 
-        //  _btnController.stop();
-        //final responseJson = jsonDecode(response.body);
-        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-        //_showMyDialog(true);
-        //_btnController.stop();
       }
       else{
+        ShowCorrectnessDialog(false,context);
         print("Question failed in test");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
-        ShowCorrectnessDialog(false,context);
-        //  _btnController.stop();
-        //_showMyDialog(false);
-        //_btnController.stop();
       }
 
       setState(() {
@@ -864,45 +814,36 @@ class _TestCardState extends State<TestCard> {
   void onCloseButton() async
   {
     final prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString("token");
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+    String token = prefs.getString("token");
+    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
-    print(widget.question.id);
-    final response = await http.delete('https://parham-backend.herokuapp.com/question',
+    String id = widget.question.id;
+    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
       headers: {
         'accept': 'application/json',
         'Authorization': tokenplus,
         'Content-Type': 'application/json',
-        'questionId' : widget.question.id,
       },
 
     );
     if (response.statusCode == 200){
       ShowCorrectnessDialog(true,context);
-      print("Question Created in test");
+      print("Question Eliminated in test");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       setState(() {
         IsDelete = true;
       });
-      //  _btnController.stop();
-      //final responseJson = jsonDecode(response.body);
-      //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-      //_showMyDialog(true);
-      //_btnController.stop();
     }
     else{
+      ShowCorrectnessDialog(false,context);
       print("Question failed in test");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-      ShowCorrectnessDialog(false,context);
       setState(() {
         IsDelete = false;
       });
-      //  _btnController.stop();
-      //_showMyDialog(false);
-      //_btnController.stop();
     }
   }
 
@@ -939,7 +880,7 @@ class _TestCardState extends State<TestCard> {
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
+              Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
               (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
             ],
           ),
@@ -985,7 +926,7 @@ class _TestCardState extends State<TestCard> {
     );
   }
 
-  bool addQuestionBankOption = false;
+  bool addQuestionBankOption;
   void addQuestionBankOptionChange(bool newValue) {
     setState(() {
       addQuestionBankOption = newValue;
@@ -1143,6 +1084,7 @@ class _TestCardState extends State<TestCard> {
     TestText3Controller.text = widget.question.optionThree;
     TestText4Controller.text = widget.question.optionFour;
 
+    addQuestionBankOption = widget.question.isPublic;
   }
 
   @override
@@ -1240,8 +1182,8 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
     if (IsEditing == true)
     {
       final prefs = await SharedPreferences.getInstance();
-      // String token = prefs.getString("token");
-      String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+      String token = prefs.getString("token");
+      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
       if (token == null) {return;}
       String tokenplus = "Bearer" + " " + token;
      // print(widget.question.id);
@@ -1264,7 +1206,7 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer.toString(),
+        "answers": qs.answer,
         "base": qs.base,
         "hardness" : qs.hardness,
         "course": qs.course,
@@ -1280,7 +1222,7 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
       );
       if (response.statusCode == 200){
         ShowCorrectnessDialog(true,context);
-        print("Question Created in test");
+        print("Question changed in tashrihi");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
 
@@ -1295,20 +1237,12 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
         widget.question.text = QuestionTextController.text;
         widget.question.answerString = TashrihiTextController.text;
 
-        //  _btnController.stop();
-        //final responseJson = jsonDecode(response.body);
-        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-        //_showMyDialog(true);
-        //_btnController.stop();
       }
       else{
+        ShowCorrectnessDialog(false,context);
         print("Question failed in test");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
-        ShowCorrectnessDialog(false,context);
-        //  _btnController.stop();
-        //_showMyDialog(false);
-        //_btnController.stop();
       }
 
       setState(() {
@@ -1325,45 +1259,36 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
   void onCloseButton() async
   {
     final prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString("token");
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
+    String token = prefs.getString("token");
+    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
-    print(widget.question.id);
-    final response = await http.delete('https://parham-backend.herokuapp.com/question',
+    String id = widget.question.id;
+    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
         headers: {
           'accept': 'application/json',
           'Authorization': tokenplus,
           'Content-Type': 'application/json',
-          'questionId' : widget.question.id,
         },
 
     );
     if (response.statusCode == 200){
       ShowCorrectnessDialog(true,context);
-      print("Question Created in test");
+      print("Question eliminated in tashrihi");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       setState(() {
         IsDelete = true;
       });
-    //  _btnController.stop();
-      //final responseJson = jsonDecode(response.body);
-      //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-      //_showMyDialog(true);
-      //_btnController.stop();
     }
     else{
+      ShowCorrectnessDialog(false,context);
       print("Question failed in test");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-      ShowCorrectnessDialog(false,context);
       setState(() {
         IsDelete = false;
       });
-    //  _btnController.stop();
-      //_showMyDialog(false);
-      //_btnController.stop();
     }
 
   }
@@ -1414,7 +1339,7 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
     );
   }
 
-  bool addQuestionBankOption = false;
+  bool addQuestionBankOption;
   void addQuestionBankOptionChange(bool newValue) {
     setState(() {
       addQuestionBankOption = newValue;
@@ -1533,8 +1458,7 @@ class _AnswerStringCardState extends State<AnswerStringCard> {
     QuestionTextController.text = widget.question.text;
     TashrihiTextController.text = widget.question.answerString;
 
-    //print(widget.question.kind);
-
+    addQuestionBankOption = widget.question.isPublic;
   }
 
   @override

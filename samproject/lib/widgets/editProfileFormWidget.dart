@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -31,7 +32,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
-    if (token == null) {_showMyDialog(false);return;}
+    if (token == null) {ShowCorrectnessDialog(false, context);return;}
     String tokenplus = "Bearer" + " " + token;
     dynamic data;
 
@@ -56,7 +57,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
         });
       }
 
-    final response = await http.put('https://parham-backend.herokuapp.com/user/update',
+    final response = await http.put('https://parham-backend.herokuapp.com/user',
       headers: {
         'accept': 'application/json',
         'Authorization': tokenplus,
@@ -68,11 +69,11 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     if (response.statusCode == 200){
       final responseJson = jsonDecode(response.body);
       HomePage.user.avatarUrl = responseJson['user']['avatar'];
-      _showMyDialog(true);
+      ShowCorrectnessDialog(true, context);
       _btnController.stop();
     }
     else{
-      _showMyDialog(false);
+      ShowCorrectnessDialog(false, context);
       _btnController.stop();
     }
   }
@@ -114,31 +115,6 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
       _formStateKey.currentState.save();
     sendData(_ProfileImage);
     }
-  }
-  Future<void> _showMyDialog(bool good) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: (good) ? Text('صحیح',textDirection: TextDirection.rtl,) : Text('خطا',textDirection: TextDirection.rtl,),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                (good)? Text("اطلاعات با موفقیت ثبت شدند",textDirection: TextDirection.rtl,) : Text("مشکلی وجود دارد امکان دارد ثبت نام و ورود نکرده باشید",textDirection: TextDirection.rtl,),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('باشه',textDirection: TextDirection.rtl,),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   File _ProfileImage;
@@ -304,17 +280,11 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                   widthFactor: 1,
                   child: RoundedLoadingButton(
                     child: Text('تغییرات',style: TextStyle(color: Colors.white),),
-                    borderRadius: 0,
+                    //borderRadius: 0,
                     controller: _btnController,
                     color: Color(0xFF3D5A80),
                     onPressed: () => _submitUser(),
                   )
-                  /*RaisedButton(
-
-                    child:Text('تغییرات',style: TextStyle(color: Colors.white),),
-                    color: Color(0xFF3D5A80),
-                    onPressed: () => _submitUser(),
-                  ),*/
                 ),
           ],
         ),

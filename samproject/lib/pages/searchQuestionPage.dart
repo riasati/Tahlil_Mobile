@@ -100,10 +100,9 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
   void searchQuestion() async
   {
     final prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString("token");
-    print("in searchQuestion");
+    String token = prefs.getString("token");
 
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
+  //  String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
 
@@ -114,36 +113,38 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
 
     var params = {
       'page': thispage.toString(),
-      'limit': '1',
+      'limit': '5',
     };
     var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
     Question temporaryQuestion = new Question();
-    print("in searchQuestion 2");
+
     temporaryQuestion.paye = payeData.name;
     temporaryQuestion.book = bookData.name;
     temporaryQuestion.chapter = chapterData.name;
     temporaryQuestion.kind = kindData.name;
     temporaryQuestion.difficulty = difficultyData.name;
-    print(temporaryQuestion.paye);
-    print(temporaryQuestion.book);
-    print(temporaryQuestion.chapter);
-    print(temporaryQuestion.kind);
-    print(temporaryQuestion.difficulty);
+    // print(temporaryQuestion.paye);
+    // print(temporaryQuestion.book);
+    // print(temporaryQuestion.chapter);
+    // print(temporaryQuestion.kind);
+    // print(temporaryQuestion.difficulty);
+
     QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
 
-    print(qs.type);
-    print(qs.base);
-    print(qs.hardness);
-    print(qs.course);
+    // print(qs.type);
+    // print(qs.base);
+    // print(qs.hardness);
+    // print(qs.course);
     dynamic data = jsonEncode(<String,dynamic>{
       "type":[qs.type],
       "base": [qs.base],
       "hardness" : [qs.hardness],
       "course": [qs.course],
-   //   "chapter" : [qs.chapter],
+      "chapter" : [qs.chapter],
     });
+    print(data);
     questionList = [];
-    print("in searchQuestion 3");
+    print(questionList.length);
     var response = await http.post('https://parham-backend.herokuapp.com/bank?$query',
         headers: headers,
       body: data
@@ -151,23 +152,21 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
     if (response.statusCode == 200){
       print("ok");
       final responseJson = jsonDecode(response.body);
-      //print(responseJson.toString());
+      print(responseJson.toString());
 
       totalpage = responseJson["totalPages"];
-      print(responseJson["questions"].length);
+     // print(responseJson["questions"].length);
       for (int i=0;i<responseJson["questions"].length;i++)
       {
         QuestionServer qs = new QuestionServer();
         qs.type = responseJson["questions"][i]["type"];
         qs.question = responseJson["questions"][i]["question"];
         qs.base = responseJson["questions"][i]["base"];
-       // qs.course = responseJson["questions"][i]["course"];
+        qs.course = responseJson["questions"][i]["course"];
         qs.chapter = responseJson["questions"][i]["chapter"];
         qs.hardness = responseJson["questions"][i]["hardness"];
-        qs.answer = responseJson["questions"][i]["answers"].toString();
+        qs.answer = responseJson["questions"][i]["answers"];
         qs.options = responseJson["questions"][i]["options"];
-     //   qs.public = responseJson["questions"][i]["public"].toString();
-    //    qs.id = responseJson["questions"][i]["_id"];
 
         // print(qs.type);
         // print(qs.public);
@@ -178,13 +177,13 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
         // print(qs.course);
         // print("---");
         Question q = Question.QuestionServerToQuestion(qs);
-        print(q.kind);
-        print(q.isPublic);
-        print(q.text);
-        //print(qs.answer);
-        print(q.paye);
-        print(q.difficulty);
-        print(q.book);
+        // print(q.kind);
+        // print(q.isPublic);
+        // print(q.text);
+        // //print(qs.answer);
+        // print(q.paye);
+        // print(q.difficulty);
+        // print(q.book);
         questionList.add(q);
       }
       // for (int i=0;i<questionList.length;i++)
@@ -197,26 +196,12 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
       });
     }
     else{
-      print("nokey");
+      print("not okey");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       ShowCorrectnessDialog(false,context);
         _btnController.stop();
-      //_showMyDialog(false);
-      //_btnController.stop();
     }
-
-
-
-
-    // print(payeData.name);
-    // print(bookData.name);
-    // print(chapterData.name);
-    // print(kindData.name);
-    // print(difficultyData.name);
-    // setState(() {
-    //   _btnController.stop();
-    // });
 
   }
   @override
@@ -288,7 +273,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                   child: ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: (questionList.length == 0)? 0:1,
+                      itemCount: questionList.length,
                       itemBuilder: (BuildContext context, int index)
                       {
                         if(questionList[index].kind == "جایخالی") return AnswerString(question: questionList[index]);
@@ -305,7 +290,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                       //physics: NeverScrollableScrollPhysics(),
                       //shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
-                      itemCount: 5,//totalpage,
+                      itemCount: totalpage,
                       itemBuilder: (BuildContext context, int index)
                       {
                         int indexplus = index+1;
@@ -387,7 +372,7 @@ class _TestViewState extends State<TestView> {
                 textDirection: TextDirection.rtl,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
+                  Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
                   (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
@@ -524,7 +509,7 @@ class _MultiOptionViewState extends State<MultiOptionView> {
                 textDirection: TextDirection.rtl,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl)),
+                  Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
                   (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
@@ -639,7 +624,7 @@ class _AnswerStringState extends State<AnswerString> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(alignment: Alignment.centerRight,child: Text("جواب : "+ widget.question.answerString,textDirection: TextDirection.rtl)),
-                  (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
+                  (widget.question.answerImage != null) ? Text(widget.question.questinImage) : Container(),
                 ],
               ),
             ):Container(),

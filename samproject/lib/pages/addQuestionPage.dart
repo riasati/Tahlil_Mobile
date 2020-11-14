@@ -26,14 +26,10 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
   TextEditingController TestText2Controller = new TextEditingController();
   TextEditingController TestText3Controller = new TextEditingController();
   TextEditingController TestText4Controller = new TextEditingController();
-  TextEditingController MultiOptionText1Controller =
-      new TextEditingController();
-  TextEditingController MultiOptionText2Controller =
-      new TextEditingController();
-  TextEditingController MultiOptionText3Controller =
-      new TextEditingController();
-  TextEditingController MultiOptionText4Controller =
-      new TextEditingController();
+  TextEditingController MultiOptionText1Controller = new TextEditingController();
+  TextEditingController MultiOptionText2Controller = new TextEditingController();
+  TextEditingController MultiOptionText3Controller = new TextEditingController();
+  TextEditingController MultiOptionText4Controller = new TextEditingController();
 
   popupMenuData payeData = new popupMenuData("پایه تحصیلی");
   List<String> payelist = ["دهم", "یازدهم", "دوازدهم"];
@@ -722,8 +718,6 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
 
   void submit() async {
     newQuestion.text = QuestionTextController.text;
-    //newQuestion.image1 =
-    //newQuestion.image2 =
     newQuestion.paye = payeData.name;
     newQuestion.book = bookData.name;
     newQuestion.chapter = chapterData.name;
@@ -732,10 +726,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     newQuestion.isPublic = addQuestionBankOption;
 
     final prefs = await SharedPreferences.getInstance();
-    // String token = prefs.getString("token");
-
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
+    String token = prefs.getString("token");
     if (token == null) {
       return;
     }
@@ -750,26 +741,18 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       newQuestion.optionFour = TestText4Controller.text;
       newQuestion.numberOne = _radioGroupValue;
       QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
-      print(qs.type);
-      print(qs.public);
-      print(qs.question);
-      print(qs.answer);
-      print(qs.base);
-      print(qs.hardness);
-      print(qs.course);
-      print(qs.options);
-      print(qs.chapter);
       data = jsonEncode(<String, dynamic>{
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer.toString(),
+        "answers": [{"answer":2}],
         "base": qs.base,
         "hardness": qs.hardness,
         "course": qs.course,
         "options": qs.options,
         "chapter": qs.chapter,
       });
+      //print(data);
       final response = await http.post(url,
           headers: {
             'accept': 'application/json',
@@ -783,39 +766,28 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
         _btnController.stop();
-        //final responseJson = jsonDecode(response.body);
-        //HomePage.user.avatarUrl = responseJson['user']['avatar'];
-        //_showMyDialog(true);
-        //_btnController.stop();
+
       } else {
-        print("Question failed int test");
+        ShowCorrectnessDialog(false, context);
+        print("Question failed in test");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
-        ShowCorrectnessDialog(false, context);
         _btnController.stop();
-        //_showMyDialog(false);
-        //_btnController.stop();
       }
     } else if (newQuestion.kind == "جایخالی") {
       newQuestion.answerString = BlankTextController.text;
       QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
-      // print(qs.type);
-      // print(qs.public);
-      // print(qs.question);
-      // print(qs.answer);
-      // print(qs.base);
-      // print(qs.hardness);
-      // print(qs.course);
-      data = jsonEncode(<String, String>{
+      data = jsonEncode(<String, dynamic>{
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer,
+        "answers": qs.answer,
         "base": qs.base,
         "hardness": qs.hardness,
         "course": qs.course,
         "chapter": qs.chapter,
       });
+      //print(data);
       final response = await http.post(url,
           headers: {
             'accept': 'application/json',
@@ -824,12 +796,12 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
           },
           body: data);
       if (response.statusCode == 200) {
-        print("Question Created in jayekhali");
         ShowCorrectnessDialog(true, context);
+        print("Question Created in jayekhali");
         _btnController.stop();
       } else {
-        print("Question failed in jayekhali");
         ShowCorrectnessDialog(false, context);
+        print("Question failed in jayekhali");
         _btnController.stop();
       }
     } else if (newQuestion.kind == "چند گزینه ای") {
@@ -843,25 +815,18 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       newQuestion.numberFour = (optionFour) ? 1 : 0;
 
       QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
-      // print(qs.type);
-      // print(qs.public);
-      // print(qs.question);
-      // print(qs.answer);
-      // print(qs.base);
-      // print(qs.hardness);
-      // print(qs.course);
-      // print(qs.options);
       data = jsonEncode(<String, dynamic>{
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer,
+        "answers": qs.answer,
         "base": qs.base,
         "hardness": qs.hardness,
         "course": qs.course,
         "options": qs.options,
         "chapter": qs.chapter,
       });
+      //print(data);
       final response = await http.post(url,
           headers: {
             'accept': 'application/json',
@@ -870,32 +835,32 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
           },
           body: data);
       if (response.statusCode == 200) {
-        print("Question Created in multiChoice");
         ShowCorrectnessDialog(true, context);
+        print("Question Created in multiChoice");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
         _btnController.stop();
       } else {
-        print("Question failed in multiChoice");
         ShowCorrectnessDialog(false, context);
+        print("Question failed in multiChoice");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
         _btnController.stop();
       }
     } else if (newQuestion.kind == "تشریحی") {
-      //newQuestion.image2 =
       newQuestion.answerString = TashrihiTextController.text;
       QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
-      data = jsonEncode(<String, String>{
+      data = jsonEncode(<String, dynamic>{
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answer": qs.answer,
+        "answers": qs.answer,
         "base": qs.base,
         "hardness": qs.hardness,
         "course": qs.course,
         "chapter": qs.chapter,
       });
+      //print(data);
       final response = await http.post(url,
           headers: {
             'accept': 'application/json',
@@ -904,16 +869,15 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
           },
           body: data);
       if (response.statusCode == 200) {
-        print("Question Created in tashrihi");
         ShowCorrectnessDialog(true, context);
+        print("Question Created in tashrihi");
         _btnController.stop();
       } else {
-        print("Question failed in tashrihi");
         ShowCorrectnessDialog(false, context);
+        print("Question failed in tashrihi");
         _btnController.stop();
       }
     }
-    print("etmam");
   }
 
   bool addQuestionBankOption = false;
@@ -960,7 +924,6 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                                 ],
                               ),
                             ),
-                            //TextFieldWithFocus(focusOnText: true,maxLine: 3,TextController: QuestionTextController,textInputType: TextInputType.multiline,)
                             Expanded(
                                 child: InkWell(
                               child: (focusOnQuestionText)
@@ -1075,19 +1038,12 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child:
-                      // FlatButton(
-                      //   color: Color(0xFF3D5A80),
-                      //   onPressed: submit,
-                      //   child: Text("اضافه کردن"),
-                      //   textColor: Colors.white,
-                      // ),
                       RoundedLoadingButton(
-                    height: 40,
-                    child: Text(
+                        height: 40,
+                        child: Text(
                       'اضافه کردن',
                       style: TextStyle(color: Colors.white),
                     ),
-                    //borderRadius: 0,
                     controller: _btnController,
                     color: Color(0xFF3D5A80),
                     onPressed: () => submit(),
@@ -1101,54 +1057,3 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     );
   }
 }
-
-// class TextFieldWithFocus extends StatefulWidget {
-//   bool focusOnText;
-//   TextEditingController TextController;
-//   int maxLine;
-//   TextInputType textInputType;
-//   TextFieldWithFocus({Key key, this.focusOnText, this.TextController,this.maxLine,this.textInputType}) : super(key: key);
-//   @override
-//   _TextFieldWithFocusState createState() => _TextFieldWithFocusState();
-// }
-//
-// class _TextFieldWithFocusState extends State<TextFieldWithFocus> {
-//   void _focusChangeOnText(bool isChange)
-//   {
-//     if(isChange)
-//     {
-//       setState(() {
-//         widget.focusOnText = true;
-//       });
-//     }
-//     else
-//     {
-//       setState(() {
-//         widget.focusOnText = false;
-//       });
-//     }
-//   }
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       child: (widget.focusOnText) ? TextFormField(
-//         textDirection: TextDirection.rtl,
-//         controller: widget.TextController,
-//         keyboardType: widget.textInputType,
-//         //keyboardType: TextInputType.multiline,
-//         maxLines: widget.maxLine,
-//         decoration: InputDecoration(border: OutlineInputBorder()),
-//       )
-//           :TextFormField(
-//         textDirection: TextDirection.rtl,
-//         controller: widget.TextController,
-//         keyboardType: widget.textInputType,
-//         maxLines: widget.maxLine,
-//         readOnly: true,
-//         decoration: InputDecoration(border: InputBorder.none),
-//       ),
-//       onFocusChange: (value) => _focusChangeOnText(value),
-//     );
-//   }
-// }
-//

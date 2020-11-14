@@ -29,7 +29,7 @@ class Question
     Q.id = QS.id;
     Q.text = QS.question;
 
-    if ( QS.base == "10")
+    if (QS.base == "10")
     {
       Q.paye = "دهم";
     }
@@ -130,22 +130,32 @@ class Question
       Q.kind = "تشریحی";
     }
 
-    if (QS.public == "true")
+    if (QS.public != null)
     {
-      Q.isPublic = true;
-    }
-    else
-    {
-      Q.isPublic = false;
+      if (QS.public == true)
+      {
+        Q.isPublic = true;
+      }
+      else
+      {
+        Q.isPublic = false;
+      }
     }
 
     if (QS.type == "SHORTANSWER")
     {
-      Q.answerString = QS.answer;
+      if (QS.answer.isEmpty == false)
+      {
+        Q.answerString = QS.answer[0]["answer"];
+      }
+
     }
     else if (QS.type == "LONGANSWER")
     {
-      Q.answerString = QS.answer;
+      if (QS.answer.isEmpty == false)
+      {
+        Q.answerString = QS.answer[0]["answer"];
+      }
     }
     else if (QS.type == "TEST")
     {
@@ -154,7 +164,8 @@ class Question
       Q.optionThree = QS.options[2]["option"];
       Q.optionFour = QS.options[3]["option"];
 
-    //  Q.numberOne = int.parse(QS.answer);
+      Q.numberOne = QS.answer[0]["answer"];
+   //   Q.numberOne = 3;
     }
     else if (QS.type == "MULTICHOISE")
     {
@@ -165,19 +176,19 @@ class Question
 
       for (int i=0;i<QS.answer.length;i++)
       {
-        if (QS.answer[i] == "1")
+        if (QS.answer[i]["answer"] == 1)
         {
           Q.numberOne = 1;
         }
-        else if (QS.answer[i] == "2")
+        else if (QS.answer[i]["answer"] == 2)
         {
           Q.numberTwo = 1;
         }
-        else if (QS.answer[i] == "3")
+        else if (QS.answer[i]["answer"] == 3)
         {
           Q.numberThree = 1;
         }
-        else if (QS.answer[i] == "4")
+        else if (QS.answer[i]["answer"] == 4)
         {
           Q.numberFour = 1;
         }

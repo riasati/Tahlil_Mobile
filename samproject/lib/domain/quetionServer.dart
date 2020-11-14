@@ -3,14 +3,14 @@ import 'package:samproject/domain/question.dart';
 class QuestionServer
 {
   String type;
-  String public;
+  bool public;
   String question;
-  dynamic answer;
+  dynamic answer = [];
   String base;
   String hardness;
   String course;
   String chapter;
-  List options = [];
+  dynamic options = [];
   String id;
   QuestionServer();
 
@@ -123,57 +123,68 @@ class QuestionServer
     {
       if (Q.isPublic)
       {
-        QS.public = "true";
+        QS.public = true;
       }
       else
       {
-        QS.public = "false";
+        QS.public = false;
       }
     }
 
     if (QS.type == "SHORTANSWER")
     {
-      QS.answer = Q.answerString;
+     // dynamic Answer = {"answer":Q.answerString};
+      QS.answer.add({"answer":Q.answerString});
     }
     else if (QS.type == "LONGANSWER")
     {
-      QS.answer = Q.answerString;
+     // dynamic Answer = {"answer":Q.answerString};
+      QS.answer.add({"answer":Q.answerString});
     }
     else if (QS.type == "TEST")
     {
+     // dynamic option1 = {"option":Q.optionOne};
+     // dynamic option2 = {"option":Q.optionTwo};
+     // dynamic option3 = {"option":Q.optionThree};
+     // dynamic option4 = {"option":Q.optionFour};
       QS.options.add({"option":Q.optionOne});
       QS.options.add({"option":Q.optionTwo});
       QS.options.add({"option":Q.optionThree});
       QS.options.add({"option":Q.optionFour});
-      // QS.answer = [];
-      // QS.answer.add(Q.numberOne.toString());
-      QS.answer = Q.numberOne;
+     // dynamic Answer = {"answer":Q.numberOne};
+      QS.answer.add({"answer":Q.numberOne});
     }
     else if (QS.type == "MULTICHOISE")
     {
+      // dynamic option1 = {"option":Q.optionOne};
+      // dynamic option2 = {"option":Q.optionTwo};
+      // dynamic option3 = {"option":Q.optionThree};
+      // dynamic option4 = {"option":Q.optionFour};
       QS.options.add({"option":Q.optionOne});
       QS.options.add({"option":Q.optionTwo});
       QS.options.add({"option":Q.optionThree});
       QS.options.add({"option":Q.optionFour});
 
-      QS.answer = [];
       if (Q.numberOne == 1)
       {
-        QS.answer.add("1");
+      //  dynamic Answer = {"answer":1};
+        QS.answer.add({"answer":1});
       }
       if(Q.numberTwo == 1)
       {
-        QS.answer.add("2");
+      //  dynamic Answer = {"answer":2};
+        QS.answer.add({"answer":2});
       }
       if(Q.numberThree == 1)
       {
-        QS.answer.add("3");
+      //  dynamic Answer = {"answer":3};
+        QS.answer.add({"answer":3});
       }
       if(Q.numberFour == 1)
       {
-        QS.answer.add("4");
+      //  dynamic Answer = {"answer":4};
+        QS.answer.add({"answer":4});
       }
-      QS.answer = QS.answer.toString();
     }
 
     return QS;

@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class DrawerListTile extends StatefulWidget {
   final callHomePageBiuld;
@@ -78,26 +79,27 @@ class _DrawerListTileState extends State<DrawerListTile> {
             );
           },
         ),
+        Divider(color: Colors.grey),
         ListTile(
           //leading: Icon(Icons.alarm),
           title: Row(
             textDirection: TextDirection.rtl,
             children: [
-              Icon(Icons.cake),
+              Icon(Icons.question_answer),
               Padding(
                 padding: const EdgeInsets.only(right: 5.0),
-                child: Text('آیتم'),
+                child: Text('سوالات من'),
               ),
             ],
           ),
           onTap: () {
             Navigator.pop(context);
-            //Navigator.push(
-            //  context,
-            //  MaterialPageRoute(
-            //    builder: (context) => Reminders(),
-            //  ),
-            //);
+            Navigator.push(
+             context,
+             MaterialPageRoute(
+               builder: (context) => MyQuestionPage(),
+             ),
+            );
           },
         ),
         Divider(color: Colors.grey),
