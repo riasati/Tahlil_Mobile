@@ -5,6 +5,11 @@ import 'SignIn/SignInPage.dart';
 import 'SignUp/SignUpPage.dart';
 
 class LoginPage extends StatefulWidget {
+  final callHomePageBiuld;
+
+  LoginPage( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   static PageController pageController = PageController(
     initialPage: 0,
   );
@@ -13,10 +18,15 @@ class LoginPage extends StatefulWidget {
   static bool loading = false;
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginPageState createState() => _LoginPageState(toggleCoinCallback: callHomePageBiuld);
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  final callHomePageBiuld;
+  _LoginPageState( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,11 +89,11 @@ class _LoginPageState extends State<LoginPage> {
                     children: <Widget>[
                       new ConstrainedBox(
                         constraints: const BoxConstraints.expand(),
-                        child: SignInPage(),
+                        child: SignInPage(toggleCoinCallback: callHomePageBiuld,),
                       ),
                       new ConstrainedBox(
                         constraints: const BoxConstraints.expand(),
-                        child: SignUpPage(),
+                        child: SignUpPage(toggleCoinCallback: callHomePageBiuld,),
                       ),
                     ],
                   ),
@@ -99,4 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  callBuild(){
+    widget?.callHomePageBiuld();
+  }
 }

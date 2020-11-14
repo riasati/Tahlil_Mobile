@@ -59,24 +59,6 @@ class Person
     this.username = null;
     this.password = null;
   }
-  void PersonLoggedout() async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token');
-    if (token == null) return;
-    token = "Bearer " + token;
-    final response = await http.post('https://parham-backend.herokuapp.com/user/logout',
-        headers: {
-          'accept': 'application/json',
-          'Authorization': token,
-          'Content-Type': 'application/json',
-        },
-    );
-    if (response.statusCode == 200){
-      prefs.setString("token", null);
-      becomeNullPerson();
-    }
 
-  }
 //PerosnProfile({this.name = null, this.username = null, this.password = null, this.email = null});
 }

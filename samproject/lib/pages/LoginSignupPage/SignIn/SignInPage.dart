@@ -11,6 +11,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class SignInPage extends StatefulWidget {
+  final callHomePageBiuld;
+
+  SignInPage( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
   @override
   _SignInPageState createState() => _SignInPageState();
 }
@@ -154,7 +158,7 @@ class _SignInPageState extends State<SignInPage> {
                   // ),
                   child: RoundedLoadingButton(
                     // curve: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    color: Color(0xFF3D5A80),
+                    color: Color.fromRGBO(14, 145, 140, 1),
                     controller: btnController,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -219,7 +223,7 @@ class _SignInPageState extends State<SignInPage> {
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 onPressed: () => Navigator.pop(context),
-                color: Color(0xFF3D5A80),
+                color: Color.fromRGBO(14, 145, 140, 1),
               ),
             ],
           ).show();
@@ -239,6 +243,7 @@ class _SignInPageState extends State<SignInPage> {
       _saveToken(personInfo['token']);
       Navigator.pop(context);
     }
+    widget?.callHomePageBiuld();
   }
 
   void _saveToken(String token) async{
