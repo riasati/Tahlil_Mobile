@@ -35,13 +35,7 @@ class _ListOfClassesState extends State<ListOfClasses> {
       );
     }
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        color: Colors.black45.withOpacity(0.3),
-      ),
+      color: Colors.black45.withOpacity(0.3),
       child: Padding(
         padding: EdgeInsets.all(15),
         child: GridView.count(

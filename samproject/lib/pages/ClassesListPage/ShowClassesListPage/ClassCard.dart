@@ -22,6 +22,7 @@ class _ClassCardState extends State<ClassCard> {
   @override
   Widget build(BuildContext context) {
     var classCardIcon;
+    var classOwnerName;
     if(classCard.className.contains("ریاضی"))
       classCardIcon = Padding(
         child: Icon(
@@ -52,6 +53,25 @@ class _ClassCardState extends State<ClassCard> {
         ),
         padding: EdgeInsets.only(right: 10),
       );
+
+    if(!(classCard.ownerFullName == null || classCard.ownerFullName == "**** ****"))
+      classOwnerName = Padding(
+        padding: EdgeInsets.only(top: 8),
+        child: Container(
+          alignment: Alignment.centerRight,
+          child: AutoSizeText(
+            "استاد:" + classCard.ownerFullName,
+            maxLines: 1,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    else
+      classOwnerName = Container();
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -74,24 +94,11 @@ class _ClassCardState extends State<ClassCard> {
                   maxLines: 1,
                   style: TextStyle(
                     color: Colors.black,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  child: AutoSizeText(
-                    "استاد:" + classCard.ownerFullName,
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
+              classOwnerName,
             ],
           ),
         ),
