@@ -159,34 +159,73 @@ class Question
     }
     else if (QS.type == "TEST")
     {
-      if (QS.options[0] != null)
+      //List ls = [];
+      //ls.length
+      for (int i = 0;i<QS.options.length;i++)
       {
-        Q.optionOne = QS.options[0]["option"];
+        if (i==0)
+        {
+          Q.optionOne = QS.options[0]["option"];
+          Q.optionTwo = "خالی";
+          Q.optionThree = "خالی";
+          Q.optionFour = "خالی";
+        }
+        else if (i==1)
+        {
+          Q.optionTwo = QS.options[1]["option"];
+          Q.optionThree = "خالی";
+          Q.optionFour = "خالی";
+        }
+        else if (i==2)
+        {
+          Q.optionThree = QS.options[2]["option"];
+          Q.optionFour = "خالی";
+        }
+        else if (i==3)
+        {
+          Q.optionFour = QS.options[3]["option"];
+        }
       }
-      if (QS.options[1] != null)
-      {
-        Q.optionTwo = QS.options[1]["option"];
-      }
-      if (QS.options[2] != null)
-      {
-        Q.optionThree = QS.options[2]["option"];
-      }
-      if (QS.options[3] != null)
-      {
-        Q.optionFour = QS.options[3]["option"];
-      }
+
       //Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
      // Q.numberOne = int.parse(QS.answer[0]["answer"]);
-      //Q.numberOne = QS.answer[0]["answer"];
-      Q.numberOne = 3;
+      if (QS.answer[0]["answer"] is !String)
+      {
+        Q.numberOne = QS.answer[0]["answer"];
+      }
+      else
+        {
+          Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
+        }
+      //Q.numberOne = 3;
     }
     else if (QS.type == "MULTICHOISE")
     {
-      Q.optionOne = QS.options[0]["option"];
-      Q.optionTwo = QS.options[1]["option"];
-      Q.optionThree = QS.options[2]["option"];
-      Q.optionFour = QS.options[3]["option"];
-
+      for (int i = 0;i<QS.options.length;i++)
+      {
+        if (i==0)
+        {
+          Q.optionOne = QS.options[0]["option"];
+          Q.optionTwo = "خالی";
+          Q.optionThree = "خالی";
+          Q.optionFour = "خالی";
+        }
+        else if (i==1)
+        {
+          Q.optionTwo = QS.options[1]["option"];
+          Q.optionThree = "خالی";
+          Q.optionFour = "خالی";
+        }
+        else if (i==2)
+        {
+          Q.optionThree = QS.options[2]["option"];
+          Q.optionFour = "خالی";
+        }
+        else if (i==3)
+        {
+          Q.optionFour = QS.options[3]["option"];
+        }
+      }
       for (int i=0;i<QS.answer.length;i++)
       {
         if (QS.answer[i]["answer"] == 1)
