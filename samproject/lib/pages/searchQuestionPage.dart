@@ -142,19 +142,26 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
       "course": [qs.course],
       "chapter" : [qs.chapter],
     });
-    print(data);
     questionList = [];
+    String url = 'https://parham-backend.herokuapp.com/bank?$query';
     print(questionList.length);
-    var response = await http.post('https://parham-backend.herokuapp.com/bank?$query',
+    var response = await http.post(url,
         headers: headers,
       body: data
     );
+    print(url);
+    print(headers);
+    print(data);
     if (response.statusCode == 200){
       print("ok");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-
+      if (responseJson["message"] == "nothing found")
+      {
+        return;
+      }
       totalpage = responseJson["totalPages"];
+
      // print(responseJson["questions"].length);
       for (int i=0;i<responseJson["questions"].length;i++)
       {
@@ -306,7 +313,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                             // width: 20,
                             // height: 20,
                             color: Color(0xFF3D5A80),
-                            child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+                            child: (indexplus == thispage) ? Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.amber),) : Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
                           ),
                         );
                       }

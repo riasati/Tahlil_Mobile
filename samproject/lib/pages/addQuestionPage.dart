@@ -745,7 +745,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         "type": qs.type,
         "public": qs.public,
         "question": qs.question,
-        "answers": [{"answer":2}],
+        "answers": qs.answer,
         "base": qs.base,
         "hardness": qs.hardness,
         "course": qs.course,

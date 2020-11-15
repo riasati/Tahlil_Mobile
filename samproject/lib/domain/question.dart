@@ -159,13 +159,26 @@ class Question
     }
     else if (QS.type == "TEST")
     {
-      Q.optionOne = QS.options[0]["option"];
-      Q.optionTwo = QS.options[1]["option"];
-      Q.optionThree = QS.options[2]["option"];
-      Q.optionFour = QS.options[3]["option"];
-
-      Q.numberOne = QS.answer[0]["answer"];
-   //   Q.numberOne = 3;
+      if (QS.options[0] != null)
+      {
+        Q.optionOne = QS.options[0]["option"];
+      }
+      if (QS.options[1] != null)
+      {
+        Q.optionTwo = QS.options[1]["option"];
+      }
+      if (QS.options[2] != null)
+      {
+        Q.optionThree = QS.options[2]["option"];
+      }
+      if (QS.options[3] != null)
+      {
+        Q.optionFour = QS.options[3]["option"];
+      }
+      //Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
+     // Q.numberOne = int.parse(QS.answer[0]["answer"]);
+      //Q.numberOne = QS.answer[0]["answer"];
+      Q.numberOne = 3;
     }
     else if (QS.type == "MULTICHOISE")
     {

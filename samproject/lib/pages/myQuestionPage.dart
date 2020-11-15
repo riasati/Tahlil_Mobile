@@ -186,7 +186,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
                         margin: EdgeInsets.all(8.0),
                         padding: EdgeInsets.all(8.0),
                         color: Color(0xFF3D5A80),
-                        child: Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+                        child: (indexplus == thispage) ? Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.amber),) : Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),//Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
                       ),
                     );
                   }
