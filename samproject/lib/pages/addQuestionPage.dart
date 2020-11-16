@@ -283,27 +283,26 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
               "پاسخ سوال",
               textDirection: TextDirection.rtl,
             ),
-            Container(
-                padding: EdgeInsets.all(4.0),
-                width: 120,
-                child: InkWell(
-                  child: (focusOnBlank)
-                      ? TextFormField(
-                          textDirection: TextDirection.rtl,
-                          controller: BlankTextController,
-                          keyboardType: TextInputType.text,
-                          decoration:
-                              InputDecoration(border: OutlineInputBorder()),
-                        )
-                      : TextFormField(
-                          textDirection: TextDirection.rtl,
-                          controller: BlankTextController,
-                          keyboardType: TextInputType.text,
-                          readOnly: true,
-                          decoration: InputDecoration(border: InputBorder.none),
-                        ),
-                  onFocusChange: (value) => _focusChangeOnBlank(value),
-                )),
+            Expanded(
+              child: InkWell(
+                child: (focusOnBlank)
+                    ? TextFormField(
+                        textDirection: TextDirection.rtl,
+                        controller: BlankTextController,
+                        keyboardType: TextInputType.text,
+                        decoration:
+                            InputDecoration(border: OutlineInputBorder()),
+                      )
+                    : TextFormField(
+                        textDirection: TextDirection.rtl,
+                        controller: BlankTextController,
+                        keyboardType: TextInputType.text,
+                        readOnly: true,
+                        decoration: InputDecoration(border: InputBorder.none),
+                      ),
+                onFocusChange: (value) => _focusChangeOnBlank(value),
+              ),
+            ),
           ],
         ),
       ),
@@ -967,51 +966,45 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                 ),
                 //TextFormField(),
                 Card(
-                  child: Column(
-                    children: [
-                      Row(
-                        textDirection: TextDirection.rtl,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: PopupMenu(
-                                Data: payeData,
-                              )),
-                          Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: PopupMenu(
-                                Data: bookData,
-                              )),
-                          Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: PopupMenu(
-                                Data: chapterData,
-                              )),
-                        ],
-                      ),
-                      Row(
-                        textDirection: TextDirection.rtl,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: PopupMenuButton(
-                              //padding: EdgeInsets.all(50.0),
-                              child:
-                                  (kind == null) ? Text("نوع سوال") : Text(kind),
-                              onSelected: onSelectedKindMenu,
-                              itemBuilder: (context) => kindList,
-                            ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Column(
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
+                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
+                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,))),
+                            ],
                           ),
-                          Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: PopupMenu(
-                                Data: difficultyData,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child:PopupMenuButton(
+                                child:
+                                    (kind == null) ? Text("نوع سوال") : Text(kind),
+                                onSelected: onSelectedKindMenu,
+                                itemBuilder: (context) => kindList,
+                              ),
                               )),
-                        ],
-                      ),
-                    ],
+                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 if (whichKind == 1)

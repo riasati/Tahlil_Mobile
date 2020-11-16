@@ -23,6 +23,30 @@ class Question
   String id;
 
   Question();
+  Question CopyQuestion()
+  {
+    Question q = new Question();
+    q.text = this.text;
+    q.questinImage = this.questinImage;
+    q.answerImage = this.answerImage;
+    q.paye = this.paye;
+    q.book = this.book;
+    q.chapter = this.chapter;
+    q.difficulty = this.difficulty;
+    q.kind = this.kind;
+    q.answerString = this.answerString;
+    q.numberOne = this.numberOne;
+    q.numberTwo = this.numberTwo;
+    q.numberThree = this.numberThree;
+    q.numberFour = this.numberFour;
+    q.optionOne = this.optionOne;
+    q.optionTwo = this.optionTwo;
+    q.optionThree = this.optionThree;
+    q.optionFour = this.optionFour;
+    q.isPublic = this.isPublic;
+    q.id = this.id;
+    return q;
+  }
   static Question QuestionServerToQuestion(QuestionServer QS)
   {
     Question Q = new Question();

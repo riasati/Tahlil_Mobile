@@ -1,14 +1,256 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
-import 'package:samproject/widgets/popumMenu.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:samproject/widgets/questionWidgets.dart';
+import 'package:samproject/domain/controllers.dart';
+
+
+class QuestionView extends StatefulWidget {
+  Question question;
+  QuestionView({Key key,this.question}) : super(key: key);
+  @override
+  _QuestionViewState createState() => _QuestionViewState();
+}
+
+class _QuestionViewState extends State<QuestionView> {
+  Controllers controllers = new Controllers();
+  bool IsDelete = false;
+  bool IsEdit = false;
+
+  Widget Editing(Question question,VoidCallback onCloseButton,Controllers controllers)//VoidCallback onEditButton,VoidCallback onCloseButton
+  {
+    Question changedQuestion = widget.question.CopyQuestion();
+
+    popupMenuData payeData = new popupMenuData("پایه تحصیلی");
+    popupMenuData bookData = new popupMenuData("درس");
+    popupMenuData chapterData = new popupMenuData("فصل");
+    popupMenuData kindData = new popupMenuData("نوع سوال");
+    popupMenuData difficultyData = new popupMenuData("دشواری سوال");
+
+    void onEditButton() async
+    {
+      final prefs = await SharedPreferences.getInstance();
+      String token = prefs.getString("token");
+      if (token == null) {return;}
+      String tokenplus = "Bearer" + " " + token;
+      changedQuestion.text = controllers.QuestionTextController.text;
+      changedQuestion.paye = payeData.name;
+      changedQuestion.book = bookData.name;
+      changedQuestion.chapter = chapterData.name;
+      changedQuestion.kind = kindData.name;
+      changedQuestion.difficulty = difficultyData.name;
+      changedQuestion.id = widget.question.id;
+      dynamic data;
+      if (widget.question.kind == "چند گزینه ای")
+      {
+        changedQuestion.optionOne = controllers.MultiOptionText1Controller.text;
+        changedQuestion.optionTwo = controllers.MultiOptionText2Controller.text;
+        changedQuestion.optionThree = controllers.MultiOptionText3Controller.text;
+        changedQuestion.optionFour = controllers.MultiOptionText4Controller.text;
+
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": qs.type,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": qs.base,
+          "hardness" : qs.hardness,
+          "course": qs.course,
+          "options" : qs.options,
+          "chapter" : qs.chapter,
+        });
+      }
+      else if (widget.question.kind == "تستی")
+      {
+        changedQuestion.optionOne = controllers.TestText1Controller.text;
+        changedQuestion.optionTwo = controllers.TestText2Controller.text;
+        changedQuestion.optionThree = controllers.TestText3Controller.text;
+        changedQuestion.optionFour = controllers.TestText4Controller.text;
+
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": qs.type,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": qs.base,
+          "hardness" : qs.hardness,
+          "course": qs.course,
+          "options" : qs.options,
+          "chapter" : qs.chapter,
+        });
+      }
+      else {
+        changedQuestion.answerString = controllers.TashrihiTextController.text;
+
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": qs.type,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": qs.base,
+          "hardness" : qs.hardness,
+          "course": qs.course,
+          "chapter" : qs.chapter,
+        });
+      }
+      final response = await http.put('https://parham-backend.herokuapp.com/question',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': tokenplus,
+            'Content-Type': 'application/json',
+          },
+          body: data
+      );
+      if (response.statusCode == 200){
+        ShowCorrectnessDialog(true,context);
+        print("Question changed ");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
+        widget.question = changedQuestion.CopyQuestion();
+
+      }
+      else{
+        ShowCorrectnessDialog(false,context);
+        print("Question failed");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
+      }
+
+
+      setState(() {
+        IsEdit = false;
+      });
+    }
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
+          textDirection: TextDirection.rtl,
+          children: [
+            EditingOneLineQuestionSpecification(question: changedQuestion,payeData: payeData,bookData: bookData,kindData: kindData,chapterData: chapterData,difficultyData: difficultyData,),
+            EditingQuestionText(controllers: controllers,question: changedQuestion,),
+            if (widget.question.kind == "چند گزینه ای") EditingMultiChoiceOption(controllers: controllers,question: changedQuestion,)
+            else if (widget.question.kind == "تستی") EditingTest(question: changedQuestion,controllers: controllers,)
+            else if (widget.question.kind == "جایخالی") EditingAnswerString(question: changedQuestion,controllers: controllers,)
+            else if (widget.question.kind == "تشریحی") EditingAnswerString(question: changedQuestion,controllers: controllers,),
+            AddInBankOption(question: changedQuestion,),
+            EditAndEliminateButton(onEditPressed: onEditButton,onEliminatePressed: onCloseButton,),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget NotEditing(Question question,VoidCallback onCloseButton,)
+  {
+    void onEditButton()
+    {
+      setState(() {
+        IsEdit = true;
+      });
+    }
+    return Card(
+      child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Column(
+            children: [
+              Column(
+                textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  NotEditingQuestionSpecification(question: question,),
+                  NotEditingQuestionText(question: question,),
+                  if (widget.question.kind == "چند گزینه ای") NotEditingMultiChoiceOption(question: question,isNull: true,)
+                  else if (widget.question.kind == "تستی") NotEditingTest(question: question)
+                  else if (widget.question.kind == "جایخالی") NotEditingAnswerString(question: question)
+                  else if (widget.question.kind == "تشریحی") NotEditingAnswerString(question: question),
+                ],
+              ),
+              EditAndEliminateButton(onEditPressed: onEditButton,onEliminatePressed: onCloseButton,),
+            ],
+          )
+      ),
+    );
+  }
+
+  void onCloseButton() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+    String id = widget.question.id;
+    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': tokenplus,
+        'Content-Type': 'application/json',
+      },
+
+    );
+    if (response.statusCode == 200){
+      ShowCorrectnessDialog(true,context);
+      print("Question eliminated");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      setState(() {
+        IsDelete = true;
+      });
+    }
+    else{
+      ShowCorrectnessDialog(false,context);
+      print("Question failed");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      setState(() {
+        IsDelete = false;
+      });
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    controllers.FillQuestionTextController(widget.question.text);
+    controllers.FillMultiOptionText1Controller(widget.question.optionOne);
+    controllers.FillMultiOptionText2Controller(widget.question.optionTwo);
+    controllers.FillMultiOptionText3Controller(widget.question.optionThree);
+    controllers.FillMultiOptionText4Controller(widget.question.optionFour);
+    controllers.FillTestText1Controller(widget.question.optionOne);
+    controllers.FillTestText2Controller(widget.question.optionTwo);
+    controllers.FillTestText3Controller(widget.question.optionThree);
+    controllers.FillTestText4Controller(widget.question.optionFour);
+    controllers.FillTashrihiTextController(widget.question.answerString);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          (IsDelete == false) ?
+          ((IsEdit == false) ? NotEditing(widget.question,onCloseButton)
+              : Editing(widget.question,onCloseButton,controllers))
+              : Container(),
+        ],
+      ),
+    );
+  }
+}
+
+
+
 
 class MyQuestionPage extends StatefulWidget {
   @override
@@ -16,19 +258,18 @@ class MyQuestionPage extends StatefulWidget {
 }
 
 class _MyQuestionPageState extends State<MyQuestionPage> {
-  // Question newQuestion = new Question();
-  // Question newQuestion2 = new Question();
-  // Question newQuestion3 = new Question();
-  // Question newQuestion4 = new Question();
+  Question newQuestion = new Question();
+  Question newQuestion2 = new Question();
+  Question newQuestion3 = new Question();
+  Question newQuestion4 = new Question();
 
   List<Question> questionList = [];
   int totalpage = 0;
   int thispage = 1;
-
   void getMyQuestion() async
   {
     final prefs = await SharedPreferences.getInstance();
-     String token = prefs.getString("token");
+    String token = prefs.getString("token");
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
 
@@ -71,17 +312,15 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
       });
     }
     else
-      {
-        ShowCorrectnessDialog(false, context);
-      }
+    {
+      ShowCorrectnessDialog(false, context);
+    }
 
   }
   @override
   void initState() {
     super.initState();
-    getMyQuestion();
-
-    //
+   getMyQuestion();
     // newQuestion.paye = "دهم";
     // newQuestion.book = "فیزیک";
     // newQuestion.chapter = "چهارم";
@@ -91,6 +330,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
     // //newQuestion.questionImage = "عکس سوال";
     // newQuestion.answerString = "منهای شش";
     // //newQuestion.image2 = "عکس پاسخ";
+    // newQuestion.isPublic = false;
     //
     // newQuestion2.paye = "دهم";
     // newQuestion2.book = "فیزیک";
@@ -107,6 +347,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
     // newQuestion2.numberTwo = 1;
     // newQuestion2.numberThree = 1;
     // newQuestion2.numberFour = 0;
+    // newQuestion2.isPublic = true;
     //
     // newQuestion3.paye = "دهم";
     // newQuestion3.book = "فیزیک";
@@ -120,6 +361,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
     // newQuestion3.optionThree = "به توان سه";
     // newQuestion3.optionFour = "به توان چهار";
     // newQuestion3.numberOne = 2;
+    // newQuestion.isPublic = true;
     //
     // newQuestion4.paye = "دهم";
     // newQuestion4.book = "فیزیک";
@@ -129,8 +371,12 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
     // newQuestion4.text = "هر میکرو معادل با 10 به توان چند است؟";
     // newQuestion4.questinImage = "عکس سوال";
     // newQuestion4.answerString = "منهای شش";
+    // newQuestion4.isPublic = false;
+
   }
 
+  bool IsDelete = false;
+  bool IsEdit = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -157,39 +403,36 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
               Flexible(
                 flex: 11,
                 child: ListView.builder(
-                  itemCount: questionList.length,
-                  itemBuilder: (BuildContext context, int index)
-                  {
-                    if(questionList[index].kind == "جایخالی") return AnswerStringCard(question: questionList[index]);
-                    else if (questionList[index].kind == "تشریحی") return AnswerStringCard(question: questionList[index],);
-                    else if (questionList[index].kind == "تستی") return TestCard(question: questionList[index],);
-                    else if (questionList[index].kind == "چند گزینه ای") return MultiOptionCard(question: questionList[index],);
-                    else return Container();
-                  }
-                  ),
+                    itemCount: questionList.length,
+                    itemBuilder: (BuildContext context, int index)
+                    {
+                      return QuestionView(question: questionList[index]);
+                    }
+                ),
               ),
+
               Flexible(
                 flex: 1,
                 child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: totalpage,
-                  itemBuilder: (BuildContext context, int index)
-                  {
-                    int indexplus = index+1;
-                    return InkWell(
-                      onTap: ()
-                      {
-                        thispage = indexplus;
-                        getMyQuestion();
-                      },
-                      child: Container(
-                        margin: EdgeInsets.all(8.0),
-                        padding: EdgeInsets.all(8.0),
-                        color: Color(0xFF3D5A80),
-                        child: (indexplus == thispage) ? Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.amber),) : Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),//Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
-                      ),
-                    );
-                  }
+                    scrollDirection: Axis.horizontal,
+                    itemCount: totalpage,
+                    itemBuilder: (BuildContext context, int index)
+                    {
+                      int indexplus = index+1;
+                      return InkWell(
+                        onTap: ()
+                        {
+                          thispage = indexplus;
+                          getMyQuestion();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
+                          color: Color(0xFF3D5A80),
+                          child: (indexplus == thispage) ? Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.amber),) : Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),//Text("$indexplus",textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white),),
+                        ),
+                      );
+                    }
                 ),
               )
             ],
@@ -198,1298 +441,5 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
         ),
       ),
     );
-  }
-}
-
-class MultiOptionCard extends StatefulWidget {
-  Question question;
-  MultiOptionCard({Key key, this.question}) : super(key: key);
-  @override
-  _MultiOptionCardState createState() => _MultiOptionCardState();
-}
-
-class _MultiOptionCardState extends State<MultiOptionCard> {
-  bool IsDelete = false;
-  bool IsEditing = false;
-   bool optionOne = false;
-  void optionOneChange(bool newValue) {
-    setState(() {
-      optionOne = newValue;
-    });
-  }
-   bool optionTwo = false;
-  void optionTwoChange(bool newValue) {
-    setState(() {
-      optionTwo = newValue;
-    });
-  }
-   bool optionThree = false;
-  void optionThreeChange(bool newValue) {
-    setState(() {
-      optionThree = newValue;
-    });
-  }
-   bool optionFour = false;
-  void optionFourChange(bool newValue) {
-    setState(() {
-      optionFour = newValue;
-    });
-  }
-
-  void viewMultiOptionAnswer()
-  {
-    setState(() {
-      (widget.question.numberOne == 1) ? optionOne = true : optionOne = false;
-      (widget.question.numberTwo == 1) ? optionTwo = true : optionTwo = false;
-      (widget.question.numberThree == 1) ? optionThree = true : optionThree = false;
-      (widget.question.numberFour == 1) ? optionFour = true : optionFour = false;
-    });
-  }
-  void onEditButton() async
-  {
-    if (IsEditing == true)
-    {
-      final prefs = await SharedPreferences.getInstance();
-       String token = prefs.getString("token");
-      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
-      if (token == null) {return;}
-      String tokenplus = "Bearer" + " " + token;
-      Question temporaryQuestion = new Question();
-      temporaryQuestion.paye = payeData.name;
-      temporaryQuestion.book = bookData.name;
-      temporaryQuestion.chapter = chapterData.name;
-      temporaryQuestion.kind = kindData.name;
-      temporaryQuestion.difficulty = difficultyData.name;
-
-      temporaryQuestion.isPublic = addQuestionBankOption;
-      temporaryQuestion.id = widget.question.id;
-
-      temporaryQuestion.text = QuestionTextController.text;
-      temporaryQuestion.optionOne =  MultiOptionText1Controller.text;
-      temporaryQuestion.optionTwo = MultiOptionText2Controller.text;
-      temporaryQuestion.optionThree = MultiOptionText3Controller.text;
-      temporaryQuestion.optionFour = MultiOptionText4Controller.text;
-
-      temporaryQuestion.numberOne = (optionOne) ? 1 : 0;
-      temporaryQuestion.numberTwo = (optionTwo) ? 1 : 0;
-      temporaryQuestion.numberThree = (optionThree) ? 1 : 0;
-      temporaryQuestion.numberFour = (optionFour) ? 1 : 0;
-
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
-
-      dynamic data = jsonEncode(<String,dynamic>{
-        "questionId":qs.id,
-        "type": qs.type,
-        "public": qs.public,
-        "question": qs.question,
-        "answers": qs.answer,
-        "base": qs.base,
-        "hardness" : qs.hardness,
-        "course": qs.course,
-        "options" : qs.options,
-        "chapter" : qs.chapter,
-      });
-      final response = await http.put('https://parham-backend.herokuapp.com/question',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': tokenplus,
-            'Content-Type': 'application/json',
-          },
-          body: data
-      );
-      if (response.statusCode == 200){
-        ShowCorrectnessDialog(true,context);
-        print("Question changed in multichoice");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-
-        widget.question.paye = payeData.name;
-        widget.question.book = bookData.name;
-        widget.question.chapter = chapterData.name;
-        widget.question.kind = kindData.name;
-        widget.question.difficulty = difficultyData.name;
-
-        widget.question.text = QuestionTextController.text;
-        widget.question.optionOne = MultiOptionText1Controller.text;
-        widget.question.optionTwo = MultiOptionText2Controller.text;
-        widget.question.optionThree = MultiOptionText3Controller.text;
-        widget.question.optionFour = MultiOptionText4Controller.text;
-
-        widget.question.numberOne = (optionOne) ? 1 : 0;
-        widget.question.numberTwo = (optionTwo) ? 1 : 0;
-        widget.question.numberThree = (optionThree) ? 1 : 0;
-        widget.question.numberFour = (optionFour) ? 1 : 0;
-
-      }
-      else{
-        ShowCorrectnessDialog(false,context);
-        print("Question failed in multichoice");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-
-      }
-
-      setState(() {
-        IsEditing = false;
-      });
-    }
-    else
-      {
-        setState(() {
-          IsEditing = true;
-        });
-      }
-  }
-  void onCloseButton() async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
-    if (token == null) {return;}
-    String tokenplus = "Bearer" + " " + token;
-    String id = widget.question.id;
-    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
-      headers: {
-        'accept': 'application/json',
-        'Authorization': tokenplus,
-        'Content-Type': 'application/json',
-      },
-
-    );
-    if (response.statusCode == 200){
-      ShowCorrectnessDialog(true,context);
-      print("Question eliminated in multichoice");
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
-      setState(() {
-        IsDelete = true;
-      });
-    }
-    else{
-      ShowCorrectnessDialog(false,context);
-      print("Question failed in multichoice");
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
-      setState(() {
-        IsDelete = false;
-      });
-    }
-  }
-
-
-  Widget notEditingCard()
-  {
-    return Column(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(widget.question.paye),
-              Text(widget.question.book),
-              Text(widget.question.chapter),
-              Text(widget.question.kind),
-              Text(widget.question.difficulty),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
-              (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Checkbox(value: (widget.question.numberOne == 1) ? true: false, onChanged: null),
-                  Expanded(child: Text(widget.question.optionOne,textDirection: TextDirection.rtl))
-                ],
-              ),
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Checkbox(value: (widget.question.numberTwo == 1) ? true: false, onChanged: null),
-                  Expanded(child: Text(widget.question.optionTwo,textDirection: TextDirection.rtl,))
-                ],
-              ),
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Checkbox(value: (widget.question.numberThree == 1) ? true: false, onChanged: null),
-                  Expanded(child: Text(widget.question.optionThree,textDirection: TextDirection.rtl,))
-                ],
-              ),
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Checkbox(value: (widget.question.numberFour == 1) ? true: false, onChanged: null),
-                  Expanded(child: Text(widget.question.optionFour,textDirection: TextDirection.rtl,))
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-  List<String> payelist = ["دهم","یازدهم","دوازدهم"];
-  popupMenuData bookData = new popupMenuData("درس");
-  List<String> booklist = ["ریاضی","فیزیک","شیمی","زیست"];
-  popupMenuData chapterData = new popupMenuData("فصل");
-  List<String> cahpterlist = ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
-  popupMenuData kindData = new popupMenuData("نوع سوال");
-  List<String> kindlist = ["تستی","جایخالی","چند گزینه ای","تشریحی"];
-  popupMenuData difficultyData = new popupMenuData("دشواری سوال");
-  List<String> difficultylist = ["آسان","متوسط","سخت"];
-
-  File _QuestionImage;
-  final picker = ImagePicker();
-  void getQuestionImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null ) {
-        _QuestionImage = File(pickedFile.path);
-      }
-    });
-  }
-  void _deleteQuestionImage()
-  {
-    setState(() {
-      _QuestionImage = null;
-    });
-  }
-
-  TextEditingController QuestionTextController = new TextEditingController();
-  TextEditingController MultiOptionText1Controller = new TextEditingController();
-  TextEditingController MultiOptionText2Controller = new TextEditingController();
-  TextEditingController MultiOptionText3Controller = new TextEditingController();
-  TextEditingController MultiOptionText4Controller = new TextEditingController();
-
-  bool addQuestionBankOption;
-  void addQuestionBankOptionChange(bool newValue) {
-    setState(() {
-      addQuestionBankOption = newValue;
-    });
-  }
-
-  Widget EditingCard()
-  {
-    return Column(
-      textDirection: TextDirection.rtl,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: kindData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Column(
-                  children: [
-                    Text("متن سوال",textDirection: TextDirection.rtl,),
-                    IconButton(icon: Icon(Icons.camera),onPressed: getQuestionImage,tooltip: "می توان فقط عکس هم فرستاد",)
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: TextFormField(
-                    autofocus: true,
-                    textDirection: TextDirection.rtl,
-                    controller: QuestionTextController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 3,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              ),
-            ],
-          ),
-        ),
-        (_QuestionImage != null) ? Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-            : Container(),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Checkbox(value: optionOne, onChanged: optionOneChange),
-              Expanded(
-                child: TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: MultiOptionText1Controller,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                ),
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Checkbox(value: optionTwo, onChanged: optionTwoChange),
-              Expanded(
-                child: TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: MultiOptionText2Controller,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                )
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Checkbox(value: optionThree, onChanged: optionThreeChange),
-              Expanded(
-                  child: TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText3Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Checkbox(value: optionFour, onChanged: optionFourChange),
-              Expanded(
-                  child: TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: MultiOptionText4Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              )
-            ],
-          ),
-        ),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
-            Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
-          ],
-        ),
-      ],
-    );
-  }
-  @override
-  void initState() {
-    super.initState();
-    (widget.question.numberOne == 1) ? optionOne = true : optionOne = false;
-    (widget.question.numberTwo == 1) ? optionTwo = true : optionTwo = false;
-    (widget.question.numberThree == 1) ? optionThree = true : optionThree = false;
-    (widget.question.numberFour == 1) ? optionFour = true : optionFour = false;
-
-    payeData.fillStringList(payelist);
-    bookData.fillStringList(booklist);
-    chapterData.fillStringList(cahpterlist);
-    kindData.fillStringList(kindlist);
-    difficultyData.fillStringList(difficultylist);
-
-    payeData.name = widget.question.paye;
-    bookData.name = widget.question.book;
-    chapterData.name = widget.question.chapter;
-    kindData.name = widget.question.kind;
-    difficultyData.name = widget.question.difficulty;
-
-    QuestionTextController.text = widget.question.text;
-    MultiOptionText1Controller.text = widget.question.optionOne;
-    MultiOptionText2Controller.text = widget.question.optionTwo;
-    MultiOptionText3Controller.text = widget.question.optionThree;
-    MultiOptionText4Controller.text = widget.question.optionFour;
-
-    addQuestionBankOption = widget.question.isPublic;
-  }
-  @override
-  Widget build(BuildContext context) {
-    return (IsDelete == false) ? Card(
-      child: Padding(
-        padding: EdgeInsets.all(4.0),
-        child: Column(
-          children: [
-            (IsEditing == false) ? notEditingCard() : EditingCard(),
-            Row(
-              textDirection: TextDirection.rtl,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FlatButton(
-                  color: Color(0xFF3D5A80),
-                  onPressed: onEditButton,
-                  child: Text("ويرايش"),
-                  textColor: Colors.white,
-                ),
-                FlatButton(
-                  color: Color(0xFF3D5A80),
-                  onPressed: onCloseButton,
-                  child: Text("حذف"),
-                  textColor: Colors.white,
-                ),
-              ],
-            )
-          ],
-        )
-      ),
-    ) : Container();
-  }
-}
-
-class TestCard extends StatefulWidget {
-  Question question;
-  TestCard({Key key, this.question}) : super(key: key);
-  @override
-  _TestCardState createState() => _TestCardState();
-}
-
-class _TestCardState extends State<TestCard> {
-
-  bool IsEditing = false;
-  bool IsDelete = false;
-
-  TextEditingController QuestionTextController = new TextEditingController();
-  TextEditingController TestText1Controller = new TextEditingController();
-  TextEditingController TestText2Controller = new TextEditingController();
-  TextEditingController TestText3Controller = new TextEditingController();
-  TextEditingController TestText4Controller = new TextEditingController();
-
-  popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-  List<String> payelist = ["دهم","یازدهم","دوازدهم"];
-  popupMenuData bookData = new popupMenuData("درس");
-  List<String> booklist = ["ریاضی","فیزیک","شیمی","زیست"];
-  popupMenuData chapterData = new popupMenuData("فصل");
-  List<String> cahpterlist = ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
-  popupMenuData kindData = new popupMenuData("نوع سوال");
-  List<String> kindlist = ["تستی","جایخالی","چند گزینه ای","تشریحی"];
-  popupMenuData difficultyData = new popupMenuData("دشواری سوال");
-  List<String> difficultylist = ["آسان","متوسط","سخت"];
-
-  File _QuestionImage;
-  final picker = ImagePicker();
-  void getQuestionImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null ) {
-        _QuestionImage = File(pickedFile.path);
-      }
-    });
-  }
-  void _deleteQuestionImage()
-  {
-    setState(() {
-      _QuestionImage = null;
-    });
-  }
-
-  void onEditButton() async
-  {
-    if (IsEditing == true)
-    {
-      final prefs = await SharedPreferences.getInstance();
-      String token = prefs.getString("token");
-      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
-      if (token == null) {return;}
-      String tokenplus = "Bearer" + " " + token;
-      Question temporaryQuestion = new Question();
-      temporaryQuestion.paye = payeData.name;
-      temporaryQuestion.book = bookData.name;
-      temporaryQuestion.chapter = chapterData.name;
-      temporaryQuestion.kind = kindData.name;
-      temporaryQuestion.difficulty = difficultyData.name;
-
-      temporaryQuestion.isPublic = addQuestionBankOption;
-      temporaryQuestion.id = widget.question.id;
-
-      temporaryQuestion.text = QuestionTextController.text;
-      temporaryQuestion.optionOne = TestText1Controller.text;
-      temporaryQuestion.optionTwo = TestText2Controller.text;
-      temporaryQuestion.optionThree = TestText3Controller.text;
-      temporaryQuestion.optionFour = TestText4Controller.text;
-
-      temporaryQuestion.numberOne = _radioGroupValue;
-
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
-
-      dynamic data = jsonEncode(<String,dynamic>{
-        "questionId":qs.id,
-        "type": qs.type,
-        "public": qs.public,
-        "question": qs.question,
-        "answers": qs.answer,
-        "base": qs.base,
-        "hardness" : qs.hardness,
-        "course": qs.course,
-        "options" : qs.options,
-        "chapter" : qs.chapter,
-      });
-      final response = await http.put('https://parham-backend.herokuapp.com/question',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': tokenplus,
-            'Content-Type': 'application/json',
-          },
-          body: data
-      );
-      if (response.statusCode == 200){
-        ShowCorrectnessDialog(true,context);
-        print("Question changed in test");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-
-        widget.question.paye = payeData.name;
-        widget.question.book = bookData.name;
-        widget.question.chapter = chapterData.name;
-        widget.question.kind = kindData.name;
-        widget.question.difficulty = difficultyData.name;
-
-        widget.question.text = QuestionTextController.text;
-        widget.question.optionOne = TestText1Controller.text;
-        widget.question.optionTwo = TestText2Controller.text;
-        widget.question.optionThree = TestText3Controller.text;
-        widget.question.optionFour = TestText4Controller.text;
-
-        widget.question.numberOne = _radioGroupValue;
-
-      }
-      else{
-        ShowCorrectnessDialog(false,context);
-        print("Question failed in test");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-      }
-
-      setState(() {
-        IsEditing = false;
-      });
-    }
-    else
-    {
-      setState(() {
-        IsEditing = true;
-      });
-    }
-  }
-  void onCloseButton() async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
-    if (token == null) {return;}
-    String tokenplus = "Bearer" + " " + token;
-    String id = widget.question.id;
-    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
-      headers: {
-        'accept': 'application/json',
-        'Authorization': tokenplus,
-        'Content-Type': 'application/json',
-      },
-
-    );
-    if (response.statusCode == 200){
-      ShowCorrectnessDialog(true,context);
-      print("Question Eliminated in test");
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
-      setState(() {
-        IsDelete = true;
-      });
-    }
-    else{
-      ShowCorrectnessDialog(false,context);
-      print("Question failed in test");
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
-      setState(() {
-        IsDelete = false;
-      });
-    }
-  }
-
-  int _radioGroupValue = 0;
-  void _radioOnChanged(int index) {
-    setState(() {
-      _radioGroupValue = index;
-    });
-  }
-
-  Widget notEditingCard()
-  {
-    return Column(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(widget.question.paye),
-              Text(widget.question.book),
-              Text(widget.question.chapter),
-              Text(widget.question.kind),
-              Text(widget.question.difficulty),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
-              (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Radio(visualDensity: VisualDensity.compact,value: 1, groupValue: _radioGroupValue, onChanged: null),
-                  Expanded(child: Text(widget.question.optionOne,textDirection: TextDirection.rtl))
-                ],
-              ),
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Radio(visualDensity: VisualDensity.compact,value: 2, groupValue: _radioGroupValue, onChanged: null),
-                  Expanded(child: Text(widget.question.optionTwo,textDirection: TextDirection.rtl,))
-                ],
-              ),
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Radio(visualDensity: VisualDensity.compact,value: 3, groupValue: _radioGroupValue, onChanged: null),
-                  Expanded(child: Text(widget.question.optionThree,textDirection: TextDirection.rtl,))
-                ],
-              ),
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Radio(visualDensity: VisualDensity.compact,value: 4, groupValue: _radioGroupValue, onChanged: null),
-                  Expanded(child: Text(widget.question.optionFour,textDirection: TextDirection.rtl,))
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  bool addQuestionBankOption;
-  void addQuestionBankOptionChange(bool newValue) {
-    setState(() {
-      addQuestionBankOption = newValue;
-    });
-  }
-
-  Widget EditingCard()
-  {
-    return Column(
-      textDirection: TextDirection.rtl,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: kindData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Column(
-                  children: [
-                    Text("متن سوال",textDirection: TextDirection.rtl,),
-                    IconButton(icon: Icon(Icons.camera),onPressed: getQuestionImage,tooltip: "می توان فقط عکس هم فرستاد",)
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: TextFormField(
-                    autofocus: true,
-                    textDirection: TextDirection.rtl,
-                    controller: QuestionTextController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 3,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              ),
-            ],
-          ),
-        ),
-        (_QuestionImage != null) ? Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-            : Container(),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Radio(visualDensity: VisualDensity.compact,value: 1, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index),),
-              Expanded(
-                child: TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: TestText1Controller,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                ),
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Radio(visualDensity: VisualDensity.compact,value: 2, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index),),
-              Expanded(
-                  child: TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText2Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Radio(visualDensity: VisualDensity.compact,value: 3, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index),),
-              Expanded(
-                  child: TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText3Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              )
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Radio(visualDensity: VisualDensity.compact,value: 4, groupValue: _radioGroupValue, onChanged: (index) => _radioOnChanged(index),),
-              Expanded(
-                  child: TextFormField(
-                    textDirection: TextDirection.rtl,
-                    controller: TestText4Controller,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              )
-            ],
-          ),
-        ),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
-            Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
-          ],
-        ),
-      ],
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _radioGroupValue = widget.question.numberOne;
-
-    payeData.fillStringList(payelist);
-    bookData.fillStringList(booklist);
-    chapterData.fillStringList(cahpterlist);
-    kindData.fillStringList(kindlist);
-    difficultyData.fillStringList(difficultylist);
-
-    payeData.name = widget.question.paye;
-    bookData.name = widget.question.book;
-    chapterData.name = widget.question.chapter;
-    kindData.name = widget.question.kind;
-    difficultyData.name = widget.question.difficulty;
-
-    QuestionTextController.text = widget.question.text;
-    TestText1Controller.text = widget.question.optionOne;
-    TestText2Controller.text = widget.question.optionTwo;
-    TestText3Controller.text = widget.question.optionThree;
-    TestText4Controller.text = widget.question.optionFour;
-
-    addQuestionBankOption = widget.question.isPublic;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return (IsDelete == false) ? Card(
-      child: Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            children: [
-              (IsEditing == false) ? notEditingCard() : EditingCard(),
-              Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    color: Color(0xFF3D5A80),
-                    onPressed: onEditButton,
-                    child: Text("ويرايش"),
-                    textColor: Colors.white,
-                  ),
-                  FlatButton(
-                    color: Color(0xFF3D5A80),
-                    onPressed: onCloseButton,
-                    child: Text("حذف"),
-                    textColor: Colors.white,
-                  ),
-                ],
-              )
-            ],
-          )
-      ),
-    ) : Container();
-  }
-}
-class AnswerStringCard extends StatefulWidget {
-  Question question;
-  AnswerStringCard({Key key, this.question}) : super(key: key);
-  @override
-  _AnswerStringCardState createState() => _AnswerStringCardState();
-}
-
-class _AnswerStringCardState extends State<AnswerStringCard> {
-
-  bool IsEditing = false;
-  bool IsDelete = false;
-
-  TextEditingController QuestionTextController = new TextEditingController();
-  TextEditingController TashrihiTextController = new TextEditingController();
-
-  popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-  List<String> payelist = ["دهم","یازدهم","دوازدهم"];
-  popupMenuData bookData = new popupMenuData("درس");
-  List<String> booklist = ["ریاضی","فیزیک","شیمی","زیست"];
-  popupMenuData chapterData = new popupMenuData("فصل");
-  List<String> cahpterlist = ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
-  popupMenuData kindData = new popupMenuData("نوع سوال");
-  List<String> kindlist = ["تستی","جایخالی","چند گزینه ای","تشریحی"];
-  popupMenuData difficultyData = new popupMenuData("دشواری سوال");
-  List<String> difficultylist = ["آسان","متوسط","سخت"];
-
-  File _QuestionImage;
-  File _AnswerImage;
-  final picker = ImagePicker();
-  void getQuestionImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null ) {
-        _QuestionImage = File(pickedFile.path);
-      }
-    });
-  }
-  void getAnswerImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null ) {
-        _AnswerImage = File(pickedFile.path);
-      }
-    });
-  }
-  void _deleteQuestionImage()
-  {
-    setState(() {
-      _QuestionImage = null;
-    });
-  }
-  void _deleteAnswerImage()
-  {
-    setState(() {
-      _AnswerImage = null;
-    });
-  }
-
-  void onEditButton() async
-  {
-    if (IsEditing == true)
-    {
-      final prefs = await SharedPreferences.getInstance();
-      String token = prefs.getString("token");
-      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
-      if (token == null) {return;}
-      String tokenplus = "Bearer" + " " + token;
-     // print(widget.question.id);
-      Question temporaryQuestion = new Question();
-      temporaryQuestion.paye = payeData.name;
-      temporaryQuestion.book = bookData.name;
-      temporaryQuestion.chapter = chapterData.name;
-      temporaryQuestion.kind = kindData.name;
-      temporaryQuestion.difficulty = difficultyData.name;
-
-      temporaryQuestion.isPublic = addQuestionBankOption;
-      temporaryQuestion.id = widget.question.id;
-
-      temporaryQuestion.text = QuestionTextController.text;
-      temporaryQuestion.answerString = TashrihiTextController.text;
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
-
-      dynamic data = jsonEncode(<String,dynamic>{
-        "questionId":qs.id,
-        "type": qs.type,
-        "public": qs.public,
-        "question": qs.question,
-        "answers": qs.answer,
-        "base": qs.base,
-        "hardness" : qs.hardness,
-        "course": qs.course,
-        "chapter" : qs.chapter,
-      });
-      final response = await http.put('https://parham-backend.herokuapp.com/question',
-        headers: {
-          'accept': 'application/json',
-          'Authorization': tokenplus,
-          'Content-Type': 'application/json',
-        },
-        body: data
-      );
-      if (response.statusCode == 200){
-        ShowCorrectnessDialog(true,context);
-        print("Question changed in tashrihi");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-
-        widget.question.paye = payeData.name;
-        widget.question.book = bookData.name;
-        widget.question.chapter = chapterData.name;
-        widget.question.kind = kindData.name;
-        widget.question.difficulty = difficultyData.name;
-
-        widget.question.isPublic = addQuestionBankOption;
-
-        widget.question.text = QuestionTextController.text;
-        widget.question.answerString = TashrihiTextController.text;
-
-      }
-      else{
-        ShowCorrectnessDialog(false,context);
-        print("Question failed in test");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-      }
-
-      setState(() {
-        IsEditing = false;
-      });
-    }
-    else
-    {
-      setState(() {
-        IsEditing = true;
-      });
-    }
-  }
-  void onCloseButton() async
-  {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyNTk1OTR9.TyJbkffE4_lqj2CUEKoBbI7kapvtBl0OI8VvfVkF6uk";
-    if (token == null) {return;}
-    String tokenplus = "Bearer" + " " + token;
-    String id = widget.question.id;
-    final response = await http.delete('https://parham-backend.herokuapp.com/question/$id',
-        headers: {
-          'accept': 'application/json',
-          'Authorization': tokenplus,
-          'Content-Type': 'application/json',
-        },
-
-    );
-    if (response.statusCode == 200){
-      ShowCorrectnessDialog(true,context);
-      print("Question eliminated in tashrihi");
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
-      setState(() {
-        IsDelete = true;
-      });
-    }
-    else{
-      ShowCorrectnessDialog(false,context);
-      print("Question failed in test");
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
-      setState(() {
-        IsDelete = false;
-      });
-    }
-
-  }
-
-  Widget notEditingCard()
-  {
-    return Column(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(widget.question.paye),
-              Text(widget.question.book),
-              Text(widget.question.chapter),
-              Text(widget.question.kind),
-              Text(widget.question.difficulty),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(alignment: Alignment.centerRight,child: Text("سوال : "+widget.question.text,textDirection: TextDirection.rtl)),
-              (widget.question.questinImage != null) ? Text(widget.question.questinImage) : Container(),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(alignment: Alignment.centerRight,child: Text("جواب : "+ widget.question.answerString,textDirection: TextDirection.rtl)),
-              (widget.question.answerImage != null) ? Text(widget.question.answerImage) : Container(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  bool addQuestionBankOption;
-  void addQuestionBankOptionChange(bool newValue) {
-    setState(() {
-      addQuestionBankOption = newValue;
-    });
-  }
-  Widget EditingCard()
-  {
-    return Column(
-      textDirection: TextDirection.rtl,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: kindData,))),
-              Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Column(
-                  children: [
-                    Text("متن سوال",textDirection: TextDirection.rtl,),
-                    IconButton(icon: Icon(Icons.camera),onPressed: getQuestionImage,tooltip: "می توان فقط عکس هم فرستاد",)
-                  ],
-                ),
-              ),
-              Expanded(
-                  child: TextFormField(
-                    autofocus: true,
-                    textDirection: TextDirection.rtl,
-                    controller: QuestionTextController,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: 3,
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                  )
-              ),
-            ],
-          ),
-        ),
-        (_QuestionImage != null) ? Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-            : Container(),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Column(
-                children: [
-                  Text("پاسخ سوال",textDirection: TextDirection.rtl,),
-                  (widget.question.kind != "جایخالی") ? IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",): Container(),
-                ],
-              ),
-            ),
-            Expanded(
-                child: (widget.question.kind != "جایخالی") ? TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: TashrihiTextController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 3,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                )
-                    :Container(
-                  padding: EdgeInsets.all(4.0),
-                  width: 120,
-                      child: TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: TashrihiTextController,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                ),
-                    )
-            ),
-          ],
-        ),
-        (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-            : Container(),
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
-            Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
-          ],
-        ),
-      ],
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    payeData.fillStringList(payelist);
-    bookData.fillStringList(booklist);
-    chapterData.fillStringList(cahpterlist);
-    kindData.fillStringList(kindlist);
-    difficultyData.fillStringList(difficultylist);
-
-    payeData.name = widget.question.paye;
-    bookData.name = widget.question.book;
-    chapterData.name = widget.question.chapter;
-    kindData.name = widget.question.kind;
-    difficultyData.name = widget.question.difficulty;
-
-    QuestionTextController.text = widget.question.text;
-    TashrihiTextController.text = widget.question.answerString;
-
-    addQuestionBankOption = widget.question.isPublic;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return (IsDelete == false) ? Card(
-      child: Padding(
-          padding: EdgeInsets.all(4.0),
-          child: Column(
-            children: [
-              (IsEditing == false) ? notEditingCard() : EditingCard(),
-              Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    color: Color(0xFF3D5A80),
-                    onPressed: onEditButton,
-                    child: Text("ويرايش"),
-                    textColor: Colors.white,
-                  ),
-                  FlatButton(
-                    color: Color(0xFF3D5A80),
-                    onPressed: onCloseButton,
-                    child: Text("حذف"),
-                    textColor: Colors.white,
-                  ),
-                ],
-              )
-            ],
-          )
-      ),
-    ) : Container();
   }
 }

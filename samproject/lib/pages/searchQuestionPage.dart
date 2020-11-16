@@ -6,8 +6,10 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/domain/searchFilters.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/popumMenu.dart';
+import 'package:samproject/widgets/questionWidgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,16 +20,16 @@ class SearchQuestionPage extends StatefulWidget {
 
 class _SearchQuestionPageState extends State<SearchQuestionPage> {
   final RoundedLoadingButtonController _btnController = new RoundedLoadingButtonController();
-  popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-  List<String> payelist = ["دهم","یازدهم","دوازدهم"];
-  popupMenuData bookData = new popupMenuData("درس");
-  List<String> booklist = ["ریاضی","فیزیک","شیمی","زیست"];
-  popupMenuData chapterData = new popupMenuData("فصل");
-  List<String> cahpterlist = ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
-  popupMenuData kindData = new popupMenuData("نوع سوال");
-  List<String> kindlist = ["تستی","جایخالی","چند گزینه ای","تشریحی"];
-  popupMenuData difficultyData = new popupMenuData("دشواری سوال");
-  List<String> difficultylist = ["آسان","متوسط","سخت"];
+  // popupMenuData payeData = new popupMenuData("پایه تحصیلی");
+  // List<String> payelist = ["دهم","یازدهم","دوازدهم"];
+  // popupMenuData bookData = new popupMenuData("درس");
+  // List<String> booklist = ["ریاضی","فیزیک","شیمی","زیست"];
+  // popupMenuData chapterData = new popupMenuData("فصل");
+  // List<String> cahpterlist = ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
+  // popupMenuData kindData = new popupMenuData("نوع سوال");
+  // List<String> kindlist = ["تستی","جایخالی","چند گزینه ای","تشریحی"];
+  // popupMenuData difficultyData = new popupMenuData("دشواری سوال");
+  // List<String> difficultylist = ["آسان","متوسط","سخت"];
   
   Question newQuestion = new Question();
   Question newQuestion2 = new Question();
@@ -37,11 +39,11 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
  @override
   void initState() {
     super.initState();
-    payeData.fillStringList(payelist);
-    bookData.fillStringList(booklist);
-    chapterData.fillStringList(cahpterlist);
-    kindData.fillStringList(kindlist);
-    difficultyData.fillStringList(difficultylist);
+    // payeData.fillStringList(payelist);
+    // bookData.fillStringList(booklist);
+    // chapterData.fillStringList(cahpterlist);
+    // kindData.fillStringList(kindlist);
+    // difficultyData.fillStringList(difficultylist);
 
     newQuestion.paye = "دهم";
     newQuestion.book = "فیزیک";
@@ -102,7 +104,6 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
 
-  //  String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmFkYWYxN2Q5YmZmYzAwMTc2ZGU0NDgiLCJpYXQiOjE2MDUyMTgwNzF9.wS8GHC67ZBswQjEisWkMgot3_r92PnRyvN5WlMmhG34";
     if (token == null) {return;}
     String tokenplus = "Bearer" + " " + token;
 
@@ -116,35 +117,18 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
       'limit': '5',
     };
     var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
-    Question temporaryQuestion = new Question();
 
-    temporaryQuestion.paye = payeData.name;
-    temporaryQuestion.book = bookData.name;
-    temporaryQuestion.chapter = chapterData.name;
-    temporaryQuestion.kind = kindData.name;
-    temporaryQuestion.difficulty = difficultyData.name;
-    // print(temporaryQuestion.paye);
-    // print(temporaryQuestion.book);
-    // print(temporaryQuestion.chapter);
-    // print(temporaryQuestion.kind);
-    // print(temporaryQuestion.difficulty);
-
-    QuestionServer qs = QuestionServer.QuestionToQuestionServer(temporaryQuestion);
-
-    // print(qs.type);
-    // print(qs.base);
-    // print(qs.hardness);
-    // print(qs.course);
+    SearchFilters SF = searchFilters.SearchFilterForServer();
     dynamic data = jsonEncode(<String,dynamic>{
-      "type":[qs.type],
-      "base": [qs.base],
-      "hardness" : [qs.hardness],
-      "course": [qs.course],
-      "chapter" : [qs.chapter],
+      "type":SF.kindList,
+      "base": SF.payeList,
+      "hardness" : SF.difficultyList,
+      "course": SF.bookList,
+      "chapter" : SF.chapterList,
     });
     questionList = [];
     String url = 'https://parham-backend.herokuapp.com/bank?$query';
-    print(questionList.length);
+    //print(questionList.length);
     var response = await http.post(url,
         headers: headers,
       body: data
@@ -175,28 +159,10 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
         qs.answer = responseJson["questions"][i]["answers"];
         qs.options = responseJson["questions"][i]["options"];
 
-        // print(qs.type);
-        // print(qs.public);
-        // print(qs.question);
-        // //print(qs.answer);
-        // print(qs.base);
-        // print(qs.hardness);
-        // print(qs.course);
-        // print("---");
         Question q = Question.QuestionServerToQuestion(qs);
-        // print(q.kind);
-        // print(q.isPublic);
-        // print(q.text);
-        // //print(qs.answer);
-        // print(q.paye);
-        // print(q.difficulty);
-        // print(q.book);
         questionList.add(q);
       }
-      // for (int i=0;i<questionList.length;i++)
-      // {
-      //   print(questionList[i].text);
-      // }
+
       _btnController.stop();
       setState(() {
 
@@ -211,6 +177,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
     }
 
   }
+  SearchFilters searchFilters = new SearchFilters();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -227,50 +194,17 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                       textDirection: TextDirection.rtl,
                       children: [
                         Container(padding: const EdgeInsets.all(4.0),alignment: Alignment.centerRight,child: Text("جستجو بر اساس",textDirection: TextDirection.rtl,)),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            textDirection: TextDirection.rtl,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
-                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
-                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,)))
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            textDirection: TextDirection.rtl,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: kindData,))),
-                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
-                            ],
-                          ),
-                        ),
+                        SearchFilterWidget(searchFilters: searchFilters ,),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child:
-                          // RaisedButton(
-                          //   child: Text("asdfads"),
-                          //   onPressed: submit,
-                          // )
-
-                          RoundedLoadingButton(
+                          child: RoundedLoadingButton(
                             height: 30,
                             child: Text('جستجو',style: TextStyle(color: Colors.white),),
-                            //  borderRadius: 0,
                             controller: _btnController,
                             color: Color.fromRGBO(238, 108,77 ,1.0), //Color.(0xFF3D5A80),
                             onPressed: () => searchQuestion(),
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -359,20 +293,7 @@ class _TestViewState extends State<TestView> {
         padding: EdgeInsets.all(4.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(widget.question.paye),
-                  Text(widget.question.book),
-                  Text(widget.question.chapter),
-                  Text(widget.question.kind),
-                  Text(widget.question.difficulty),
-                ],
-              ),
-            ),
+            NotEditingQuestionSpecification(question: widget.question,),
             Padding(
               padding: EdgeInsets.all(4.0),
               child: Column(
@@ -496,20 +417,7 @@ class _MultiOptionViewState extends State<MultiOptionView> {
         padding: EdgeInsets.all(4.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(widget.question.paye),
-                  Text(widget.question.book),
-                  Text(widget.question.chapter),
-                  Text(widget.question.kind),
-                  Text(widget.question.difficulty),
-                ],
-              ),
-            ),
+            NotEditingQuestionSpecification(question: widget.question,),
             Padding(
               padding: EdgeInsets.all(4.0),
               child: Column(
@@ -599,20 +507,7 @@ class _AnswerStringState extends State<AnswerString> {
         padding: EdgeInsets.all(4.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(widget.question.paye),
-                  Text(widget.question.book),
-                  Text(widget.question.chapter),
-                  Text(widget.question.kind),
-                  Text(widget.question.difficulty),
-                ],
-              ),
-            ),
+            NotEditingQuestionSpecification(question: widget.question,),
             Padding(
               padding: EdgeInsets.all(4.0),
               child: Column(
