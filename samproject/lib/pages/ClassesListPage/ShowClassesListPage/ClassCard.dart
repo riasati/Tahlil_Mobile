@@ -21,10 +21,10 @@ class _ClassCardState extends State<ClassCard> {
 
   @override
   Widget build(BuildContext context) {
-    var classCardIcon;
+    var customIcon;
     var classOwnerName;
     if(classCard.className.contains("ریاضی"))
-      classCardIcon = Padding(
+      customIcon = Padding(
         child: Icon(
           FontAwesomeIcons.infinity,
           size: 50,
@@ -33,19 +33,19 @@ class _ClassCardState extends State<ClassCard> {
         padding: EdgeInsets.only(right: 10),
       );
     else if(classCard.className.contains("فیزیک"))
-      classCardIcon = Icon(
+      customIcon = Icon(
         FontAwesomeIcons.atom,
         size: 50,
         color: Color(0xFF3D5A80),
       );
     else if(classCard.className.contains("شیمی"))
-      classCardIcon = Icon(
+      customIcon = Icon(
         FontAwesomeIcons.flask,
         size: 50,
         color: Color(0xFF3D5A80),
       );
     else
-      classCardIcon = Padding(
+      customIcon = Padding(
         child: Icon(
           FontAwesomeIcons.chalkboard,
           size: 50,
@@ -73,7 +73,7 @@ class _ClassCardState extends State<ClassCard> {
       classOwnerName = Container();
 
     return Card(
-      elevation: 4,
+      elevation: 20,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30))),
       //color: Colors.black45,
@@ -82,13 +82,27 @@ class _ClassCardState extends State<ClassCard> {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                child: classCardIcon,
-                alignment: Alignment.center,
+              Padding(
+                padding: EdgeInsets.only(left: 27),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: customIcon,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 0, bottom: 30),
+                      child: Container(
+                        child: Icon(FontAwesomeIcons.medal, color: Colors.yellow,),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 15),
+                padding: EdgeInsets.only(top: 5),
                 child: AutoSizeText(
                   classCard.className,
                   maxLines: 1,

@@ -32,15 +32,16 @@ class _ClassesListState extends State<ClassesList> {
   Widget build(BuildContext context) {
     return LoadingOverlay(
       child: Container(
+        color: Colors.black45.withOpacity(0.1),
         child: Column(
           children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: EdgeInsets.only(top: 15.0 ),
-                child: PersonInfo()
-              ),
-            ),
+            // Expanded(
+            //   flex: 2,
+            //   child: Padding(
+            //     padding: EdgeInsets.only(top: 15.0 ),
+            //     child: PersonInfo()
+            //   ),
+            // ),
             Expanded(
               flex: 1,
               child: CreateOrJoinClass(classListWidgetSetState: callSetState, userClasses: userClasses,),
