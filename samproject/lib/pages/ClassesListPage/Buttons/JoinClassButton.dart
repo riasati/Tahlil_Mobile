@@ -191,7 +191,7 @@ class _JoinButtonState extends State<JoinButton> {
         print("hie");
         if(response.statusCode == 200 && response.body != null){
           var joinedClassInfo = json.decode(utf8.decode(response.bodyBytes))["joinedClass"];
-          var joinedClass = Class(joinedClassInfo['name'], joinedClassInfo['ownerFullname'], joinedClassInfo['classId']);
+          var joinedClass = Class(joinedClassInfo['name'], joinedClassInfo['classId'], joinedClassInfo['ownerFullname'], joinedClassInfo['isOwned']);
           Navigator.pop(context);
           setState(() {
             Alert(

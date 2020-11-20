@@ -72,6 +72,43 @@ class _ClassCardState extends State<ClassCard> {
     else
       classOwnerName = Container();
 
+    var classIcon;
+    if(classCard.isOwner)
+      classIcon = Padding(
+        padding: EdgeInsets.only(left: 27),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: customIcon,
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 0, bottom: 30),
+              child: Container(
+                child: Icon(FontAwesomeIcons.medal, color: Colors.yellow,),
+              ),
+            ),
+          ],
+        ),
+      );
+    else
+      classIcon = Padding(
+        padding: EdgeInsets.only(left: 0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: customIcon,
+            ),
+            // Padding(
+            //   padding: EdgeInsets.only(left: 0, bottom: 30),
+            //   child: Container(
+            //     child: Icon(FontAwesomeIcons.medal, color: Colors.yellow,),
+            //   ),
+            // ),
+          ],
+        ),
+      );
     return Card(
       elevation: 20,
       shape: RoundedRectangleBorder(
@@ -84,23 +121,7 @@ class _ClassCardState extends State<ClassCard> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: EdgeInsets.only(left: 27),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: customIcon,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 0, bottom: 30),
-                      child: Container(
-                        child: Icon(FontAwesomeIcons.medal, color: Colors.yellow,),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              classIcon,
               Padding(
                 padding: EdgeInsets.only(top: 5),
                 child: AutoSizeText(
