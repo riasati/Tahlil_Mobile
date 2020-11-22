@@ -17,7 +17,9 @@ class _ClassExamsState extends State<ClassExams> {
             borderRadius: BorderRadius.all(Radius.circular(30))),
         //color: Colors.black45,
         child: FlatButton(
-          onPressed: () {},
+          onPressed: () {
+            examsListBottomSheet();
+          },
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -48,5 +50,60 @@ class _ClassExamsState extends State<ClassExams> {
         ),
       ),
     );
+  }
+
+  void examsListBottomSheet() => showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          )
+      ),
+      barrierColor: Color(0xFF3D5A80).withOpacity(0.8),
+      builder: (context) => Column(
+        //mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            child: Icon(FontAwesomeIcons.gripLines),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+              ),
+            ),
+          ),
+          Expanded(child: examsList()),
+        ],
+      ));
+
+  Widget examsList(){
+    return ListView(
+      children:  <Widget>[
+        eachExamCard(),
+        eachExamCard(),
+        eachExamCard(),
+        eachExamCard(),
+      ],
+    );
+  }
+
+  Widget eachExamCard(){
+    return Card(
+      child: FlatButton(
+        padding: EdgeInsets.all(0),
+        minWidth: double.infinity,
+        onPressed: () {},
+        child: ListTile(
+          leading: Icon(Icons.more_vert),
+          title: Text('حمیدرضا آذرباد', textAlign: TextAlign.right,),
+          //trailing: FlutterLogo(size: 45,),
+          trailing: Text("عنوان آزمون", textAlign: TextAlign.right,),
+        ),
+      ),
+    );
+  }
+
+  void _getExamsListFromServer() {
   }
 }
