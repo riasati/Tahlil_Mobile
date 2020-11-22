@@ -60,5 +60,10 @@ class Person
     this.password = null;
   }
 
+  @override
+  String toString() {
+    return 'Person{_firstname: $_firstname, _lastname: $_lastname, _email: $_email, _avatarUrl: $_avatarUrl}';
+  }
+
 //PerosnProfile({this.name = null, this.username = null, this.password = null, this.email = null});
 }

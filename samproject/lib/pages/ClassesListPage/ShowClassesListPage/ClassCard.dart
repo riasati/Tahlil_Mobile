@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 
 class ClassCard extends StatefulWidget {
   Class classCard;
@@ -78,7 +79,9 @@ class _ClassCardState extends State<ClassCard> {
           borderRadius: BorderRadius.all(Radius.circular(30))),
       //color: Colors.black45,
       child: FlatButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => InsidClassPage(classCard.classId)));
+        },
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

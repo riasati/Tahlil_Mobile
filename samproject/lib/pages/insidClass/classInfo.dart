@@ -4,6 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 
 class ClassInfoCard extends StatefulWidget {
+  static String className = "";
+  static String adminFullName = "";
+
   @override
   _ClassInfoCardState createState() => _ClassInfoCardState();
 }
@@ -18,7 +21,7 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
           Padding(
             padding: EdgeInsets.only(top: 30),
             child: AutoSizeText(
-              "شیمی دهم",
+              ClassInfoCard.className,
               maxLines: 1,
               style: TextStyle(
                 color: Colors.white,
@@ -31,7 +34,7 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
             child: Container(
               alignment: Alignment.center,
               child: AutoSizeText(
-                "استاد: حمیدرضا آذرباد",
+                ClassInfoCard.adminFullName,
                 maxLines: 1,
                 style: TextStyle(
                   color: Colors.white,

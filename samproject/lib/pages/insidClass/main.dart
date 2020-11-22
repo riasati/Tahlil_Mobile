@@ -14,27 +14,6 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Starter Template",
-      home: Scaffold(body: InsidClassPage(),appBar: AppBar(
-        backgroundColor: Color(0xFF3D5A80),
-        title: Padding(
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              "Title",
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.0,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          padding: EdgeInsets.only(left: 20),
-        ),
-      ),),
-    );
+    return InsidClassPage("l_z3DX");
   }
 }
