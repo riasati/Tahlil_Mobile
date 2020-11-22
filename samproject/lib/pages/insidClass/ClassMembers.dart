@@ -1,4 +1,6 @@
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -95,6 +97,9 @@ class _ClassMembersState extends State<ClassMembers> {
     return ListView(
       children:  <Widget>[
         eachMemberCard(),
+        eachMemberCard(),
+        eachMemberCard(),
+        eachMemberCard(),
       ],
     );
   }
@@ -105,7 +110,7 @@ class _ClassMembersState extends State<ClassMembers> {
         padding: EdgeInsets.all(0),
         minWidth: double.infinity,
         onPressed: () {
-          _getCustomUserInfo();
+          _showCompleteUserInfo();
         },
         child: ListTile(
           //leading: Icon(Icons.more_vert),
@@ -126,6 +131,40 @@ class _ClassMembersState extends State<ClassMembers> {
     );
   }
 
-  void _getCustomUserInfo() {
+  void _getUsersListFromServer() {
+  }
+
+  Future<void> _showCompleteUserInfo() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Image(
+            image: AssetImage("assets/img/unnamed.png"),
+            height: 100,
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                SelectableText('نام: حمیدرضا آذرباد', style: TextStyle(), textAlign: TextAlign.right,),
+                SelectableText('ایمیل: hamidrez@gamil.com', style: TextStyle(), textAlign: TextAlign.right,),
+              ],
+            ),
+          ),
+          // actions: <Widget>[
+          //   TextButton(
+          //     style: ButtonStyle(
+          //
+          //     ),
+          //     child: Text('Approve'),
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //   ),
+          // ],
+        );
+      },
+    );
   }
 }
