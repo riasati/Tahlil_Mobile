@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/popupMenuData.dart';
+import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/myQuestionPage.dart';
 
 class PopupMenu extends StatefulWidget {
   popupMenuData Data;
-  PopupMenu({Key key, this.Data}) : super(key: key);
+ // AddQuestionPageState parent;
+  QuestionViewInMyQuestionState parent;
+  QuestionViewInCreateExamState parent2;
+  CreateExamPageState parent3;
+  PopupMenu({Key key, this.Data,this.parent,this.parent2,this.parent3}) : super(key: key);
   @override
   _PopupMenuState createState() => _PopupMenuState();
 }
@@ -17,6 +23,21 @@ class _PopupMenuState extends State<PopupMenu> {
         setState(() {
           widget.Data.name = widget.Data.stringList[i];
         });
+        if (widget.parent != null)
+        {
+          widget.parent.setState(() {
+          });
+        }
+        if (widget.parent2 != null)
+        {
+          widget.parent2.setState(() {
+          });
+        }
+        if (widget.parent3 != null)
+        {
+          widget.parent3.setState(() {
+          });
+        }
       }
     }
     if(value == -1)
@@ -47,7 +68,7 @@ class _PopupMenuState extends State<PopupMenu> {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
-      child: (widget.Data.name == null) ? Text(widget.Data.popupMenuBottonName,textDirection: TextDirection.rtl) : Text(widget.Data.name,textDirection: TextDirection.rtl),
+      child: (widget.Data.name == null) ? Text(widget.Data.popupMenuBottonName,textDirection: TextDirection.rtl,textAlign: TextAlign.center,) : Text(widget.Data.name,textDirection: TextDirection.rtl,textAlign: TextAlign.center),
       onSelected: onSelectedMenu,
       itemBuilder: (context) => widget.Data.list,
     );

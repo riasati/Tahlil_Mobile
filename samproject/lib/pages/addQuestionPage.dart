@@ -6,12 +6,14 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/widgets/popumMenu.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 
 class AddQuestionPage extends StatefulWidget {
+  AddQuestionPage({Key key}) : super(key: key);
   @override
   _AddQuestionPageState createState() => _AddQuestionPageState();
 }
@@ -32,24 +34,15 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
   TextEditingController MultiOptionText4Controller = new TextEditingController();
 
   popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-  List<String> payelist = ["دهم", "یازدهم", "دوازدهم"];
+  List<String> payelist = [];
   popupMenuData bookData = new popupMenuData("درس");
-  List<String> booklist = ["ریاضی", "فیزیک", "شیمی", "زیست"];
+  List<String> booklist = [];
   popupMenuData chapterData = new popupMenuData("فصل");
-  List<String> cahpterlist = [
-    "اول",
-    "دوم",
-    "سوم",
-    "چهارم",
-    "پنجم",
-    "ششم",
-    "هفتم",
-    "هشتم",
-    "نهم",
-    "دهم",
-  ];
+  List<String> chapterlist = [];
+  popupMenuData kindData = new popupMenuData("نوع سوال");
+  List<String> kindlist = [];
   popupMenuData difficultyData = new popupMenuData("دشواری سوال");
-  List<String> difficultylist = ["آسان", "متوسط", "سخت"];
+  List<String> difficultylist = [];
 
   final RoundedLoadingButtonController _btnController =
       new RoundedLoadingButtonController();
@@ -624,60 +617,28 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     );
   }
 
-  int whichKind = 0;
-  String kind;
 
-  void onSelectedKindMenu(int value) {
-    if (value == 1) {
-      setState(() {
-        kind = "تستی";
-        whichKind = 1;
-      });
-    } else if (value == 2) {
-      setState(() {
-        kind = "جایخالی";
-        whichKind = 2;
-      });
-    } else if (value == 3) {
-      setState(() {
-        kind = "چند گزینه ای";
-        whichKind = 3;
-      });
-    } else if (value == 4) {
-      setState(() {
-        kind = "تشریحی";
-        whichKind = 4;
-      });
-    }
-  }
-
-  List<PopupMenuItem<int>> kindList = [];
-
-  PopupMenuItem<int> popupMenuItem(int value, String text) {
-    return PopupMenuItem(
-        value: value,
-        child: Container(
-            alignment: Alignment.centerRight,
-            child: Text(
-              text,
-              textDirection: TextDirection.rtl,
-            )));
-  }
-
-  @override
-  void initState() {
-    super.initState();
+  void FillLists()
+  {
+    HomePage.maps.SPayeMap.forEach((k,v) => payelist.add(v.toString()));
+    HomePage.maps.SBookMap.forEach((k,v) => booklist.add(v.toString()));
+    HomePage.maps.SChapterMap.forEach((k,v) => chapterlist.add(v.toString()));
+    HomePage.maps.SKindMap.forEach((k,v) => kindlist.add(v.toString()));
+    HomePage.maps.SDifficultyMap.forEach((k,v) => difficultylist.add(v.toString()));
 
     payeData.fillStringList(payelist);
     bookData.fillStringList(booklist);
-    chapterData.fillStringList(cahpterlist);
+    chapterData.fillStringList(chapterlist);
+    kindData.fillStringList(kindlist);
     difficultyData.fillStringList(difficultylist);
 
-    kindList
-      ..add(popupMenuItem(1, "تستی"))
-      ..add(popupMenuItem(2, "جایخالی"))
-      ..add(popupMenuItem(3, "چند گزینه ای"))
-      ..add(popupMenuItem(4, "تشریحی"));
+    setState(() {
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    FillLists();
   }
 
   void _deleteQuestionImage() {
@@ -721,8 +682,14 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     newQuestion.book = bookData.name;
     newQuestion.chapter = chapterData.name;
     newQuestion.difficulty = difficultyData.name;
-    newQuestion.kind = kind;
+    newQuestion.kind = kindData.name;
     newQuestion.isPublic = addQuestionBankOption;
+
+    String ServerPaye = HomePage.maps.RSPayeMap[newQuestion.paye];
+    String ServerBook = HomePage.maps.RSBookMap[newQuestion.book];
+    String ServerChapter = HomePage.maps.RSChapterMap[newQuestion.chapter];
+    String ServerKind = HomePage.maps.RSKindMap[newQuestion.kind];
+    String ServerDifficulty = HomePage.maps.RSDifficultyMap[newQuestion.difficulty];
 
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
@@ -733,23 +700,24 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     dynamic data;
     String url = "https://parham-backend.herokuapp.com/question";
 
-    if (newQuestion.kind == "تستی") {
+    if (newQuestion.kind == HomePage.maps.SKindMap["TEST"]) {
       newQuestion.optionOne = TestText1Controller.text;
       newQuestion.optionTwo = TestText2Controller.text;
       newQuestion.optionThree = TestText3Controller.text;
       newQuestion.optionFour = TestText4Controller.text;
       newQuestion.numberOne = _radioGroupValue;
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
+
       data = jsonEncode(<String, dynamic>{
-        "type": qs.type,
+        "type": ServerKind,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
-        "base": qs.base,
-        "hardness": qs.hardness,
-        "course": qs.course,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
         "options": qs.options,
-        "chapter": qs.chapter,
+        "chapter": ServerChapter,
       });
       //print(data);
       final response = await http.post(url,
@@ -765,7 +733,6 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
         _btnController.stop();
-
       } else {
         ShowCorrectnessDialog(false, context);
         print("Question failed in test");
@@ -773,18 +740,19 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         print(responseJson.toString());
         _btnController.stop();
       }
-    } else if (newQuestion.kind == "جایخالی") {
+    } else if (newQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"]) {
       newQuestion.answerString = BlankTextController.text;
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
+
       data = jsonEncode(<String, dynamic>{
-        "type": qs.type,
+        "type": ServerKind,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
-        "base": qs.base,
-        "hardness": qs.hardness,
-        "course": qs.course,
-        "chapter": qs.chapter,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
+        "chapter": ServerChapter,
       });
       //print(data);
       final response = await http.post(url,
@@ -803,7 +771,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         print("Question failed in jayekhali");
         _btnController.stop();
       }
-    } else if (newQuestion.kind == "چند گزینه ای") {
+    } else if (newQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"]) {
       newQuestion.optionOne = MultiOptionText1Controller.text;
       newQuestion.optionTwo = MultiOptionText2Controller.text;
       newQuestion.optionThree = MultiOptionText3Controller.text;
@@ -813,17 +781,17 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       newQuestion.numberThree = (optionThree) ? 1 : 0;
       newQuestion.numberFour = (optionFour) ? 1 : 0;
 
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
       data = jsonEncode(<String, dynamic>{
-        "type": qs.type,
+        "type": ServerKind,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
-        "base": qs.base,
-        "hardness": qs.hardness,
-        "course": qs.course,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
         "options": qs.options,
-        "chapter": qs.chapter,
+        "chapter": ServerChapter,
       });
       //print(data);
       final response = await http.post(url,
@@ -846,18 +814,18 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         print(responseJson.toString());
         _btnController.stop();
       }
-    } else if (newQuestion.kind == "تشریحی") {
+    } else if (newQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"]) {
       newQuestion.answerString = TashrihiTextController.text;
-      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion);
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
       data = jsonEncode(<String, dynamic>{
-        "type": qs.type,
+        "type": ServerKind,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
-        "base": qs.base,
-        "hardness": qs.hardness,
-        "course": qs.course,
-        "chapter": qs.chapter,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
+        "chapter": ServerChapter,
       });
       //print(data);
       final response = await http.post(url,
@@ -889,160 +857,156 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Column(
-              textDirection: TextDirection.rtl,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "متن سوال",
-                                    textDirection: TextDirection.rtl,
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.camera),
-                                    onPressed: getQuestionImage,
-                                    tooltip: "می توان فقط عکس هم فرستاد",
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                                child: InkWell(
-                              child: (focusOnQuestionText)
-                                  ? TextFormField(
-                                      autofocus: true,
+    return Scaffold(
+      body: Container(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(4.0),
+              child: Column(
+                textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            textDirection: TextDirection.rtl,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "متن سوال",
                                       textDirection: TextDirection.rtl,
-                                      controller: QuestionTextController,
-                                      keyboardType: TextInputType.multiline,
-                                      maxLines: 3,
-                                      decoration: InputDecoration(
-                                          border: OutlineInputBorder()),
-                                    )
-                                  : TextFormField(
-                                      textDirection: TextDirection.rtl,
-                                      controller: QuestionTextController,
-                                      keyboardType: TextInputType.multiline,
-                                      maxLines: 3,
-                                      readOnly: true,
-                                      decoration: InputDecoration(
-                                          border: InputBorder.none),
                                     ),
-                              onFocusChange: (value) =>
-                                  _focusChangeOnQuestionText(value),
-                            )),
-                          ],
-                        ),
-                        (_QuestionImage != null)
-                            ? Container(
-                                child: InkWell(
-                                    onTap: () => _deleteQuestionImage(),
-                                    child: Image.file(_QuestionImage,
-                                        fit: BoxFit.cover)),
-                                height: 200,
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.all(8.0),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                  ),
-                ),
-                //TextFormField(),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Column(
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            textDirection: TextDirection.rtl,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: payeData,))),
-                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: bookData,))),
-                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: chapterData,))),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Row(
-                            textDirection: TextDirection.rtl,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child:PopupMenuButton(
-                                child:
-                                    (kind == null) ? Text("نوع سوال") : Text(kind),
-                                onSelected: onSelectedKindMenu,
-                                itemBuilder: (context) => kindList,
+                                    IconButton(
+                                      icon: Icon(Icons.camera),
+                                      onPressed: getQuestionImage,
+                                      tooltip: "می توان فقط عکس هم فرستاد",
+                                    )
+                                  ],
+                                ),
                               ),
+                              Expanded(
+                                  child: InkWell(
+                                child: (focusOnQuestionText)
+                                    ? TextFormField(
+                                        autofocus: true,
+                                        textDirection: TextDirection.rtl,
+                                        controller: QuestionTextController,
+                                        keyboardType: TextInputType.multiline,
+                                        maxLines: 3,
+                                        decoration: InputDecoration(
+                                            border: OutlineInputBorder()),
+                                      )
+                                    : TextFormField(
+                                        textDirection: TextDirection.rtl,
+                                        controller: QuestionTextController,
+                                        keyboardType: TextInputType.multiline,
+                                        maxLines: 3,
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none),
+                                      ),
+                                onFocusChange: (value) =>
+                                    _focusChangeOnQuestionText(value),
                               )),
-                              SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
-                              Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: difficultyData,))),
                             ],
                           ),
-                        ),
-                      ],
+                          (_QuestionImage != null)
+                              ? Container(
+                                  child: InkWell(
+                                      onTap: () => _deleteQuestionImage(),
+                                      child: Image.file(_QuestionImage,
+                                          fit: BoxFit.cover)),
+                                  height: 200,
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.all(8.0),
+                                )
+                              : Container(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                if (whichKind == 1)
-                  testWidget()
-                else if (whichKind == 2)
-                  blankWidget()
-                else if (whichKind == 3)
-                  multiOption()
-                else if (whichKind == 4)
-                  tashrihiWidget(),
+                  //TextFormField(),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Column(
+                        textDirection: TextDirection.rtl,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Row(
+                              textDirection: TextDirection.rtl,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: (payelist.length == 0) ? Text(payeData.popupMenuBottonName,textDirection: TextDirection.rtl,) : PopupMenu(Data: payeData,))),
+                                SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: (booklist.length == 0) ? Text(bookData.popupMenuBottonName,textDirection: TextDirection.rtl,) : PopupMenu(Data: bookData,))),
+                                SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: (chapterlist.length == 0) ? Text(chapterData.popupMenuBottonName,textDirection: TextDirection.rtl,) : PopupMenu(Data: chapterData,))),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Row(
+                              textDirection: TextDirection.rtl,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: (kindlist.length == 0) ? Text(kindData.popupMenuBottonName,textDirection: TextDirection.rtl,) :PopupMenu(Data: kindData,))),
+                                SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: (difficultylist.length == 0) ? Text(difficultyData.popupMenuBottonName,textDirection: TextDirection.rtl,) :PopupMenu(Data: difficultyData,))),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (kindData.name == HomePage.maps.SKindMap["TEST"])
+                    testWidget()
+                  else if (kindData.name == HomePage.maps.SKindMap["SHORTANSWER"])
+                    blankWidget()
+                  else if (kindData.name == HomePage.maps.SKindMap["MULTICHOISE"])
+                    multiOption()
+                  else if (kindData.name == HomePage.maps.SKindMap["LONGANSWER"])
+                    tashrihiWidget(),
 
-                Row(
-                  textDirection: TextDirection.rtl,
-                  children: [
-                    Checkbox(
-                        value: addQuestionBankOption,
-                        onChanged: addQuestionBankOptionChange),
-                    Text(
-                      "افزودن به بانک سوال",
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child:
-                      RoundedLoadingButton(
-                        height: 40,
-                        child: Text(
-                      'اضافه کردن',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    controller: _btnController,
-                    color: Color(0xFF3D5A80),
-                    onPressed: () => submit(),
+                  Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      Checkbox(
+                          value: addQuestionBankOption,
+                          onChanged: addQuestionBankOptionChange),
+                      Text(
+                        "افزودن به بانک سوال",
+                        textDirection: TextDirection.rtl,
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child:
+                        RoundedLoadingButton(
+                          height: 40,
+                          child: Text(
+                        'اضافه کردن',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      controller: _btnController,
+                      color: Color(0xFF3D5A80),
+                      onPressed: () => submit(),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

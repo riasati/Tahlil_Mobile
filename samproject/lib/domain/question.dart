@@ -1,4 +1,5 @@
 import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/pages/homePage.dart';
 
 class Question
 {
@@ -21,6 +22,7 @@ class Question
   String optionFour;
   bool isPublic;
   String id;
+  double grade;
 
   Question();
   Question CopyQuestion()
@@ -45,114 +47,20 @@ class Question
     q.optionFour = this.optionFour;
     q.isPublic = this.isPublic;
     q.id = this.id;
+    q.grade = this.grade;
     return q;
   }
-  static Question QuestionServerToQuestion(QuestionServer QS)
+  static Question QuestionServerToQuestion(QuestionServer QS,String ServerKind)
   {
     Question Q = new Question();
     Q.id = QS.id;
     Q.text = QS.question;
+    Q.paye = HomePage.maps.SPayeMap[QS.base];
+    Q.book = HomePage.maps.SBookMap[QS.course];
+    Q.chapter = HomePage.maps.SChapterMap[QS.chapter];
+    Q.kind = HomePage.maps.SKindMap[QS.type];
+    Q.difficulty = HomePage.maps.SDifficultyMap[QS.hardness];
 
-    if (QS.base == "10")
-    {
-      Q.paye = "دهم";
-    }
-    else if (QS.base == "11")
-    {
-      Q.paye = "یازدهم";
-    }
-    else if (QS.base == "12")
-    {
-      Q.paye = "دوازدهم";
-    }
-
-    if(QS.course == "MATH")
-    {
-      Q.book = "ریاضی";
-    }
-    else if(QS.course == "PHYSIC")
-    {
-      Q.book = "فیزیک";
-    }
-    else if(QS.course == "CHEMISTRY")
-    {
-      Q.book = "شیمی";
-    }
-    else if(QS.course == "BIOLOGY")
-    {
-      Q.book = "زیست";
-    }
-
-    if ( QS.chapter == "1")
-    {
-      Q.chapter = "اول";
-    }
-    else if (QS.chapter == "2")
-    {
-      Q.chapter = "دوم";
-    }
-    else if (QS.chapter == "3")
-    {
-      Q.chapter = "سوم";
-    }
-    else if (QS.chapter == "4")
-    {
-      Q.chapter = "چهارم";
-    }
-    else if (QS.chapter == "5")
-    {
-      Q.chapter = "پنجم";
-    }
-    else if (QS.chapter == "6")
-    {
-      Q.chapter = "ششم";
-    }
-    else if (QS.chapter == "7")
-    {
-      Q.chapter = "هفتم";
-    }
-    else if (QS.chapter == "8")
-    {
-      Q.chapter = "هشتم";
-    }
-    else if (QS.chapter == "9")
-    {
-      Q.chapter = "نهم";
-    }
-    else if (QS.chapter == "10")
-    {
-      Q.chapter = "دهم";
-    }
-
-    if (QS.hardness == "LOW")
-    {
-      Q.difficulty = "آسان";
-    }
-    else if (QS.hardness == "MEDIUM")
-    {
-      Q.difficulty = "متوسط";
-    }
-    else if (QS.hardness == "HARD")
-    {
-      Q.difficulty = "سخت";
-    }
-
-    if (QS.type == "TEST")
-    {
-      Q.kind = "تستی";
-    }
-    else if (QS.type == "SHORTANSWER")
-    {
-      Q.kind = "جایخالی";
-    }
-    else if (QS.type == "MULTICHOISE")
-    {
-      Q.kind = "چند گزینه ای";
-    }
-    else if (QS.type == "LONGANSWER")
-    {
-      Q.kind = "تشریحی";
-    }
 
     if (QS.public != null)
     {
@@ -166,7 +74,7 @@ class Question
       }
     }
 
-    if (QS.type == "SHORTANSWER")
+    if (ServerKind == "SHORTANSWER")
     {
       if (QS.answer.isEmpty == false)
       {
@@ -174,17 +82,15 @@ class Question
       }
 
     }
-    else if (QS.type == "LONGANSWER")
+    else if (ServerKind == "LONGANSWER")
     {
       if (QS.answer.isEmpty == false)
       {
         Q.answerString = QS.answer[0]["answer"];
       }
     }
-    else if (QS.type == "TEST")
+    else if (ServerKind == "TEST")
     {
-      //List ls = [];
-      //ls.length
       for (int i = 0;i<QS.options.length;i++)
       {
         if (i==0)
@@ -221,9 +127,8 @@ class Question
         {
           Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
         }
-      //Q.numberOne = 3;
     }
-    else if (QS.type == "MULTICHOISE")
+    else if (ServerKind == "MULTICHOISE")
     {
       for (int i = 0;i<QS.options.length;i++)
       {

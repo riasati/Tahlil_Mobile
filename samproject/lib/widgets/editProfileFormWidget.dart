@@ -101,6 +101,10 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
   }
   String _validatePassword(String value)
   {
+    if (value.isEmpty == true)
+    {
+      return null;
+    }
     return value.length < 6 ? "رمز ورود باید حداقل 6 کاراکتر باشد" : null;
   }
 

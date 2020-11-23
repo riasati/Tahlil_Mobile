@@ -7,10 +7,12 @@ class Controllers
   TextEditingController MultiOptionText3Controller = new TextEditingController();
   TextEditingController MultiOptionText4Controller = new TextEditingController();
   TextEditingController TashrihiTextController = new TextEditingController();
+  TextEditingController BlankTextController = new TextEditingController();
   TextEditingController TestText1Controller = new TextEditingController();
   TextEditingController TestText2Controller = new TextEditingController();
   TextEditingController TestText3Controller = new TextEditingController();
   TextEditingController TestText4Controller = new TextEditingController();
+  TextEditingController GradeController = new TextEditingController();
 
 
   void FillQuestionTextController(String text)
@@ -37,20 +39,28 @@ class Controllers
   {
     TashrihiTextController.text = text;
   }
+  void FillBlankTextController(String text)
+  {
+    BlankTextController.text = text;
+  }
   void FillTestText1Controller(String text)
   {
     TestText1Controller.text = text;
   }
   void FillTestText2Controller(String text)
   {
-    TestText1Controller.text = text;
+    TestText2Controller.text = text;
   }
   void FillTestText3Controller(String text)
   {
-    TestText1Controller.text = text;
+    TestText3Controller.text = text;
   }
   void FillTestText4Controller(String text)
   {
-    TestText1Controller.text = text;
+    TestText4Controller.text = text;
+  }
+  void FillGradeController(String text)
+  {
+    GradeController.text = text;
   }
 }

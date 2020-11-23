@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,27 +13,30 @@ import 'package:samproject/widgets/questionWidgets.dart';
 import 'package:samproject/domain/controllers.dart';
 
 
-class QuestionView extends StatefulWidget {
+class QuestionViewInMyQuestion extends StatefulWidget {
   Question question;
-  QuestionView({Key key,this.question}) : super(key: key);
+  CreateExamPageState parent;
+  bool IsAddtoExamEnable;
+  MyQuestionPageState parent2;
+  QuestionViewInMyQuestion({Key key,this.question,this.IsAddtoExamEnable = false,this.parent,this.parent2}) : super(key: key);
   @override
-  _QuestionViewState createState() => _QuestionViewState();
+  QuestionViewInMyQuestionState createState() => QuestionViewInMyQuestionState();
 }
 
-class _QuestionViewState extends State<QuestionView> {
+class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
   Controllers controllers = new Controllers();
   bool IsDelete = false;
   bool IsEdit = false;
+  popupMenuData payeData;
+  popupMenuData bookData;
+  popupMenuData chapterData;
+  popupMenuData kindData;
+  popupMenuData difficultyData;
 
   Widget Editing(Question question,VoidCallback onCloseButton,Controllers controllers)//VoidCallback onEditButton,VoidCallback onCloseButton
   {
     Question changedQuestion = widget.question.CopyQuestion();
 
-    popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-    popupMenuData bookData = new popupMenuData("درس");
-    popupMenuData chapterData = new popupMenuData("فصل");
-    popupMenuData kindData = new popupMenuData("نوع سوال");
-    popupMenuData difficultyData = new popupMenuData("دشواری سوال");
 
     void onEditButton() async
     {
@@ -46,63 +51,85 @@ class _QuestionViewState extends State<QuestionView> {
       changedQuestion.kind = kindData.name;
       changedQuestion.difficulty = difficultyData.name;
       changedQuestion.id = widget.question.id;
+
+      String ServerPaye = HomePage.maps.RSPayeMap[changedQuestion.paye];
+      String ServerBook = HomePage.maps.RSBookMap[changedQuestion.book];
+      String ServerChapter = HomePage.maps.RSChapterMap[changedQuestion.chapter];
+      String ServerKind = HomePage.maps.RSKindMap[changedQuestion.kind];
+      String ServerDifficulty = HomePage.maps.RSDifficultyMap[changedQuestion.difficulty];
       dynamic data;
-      if (widget.question.kind == "چند گزینه ای")
+      if (changedQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"])
       {
         changedQuestion.optionOne = controllers.MultiOptionText1Controller.text;
         changedQuestion.optionTwo = controllers.MultiOptionText2Controller.text;
         changedQuestion.optionThree = controllers.MultiOptionText3Controller.text;
         changedQuestion.optionFour = controllers.MultiOptionText4Controller.text;
 
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion);
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
-          "type": qs.type,
+          "type": ServerKind,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
-          "base": qs.base,
-          "hardness" : qs.hardness,
-          "course": qs.course,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
           "options" : qs.options,
-          "chapter" : qs.chapter,
+          "chapter" : ServerChapter,
         });
       }
-      else if (widget.question.kind == "تستی")
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["TEST"])
       {
         changedQuestion.optionOne = controllers.TestText1Controller.text;
         changedQuestion.optionTwo = controllers.TestText2Controller.text;
         changedQuestion.optionThree = controllers.TestText3Controller.text;
         changedQuestion.optionFour = controllers.TestText4Controller.text;
 
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion);
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
-          "type": qs.type,
+          "type": ServerKind,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
-          "base": qs.base,
-          "hardness" : qs.hardness,
-          "course": qs.course,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
           "options" : qs.options,
-          "chapter" : qs.chapter,
+          "chapter" : ServerChapter,
         });
       }
-      else {
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"]){
         changedQuestion.answerString = controllers.TashrihiTextController.text;
 
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion);
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
-          "type": qs.type,
+          "type": ServerKind,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
-          "base": qs.base,
-          "hardness" : qs.hardness,
-          "course": qs.course,
-          "chapter" : qs.chapter,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
+          "chapter" : ServerChapter,
+        });
+      }
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"]){
+        changedQuestion.answerString = controllers.BlankTextController.text;
+
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": ServerKind,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
+          "chapter" : ServerChapter,
         });
       }
       final response = await http.put('https://parham-backend.herokuapp.com/question',
@@ -135,20 +162,31 @@ class _QuestionViewState extends State<QuestionView> {
         IsEdit = false;
       });
     }
+    void onCancelClick()
+    {
+      setState(() {
+        IsEdit = false;
+      });
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Column(
           textDirection: TextDirection.rtl,
           children: [
-            EditingOneLineQuestionSpecification(question: changedQuestion,payeData: payeData,bookData: bookData,kindData: kindData,chapterData: chapterData,difficultyData: difficultyData,),
+            Row(
+              children: [
+                Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
+                Flexible(flex: 12,child: EditingOneLineQuestionSpecification(question: changedQuestion,payeData: payeData,bookData: bookData,kindData: kindData,chapterData: chapterData,difficultyData: difficultyData,parent: this,)),
+              ],
+            ),
             EditingQuestionText(controllers: controllers,question: changedQuestion,),
-            if (widget.question.kind == "چند گزینه ای") EditingMultiChoiceOption(controllers: controllers,question: changedQuestion,)
-            else if (widget.question.kind == "تستی") EditingTest(question: changedQuestion,controllers: controllers,)
-            else if (widget.question.kind == "جایخالی") EditingAnswerString(question: changedQuestion,controllers: controllers,)
-            else if (widget.question.kind == "تشریحی") EditingAnswerString(question: changedQuestion,controllers: controllers,),
+            if (kindData.name == HomePage.maps.SKindMap["MULTICHOISE"]) EditingMultiChoiceOption(controllers: controllers,question: changedQuestion,)
+            else if (kindData.name == HomePage.maps.SKindMap["TEST"]) EditingTest(question: changedQuestion,controllers: controllers,)
+            else if (kindData.name == HomePage.maps.SKindMap["SHORTANSWER"]) EditingShortAnswer(question: changedQuestion,controllers: controllers,)
+            else if (kindData.name == HomePage.maps.SKindMap["LONGANSWER"]) EditingLongAnswer(question: changedQuestion,controllers: controllers,),
             AddInBankOption(question: changedQuestion,),
-            EditAndEliminateButton(onEditPressed: onEditButton,onEliminatePressed: onCloseButton,),
+            EditAndAddtoExamButton(onEditPressed: onEditButton,onCancelPressed: onCancelClick,IsEditing: true,IsAddtoExamEnable: widget.IsAddtoExamEnable,onAddtoExamPressed: onAddtoExamButton,),
           ],
         ),
       ),
@@ -171,21 +209,34 @@ class _QuestionViewState extends State<QuestionView> {
                 textDirection: TextDirection.rtl,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  NotEditingQuestionSpecification(question: question,),
+                  Row(
+                    children: [
+                      Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
+                      Flexible(flex: 12,child: NotEditingQuestionSpecification(question: question,)),
+                    ],
+                  ),
+              //    NotEditingQuestionSpecification(question: question,),
                   NotEditingQuestionText(question: question,),
-                  if (widget.question.kind == "چند گزینه ای") NotEditingMultiChoiceOption(question: question,isNull: true,)
-                  else if (widget.question.kind == "تستی") NotEditingTest(question: question)
-                  else if (widget.question.kind == "جایخالی") NotEditingAnswerString(question: question)
-                  else if (widget.question.kind == "تشریحی") NotEditingAnswerString(question: question),
+                  if (widget.question.kind == HomePage.maps.SKindMap["MULTICHOISE"]) NotEditingMultiChoiceOption(question: question,isNull: true,)
+                  else if (widget.question.kind == HomePage.maps.SKindMap["TEST"]) NotEditingTest(question: question)
+                  else if (widget.question.kind == HomePage.maps.SKindMap["SHORTANSWER"]) NotEditingAnswerString(question: question)
+                  else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]) NotEditingAnswerString(question: question),
                 ],
               ),
-              EditAndEliminateButton(onEditPressed: onEditButton,onEliminatePressed: onCloseButton,),
+              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: widget.IsAddtoExamEnable,onAddtoExamPressed: onAddtoExamButton,),
             ],
           )
       ),
     );
   }
+  void onAddtoExamButton()
+  {
+    CreateExamPage.questionList.add(widget.question);
+    widget.parent.setState(() {
 
+    });
+    Navigator.pop(context);
+  }
   void onCloseButton() async
   {
     final prefs = await SharedPreferences.getInstance();
@@ -208,6 +259,10 @@ class _QuestionViewState extends State<QuestionView> {
       print(responseJson.toString());
       setState(() {
         IsDelete = true;
+      });
+      MyQuestionPageState.questionList.remove(widget.question);
+      widget.parent2.setState(() {
+
       });
     }
     else{
@@ -233,6 +288,15 @@ class _QuestionViewState extends State<QuestionView> {
     controllers.FillTestText3Controller(widget.question.optionThree);
     controllers.FillTestText4Controller(widget.question.optionFour);
     controllers.FillTashrihiTextController(widget.question.answerString);
+    controllers.FillBlankTextController(widget.question.answerString);
+
+    payeData = new popupMenuData("پایه تحصیلی");
+    bookData = new popupMenuData("درس");
+    chapterData = new popupMenuData("فصل");
+    kindData = new popupMenuData("نوع سوال");
+    difficultyData = new popupMenuData("دشواری سوال");
+    kindData.name = widget.question.kind;
+
   }
   @override
   Widget build(BuildContext context) {
@@ -250,20 +314,17 @@ class _QuestionViewState extends State<QuestionView> {
 }
 
 
-
-
 class MyQuestionPage extends StatefulWidget {
+  bool IsAddtoExamEnable;
+  CreateExamPageState parent;
+  MyQuestionPage({Key key,this.IsAddtoExamEnable = false,this.parent}) : super(key: key);
   @override
-  _MyQuestionPageState createState() => _MyQuestionPageState();
+  MyQuestionPageState createState() => MyQuestionPageState();
 }
 
-class _MyQuestionPageState extends State<MyQuestionPage> {
-  Question newQuestion = new Question();
-  Question newQuestion2 = new Question();
-  Question newQuestion3 = new Question();
-  Question newQuestion4 = new Question();
+class MyQuestionPageState extends State<MyQuestionPage> {
 
-  List<Question> questionList = [];
+  static List<Question> questionList = [];
   int totalpage = 0;
   int thispage = 1;
   void getMyQuestion() async
@@ -304,7 +365,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
         qs.public = responseJson["questions"][i]["public"];
         qs.id = responseJson["questions"][i]["_id"];
 
-        Question q = Question.QuestionServerToQuestion(qs);
+        Question q = Question.QuestionServerToQuestion(qs,qs.type);
         questionList.add(q);
       }
       setState(() {
@@ -317,62 +378,11 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
     }
 
   }
+
   @override
   void initState() {
-    super.initState();
+   super.initState();
    getMyQuestion();
-    // newQuestion.paye = "دهم";
-    // newQuestion.book = "فیزیک";
-    // newQuestion.chapter = "چهارم";
-    // newQuestion.kind = "تشریحی";
-    // newQuestion.difficulty = "سخت";
-    // newQuestion.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // //newQuestion.questionImage = "عکس سوال";
-    // newQuestion.answerString = "منهای شش";
-    // //newQuestion.image2 = "عکس پاسخ";
-    // newQuestion.isPublic = false;
-    //
-    // newQuestion2.paye = "دهم";
-    // newQuestion2.book = "فیزیک";
-    // newQuestion2.chapter = "چهارم";
-    // newQuestion2.kind = "چند گزینه ای";
-    // newQuestion2.difficulty = "سخت";
-    // newQuestion2.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // newQuestion2.questinImage = "عکس سوال";
-    // newQuestion2.optionOne = "به توان یک";
-    // newQuestion2.optionTwo = "به توان دو";
-    // newQuestion2.optionThree = "به توان سه";
-    // newQuestion2.optionFour = "به توان چهار";
-    // newQuestion2.numberOne = 0;
-    // newQuestion2.numberTwo = 1;
-    // newQuestion2.numberThree = 1;
-    // newQuestion2.numberFour = 0;
-    // newQuestion2.isPublic = true;
-    //
-    // newQuestion3.paye = "دهم";
-    // newQuestion3.book = "فیزیک";
-    // newQuestion3.chapter = "چهارم";
-    // newQuestion3.kind = "تستی";
-    // newQuestion3.difficulty = "سخت";
-    // newQuestion3.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // newQuestion3.questinImage = "عکس سوال";
-    // newQuestion3.optionOne = "به توان یک";
-    // newQuestion3.optionTwo = "به توان دو";
-    // newQuestion3.optionThree = "به توان سه";
-    // newQuestion3.optionFour = "به توان چهار";
-    // newQuestion3.numberOne = 2;
-    // newQuestion.isPublic = true;
-    //
-    // newQuestion4.paye = "دهم";
-    // newQuestion4.book = "فیزیک";
-    // newQuestion4.chapter = "چهارم";
-    // newQuestion4.kind = "جایخالی";
-    // newQuestion4.difficulty = "سخت";
-    // newQuestion4.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // newQuestion4.questinImage = "عکس سوال";
-    // newQuestion4.answerString = "منهای شش";
-    // newQuestion4.isPublic = false;
-
   }
 
   bool IsDelete = false;
@@ -406,7 +416,7 @@ class _MyQuestionPageState extends State<MyQuestionPage> {
                     itemCount: questionList.length,
                     itemBuilder: (BuildContext context, int index)
                     {
-                      return QuestionView(question: questionList[index]);
+                      return QuestionViewInMyQuestion(question: questionList[index],IsAddtoExamEnable: widget.IsAddtoExamEnable,parent : widget.parent,parent2: this,);
                     }
                 ),
               ),

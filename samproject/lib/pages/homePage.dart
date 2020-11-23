@@ -5,9 +5,11 @@ import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:samproject/Layout/BottomNavigator.dart';
 import 'package:samproject/domain/Class.dart';
+import 'package:samproject/domain/maps.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:samproject/pages/ClassesListPage/LoginPersonPage/LoginOrSignup.dart';
 import 'package:samproject/pages/searchQuestionPage.dart';
+import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/drawerWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +18,7 @@ import 'addQuestionPage.dart';
 
 class HomePage extends StatefulWidget {
   static Person user = Person();
+  static Maps maps;
   static final PageController homePageController = PageController(
     initialPage: 1,
   );
@@ -31,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _getToken();
+    _getQuestionSpecification();
   }
 
   @override
@@ -133,6 +137,43 @@ class _HomePageState extends State<HomePage> {
     }on Exception catch(e){
       print(e.toString());
       stopLoading();
+    }
+  }
+  void _getQuestionSpecification() async
+  {
+    String url = "https://parham-backend.herokuapp.com/public/question/category";
+    final response = await get(url);
+    if (response.statusCode == 200) {
+      Map<String,dynamic> responseJson = jsonDecode(response.body);
+      Map SPayeMap = {};
+      Map RSPayeMap = {};
+      Map SBookMap = {};
+      Map RSBookMap = {};
+      Map SChapterMap = {};
+      Map RSChapterMap = {};
+      Map SKindMap = {};
+      Map RSKindMap = {};
+      Map SDifficultyMap = {};
+      Map RSDifficultyMap = {};
+
+      SPayeMap = responseJson["base"];
+      SBookMap = responseJson["course"];
+      SChapterMap = responseJson["chapter"];
+      SKindMap = responseJson["type"];
+      SDifficultyMap = responseJson["hardness"];
+
+      SPayeMap.forEach((k,v) => RSPayeMap.putIfAbsent(v, () => k));
+      SBookMap.forEach((k,v) => RSBookMap.putIfAbsent(v, () => k));
+      SChapterMap.forEach((k,v) => RSChapterMap.putIfAbsent(v, () => k));
+      SKindMap.forEach((k,v) => RSKindMap.putIfAbsent(v, () => k));
+      SDifficultyMap.forEach((k,v) => RSDifficultyMap.putIfAbsent(v, () => k));
+
+      HomePage.maps = new Maps(SPayeMap: SPayeMap,RSPayeMap: RSPayeMap,SBookMap: SBookMap,RSBookMap: RSBookMap,SChapterMap: SChapterMap,RSChapterMap: RSChapterMap,SKindMap: SKindMap,RSKindMap: RSKindMap,SDifficultyMap: SDifficultyMap,RSDifficultyMap: RSDifficultyMap);
+    }
+    else {
+      ShowCorrectnessDialog(false, context);
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
     }
   }
 

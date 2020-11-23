@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
+import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/widgets/popumMenu.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/searchFilters.dart';
+import 'package:samproject/pages/createExamPage.dart';
 class NotEditingQuestionSpecification extends StatelessWidget {
   Question question;
   NotEditingQuestionSpecification({Key key, @required this.question}) : super(key: key);
@@ -123,30 +126,82 @@ class _NotEditingMultiChoiceOptionState extends State<NotEditingMultiChoiceOptio
   }
 }
 
-class EditAndEliminateButton extends StatelessWidget {
-  EditAndEliminateButton({Key key, this.onEditPressed,this.onEliminatePressed}) : super(key: key);
-  final VoidCallback onEditPressed;
-  final VoidCallback onEliminatePressed;
+class VisitAnswerAndAddtoExamButton extends StatelessWidget {
+  final VoidCallback onVisitAnswerPressed;
+  final VoidCallback onAddtoExamPressed;
+  bool IsAddtoExamEnable = false;
+  VisitAnswerAndAddtoExamButton({Key key, this.onVisitAnswerPressed,this.onAddtoExamPressed,this.IsAddtoExamEnable = false}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return (IsAddtoExamEnable) ? Row(
       textDirection: TextDirection.rtl,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        FlatButton(
-          color: Color(0xFF3D5A80),
-          onPressed: onEditPressed,
-          child: Text("ويرايش"),
-          textColor: Colors.white,
-        ),
-        FlatButton(
-          color: Color(0xFF3D5A80),
-          onPressed: onEliminatePressed,
-          child: Text("حذف"),
-          textColor: Colors.white,
-        ),
+        RaisedButton(
+            textColor: Colors.white,
+            color: Color(0xFF3D5A80),
+            child: Text("دیدن پاسخ"),
+            onPressed: onVisitAnswerPressed),
+        RaisedButton(
+            textColor: Colors.white,
+            color: Color(0xFF3D5A80),
+            child: Text("اضافه کردن به آزمون"),
+            onPressed: onAddtoExamPressed),
       ],
-    );
+    ) :
+    RaisedButton(
+        textColor: Colors.white,
+        color: Color(0xFF3D5A80),
+        child: Text("دیدن پاسخ"),
+        onPressed: onVisitAnswerPressed);
+  }
+}
+
+class EditAndAddtoExamButton extends StatelessWidget {
+  EditAndAddtoExamButton({Key key, this.onEditPressed,this.onCancelPressed,this.onAddtoExamPressed,this.IsAddtoExamEnable = false,this.IsEditing = false}) : super(key: key);
+  final VoidCallback onEditPressed;
+  final VoidCallback onCancelPressed;
+  final VoidCallback onAddtoExamPressed;
+  bool IsEditing = false;
+  bool IsAddtoExamEnable = false;
+  @override
+  Widget build(BuildContext context) {
+    return (IsAddtoExamEnable) ? Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        // RaisedButton(
+        //     textColor: Colors.white,
+        //     color: Color(0xFF3D5A80),
+        //     child: Text("ويرايش"),
+        //     onPressed: onEditPressed),
+        RaisedButton(
+            textColor: Colors.white,
+            color: Color(0xFF3D5A80),
+            child: Text("اضافه کردن به آزمون"),
+            onPressed: onAddtoExamPressed),
+      ],
+    ) :(IsEditing) ?
+        Row(
+          textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            RaisedButton(
+                textColor: Colors.white,
+                color: Color(0xFF3D5A80),
+                child: Text("ويرايش"),
+                onPressed: onEditPressed),
+            RaisedButton(
+                textColor: Colors.white,
+                color: Color(0xFF3D5A80),
+                child: Text("انصراف"),
+                onPressed: onCancelPressed)
+          ],
+        ): RaisedButton(
+            textColor: Colors.white,
+            color: Color(0xFF3D5A80),
+            child: Text("ويرايش"),
+              onPressed: onEditPressed);
   }
 }
 
@@ -157,31 +212,41 @@ class EditingOneLineQuestionSpecification extends StatefulWidget {
   popupMenuData chapterData;
   popupMenuData kindData;
   popupMenuData difficultyData;
-  EditingOneLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData}) : super(key: key);
+  QuestionViewInMyQuestionState parent;
+  QuestionViewInCreateExamState parent2;
+  EditingOneLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData,this.parent,this.parent2}) : super(key: key);
   @override
   _EditingOneLineQuestionSpecificationState createState() => _EditingOneLineQuestionSpecificationState();
 }
 
 class _EditingOneLineQuestionSpecificationState extends State<EditingOneLineQuestionSpecification> {
   //popupMenuData payeData = new popupMenuData("پایه تحصیلی");
-  List<String> payelist = ["دهم","یازدهم","دوازدهم"];
+  List<String> payelist = [];// ["دهم","یازدهم","دوازدهم"];
   // popupMenuData bookData = new popupMenuData("درس");
-  List<String> booklist = ["ریاضی","فیزیک","شیمی","زیست"];
+  List<String> booklist = [];// ["ریاضی","فیزیک","شیمی","زیست"];
   // popupMenuData chapterData = new popupMenuData("فصل");
-  List<String> cahpterlist = ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
+  List<String> chapterlist = [];// ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
   // popupMenuData kindData = new popupMenuData("نوع سوال");
-  List<String> kindlist = ["تستی","جایخالی","چند گزینه ای","تشریحی"];
+  List<String> kindlist = [];// ["تست","پاسخ کوتاه","چند گزینه ای","جواب کامل"];
   // popupMenuData difficultyData = new popupMenuData("دشواری سوال");
-  List<String> difficultylist = ["آسان","متوسط","سخت"];
+  List<String> difficultylist = [];// = ["آسان","متوسط","سخت"];
 
   @override
   void initState() {
     super.initState();
-    widget.payeData.fillStringList(payelist);
-    widget.bookData.fillStringList(booklist);
-    widget.chapterData.fillStringList(cahpterlist);
-    widget.kindData.fillStringList(kindlist);
-    widget.difficultyData.fillStringList(difficultylist);
+    HomePage.maps.SPayeMap.forEach((k,v) => payelist.add(v.toString()));
+    HomePage.maps.SBookMap.forEach((k,v) => booklist.add(v.toString()));
+    HomePage.maps.SChapterMap.forEach((k,v) => chapterlist.add(v.toString()));
+    HomePage.maps.SKindMap.forEach((k,v) => kindlist.add(v.toString()));
+    HomePage.maps.SDifficultyMap.forEach((k,v) => difficultylist.add(v.toString()));
+    if (widget.payeData.list.isEmpty)
+    {
+      widget.payeData.fillStringList(payelist);
+      widget.bookData.fillStringList(booklist);
+      widget.chapterData.fillStringList(chapterlist);
+      widget.kindData.fillStringList(kindlist);
+      widget.difficultyData.fillStringList(difficultylist);
+    }
     if (widget.question != null)
     {
       widget.payeData.name = widget.question.paye;
@@ -202,8 +267,94 @@ class _EditingOneLineQuestionSpecificationState extends State<EditingOneLineQues
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.payeData,))),
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.bookData,))),
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.chapterData,))),
-          Flexible(child: Container(alignment: Alignment.center,child: Text(widget.kindData.name,textDirection: TextDirection.rtl,))),//PopupMenu(Data: widget.kindData,)
+
+          Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.kindData,parent: widget.parent,parent2: widget.parent2,))),
+       //   Flexible(flex: 2,child: Text((widget.question.kind != null) ? widget.kindData.name : widget.kindData.popupMenuBottonName,textDirection: TextDirection.rtl)),//PopupMenu(Data: widget.kindData,)
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.difficultyData,))),
+        ],
+      ),
+    );
+  }
+}
+
+class EditingTwoLineQuestionSpecification extends StatefulWidget {
+  Question question;
+  popupMenuData payeData;
+  popupMenuData bookData;
+  popupMenuData chapterData;
+  popupMenuData kindData;
+  popupMenuData difficultyData;
+  CreateExamPageState parent;
+
+  EditingTwoLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData,this.parent}) : super(key: key);
+  @override
+  _EditingTwoLineQuestionSpecificationState createState() => _EditingTwoLineQuestionSpecificationState();
+}
+
+class _EditingTwoLineQuestionSpecificationState extends State<EditingTwoLineQuestionSpecification> {
+  //popupMenuData payeData = new popupMenuData("پایه تحصیلی");
+  List<String> payelist = [];// ["دهم","یازدهم","دوازدهم"];
+  // popupMenuData bookData = new popupMenuData("درس");
+  List<String> booklist = [];// ["ریاضی","فیزیک","شیمی","زیست"];
+  // popupMenuData chapterData = new popupMenuData("فصل");
+  List<String> chapterlist = [];// ["اول","دوم","سوم","چهارم","پنجم","ششم","هفتم","هشتم","نهم","دهم",];
+  // popupMenuData kindData = new popupMenuData("نوع سوال");
+  List<String> kindlist = [];// ["تست","پاسخ کوتاه","چند گزینه ای","جواب کامل"];
+  // popupMenuData difficultyData = new popupMenuData("دشواری سوال");
+  List<String> difficultylist = [];// = ["آسان","متوسط","سخت"];
+
+
+  @override
+  void initState() {
+    super.initState();
+    HomePage.maps.SPayeMap.forEach((k,v) => payelist.add(v.toString()));
+    HomePage.maps.SBookMap.forEach((k,v) => booklist.add(v.toString()));
+    HomePage.maps.SChapterMap.forEach((k,v) => chapterlist.add(v.toString()));
+    HomePage.maps.SKindMap.forEach((k,v) => kindlist.add(v.toString()));
+    HomePage.maps.SDifficultyMap.forEach((k,v) => difficultylist.add(v.toString()));
+
+    if (widget.payeData.list.isEmpty)
+    {
+      widget.payeData.fillStringList(payelist);
+      widget.bookData.fillStringList(booklist);
+      widget.chapterData.fillStringList(chapterlist);
+      widget.kindData.fillStringList(kindlist);
+      widget.difficultyData.fillStringList(difficultylist);
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Column(
+        textDirection: TextDirection.rtl,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.payeData,))),
+                SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.bookData,))),
+                SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.chapterData,))),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(flex: 1,child: Container(alignment: Alignment.center,child:PopupMenu(Data: widget.kindData,parent3: widget.parent,))),
+                SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
+                Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.difficultyData,))),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -436,7 +587,10 @@ class _AddInBankOptionState extends State<AddInBankOption> {
     addQuestionBankOption = false;
     if (widget.question != null)
     {
-      addQuestionBankOption = widget.question.isPublic;
+      if (widget.question.isPublic != null)
+      {
+        addQuestionBankOption = widget.question.isPublic;
+      }
     }
   }
   @override
@@ -447,6 +601,34 @@ class _AddInBankOptionState extends State<AddInBankOption> {
         Checkbox(value: addQuestionBankOption, onChanged: addQuestionBankOptionChange),
         Text("افزودن به بانک سوال",textDirection: TextDirection.rtl,),
       ],
+    );
+  }
+}
+
+class EditingGrade extends StatelessWidget {
+  Controllers controllers;
+  EditingGrade({Key key, @required this.controllers}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: Text("بارم",textDirection: TextDirection.rtl,),
+          ),
+        //  SizedBox(width: 30,),
+          Expanded(
+            child: TextFormField(
+            textDirection: TextDirection.rtl,
+            controller: controllers.GradeController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(border: OutlineInputBorder()),
+          ),)
+        ],
+      ),
     );
   }
 }
@@ -526,15 +708,46 @@ class _NotEditingTestState extends State<NotEditingTest> {
   }
 }
 
-class EditingAnswerString extends StatefulWidget {
+class EditingShortAnswer extends StatelessWidget {
   Question question;
   Controllers controllers;
-  EditingAnswerString({Key key, @required this.controllers,this.question}) : super(key: key);
+  EditingShortAnswer({Key key, @required this.controllers,this.question}) : super(key: key);
   @override
-  _EditingAnswerStringState createState() => _EditingAnswerStringState();
+  Widget build(BuildContext context) {
+    return Column(
+      textDirection: TextDirection.rtl,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Text("پاسخ سوال",textDirection: TextDirection.rtl,),
+              Expanded(
+                  child:TextFormField(
+                    textDirection: TextDirection.rtl,
+                    controller: controllers.BlankTextController,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  )
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class _EditingAnswerStringState extends State<EditingAnswerString> {
+class EditingLongAnswer extends StatefulWidget {
+  Question question;
+  Controllers controllers;
+  EditingLongAnswer({Key key, @required this.controllers,this.question}) : super(key: key);
+  @override
+  _EditingLongAnswerState createState() => _EditingLongAnswerState();
+}
+
+class _EditingLongAnswerState extends State<EditingLongAnswer> {
   File _AnswerImage;
   final picker = ImagePicker();
   void getAnswerImage() async {
@@ -553,47 +766,33 @@ class _EditingAnswerStringState extends State<EditingAnswerString> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    print(widget.controllers.TashrihiTextController.text);
-  }
-  @override
   Widget build(BuildContext context) {
     return Column(
       textDirection: TextDirection.rtl,
       children: [
-        Row(
-          textDirection: TextDirection.rtl,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Column(
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Column(
                 children: [
                   Text("پاسخ سوال",textDirection: TextDirection.rtl,),
-                  (widget.question.kind != "جایخالی") ? IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",): Container(),
+                  IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
                 ],
               ),
-            ),
-            Expanded(
-                child: (widget.question.kind != "جایخالی") ? TextFormField(
-                  textDirection: TextDirection.rtl,
-                  controller: widget.controllers.TashrihiTextController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 3,
-                  decoration: InputDecoration(border: OutlineInputBorder()),
-                )
-                    :Container(
-                  padding: EdgeInsets.all(4.0),
-                  width: 120,
-                  child: TextFormField(
+              Expanded(
+                  child:TextFormField(
                     textDirection: TextDirection.rtl,
                     controller: widget.controllers.TashrihiTextController,
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 3,
                     decoration: InputDecoration(border: OutlineInputBorder()),
-                  ),
-                )
-            ),
-          ],
+                  )
+
+              ),
+            ],
+          ),
         ),
         (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
             : Container(),
@@ -715,353 +914,137 @@ class SearchFilterWidget extends StatefulWidget {
 }
 
 class _SearchFilterWidgetState extends State<SearchFilterWidget> {
-  String _selectedPaye1;
-  String _selectedPaye2;
-  String _selectedPaye3;
-  String _selectedBook1;
-  String _selectedBook2;
-  String _selectedBook3;
-  String _selectedBook4;
-  String _selectedChapter1;
-  String _selectedChapter2;
-  String _selectedChapter3;
-  String _selectedChapter4;
-  String _selectedChapter5;
-  String _selectedChapter6;
-  String _selectedChapter7;
-  String _selectedChapter8;
-  String _selectedChapter9;
-  String _selectedChapter10;
-  String _selectedKind1;
-  String _selectedKind2;
-  String _selectedKind3;
-  String _selectedKind4;
-  String _selectedDifficulty1;
-  String _selectedDifficulty2;
-  String _selectedDifficulty3;
   void onSelectedDifficultyMenu(value) => setState((){
-    if (value == 1)
+    for(int i = 0;i<difficultykeys.length;i++)
     {
-      if (_selectedDifficulty1 == "آسان")
+      if (value == i)
       {
-        widget.searchFilters.difficultyList.remove(_selectedDifficulty1);
-        _selectedDifficulty1 = null;
-      }
-      else
-      {
-        _selectedDifficulty1 = "آسان";
-        widget.searchFilters.difficultyList.add(_selectedDifficulty1);
-      }
-    }
-    else if (value == 2)
-    {
-      if (_selectedDifficulty2 == "متوسط")
-      {
-        widget.searchFilters.difficultyList.remove(_selectedDifficulty2);
-        _selectedDifficulty2 = null;
-      }
-      else
-      {
-        _selectedDifficulty2 = "متوسط";
-        widget.searchFilters.difficultyList.add(_selectedDifficulty2);
-      }
-    }
-    else if (value == 3)
-    {
-      if (_selectedDifficulty3 == "سخت")
-      {
-        widget.searchFilters.difficultyList.remove(_selectedDifficulty3);
-        _selectedDifficulty3 = null;
-      }
-      else
-      {
-        _selectedDifficulty3 = "سخت";
-        widget.searchFilters.difficultyList.add(_selectedDifficulty3);
+        if (difficultyMap[difficultykeys[i]])
+        {
+          widget.searchFilters.difficultyList.remove(difficultykeys[i]);
+          difficultyMap[difficultykeys[i]] = false;
+        }
+        else
+        {
+          widget.searchFilters.difficultyList.add(difficultykeys[i]);
+          difficultyMap[difficultykeys[i]] = true;
+        }
       }
     }
   });
   void onSelectedKindMenu(value) => setState((){
-    if (value == 1)
+    for(int i = 0;i<kindkeys.length;i++)
     {
-      if (_selectedKind1 == "تستی")
+      if (value == i)
       {
-        widget.searchFilters.kindList.remove(_selectedKind1);
-        _selectedKind1 = null;
-      }
-      else
-      {
-        _selectedKind1 = "تستی";
-        widget.searchFilters.kindList.add(_selectedKind1);
-      }
-    }
-    else if (value == 2)
-    {
-      if (_selectedKind2 == "جایخالی")
-      {
-        widget.searchFilters.kindList.remove(_selectedKind2);
-        _selectedKind2 = null;
-      }
-      else
-      {
-        _selectedKind2 = "جایخالی";
-        widget.searchFilters.kindList.add(_selectedKind2);
-      }
-    }
-    else if (value == 3)
-    {
-      if (_selectedKind3 == "چند گزینه ای")
-      {
-        widget.searchFilters.kindList.remove(_selectedKind3);
-        _selectedKind3 = null;
-      }
-      else
-      {
-        _selectedKind3 = "چند گزینه ای";
-        widget.searchFilters.kindList.add(_selectedKind3);
-      }
-    }
-    else if (value == 4)
-    {
-      if (_selectedKind4 == "تشریحی")
-      {
-        widget.searchFilters.kindList.remove(_selectedKind4);
-        _selectedKind4 = null;
-      }
-      else
-      {
-        _selectedKind4 = "تشریحی";
-        widget.searchFilters.kindList.add(_selectedKind4);
+        if (kindMap[kindkeys[i]])
+        {
+          widget.searchFilters.kindList.remove(kindkeys[i]);
+          kindMap[kindkeys[i]] = false;
+        }
+        else
+        {
+          widget.searchFilters.kindList.add(kindkeys[i]);
+          kindMap[kindkeys[i]] = true;
+        }
       }
     }
   });
   void onSelectedChapterMenu(value) => setState((){
-    if (value == 1)
+    for(int i = 0;i<chapterkeys.length;i++)
     {
-      if (_selectedChapter1 == "اول")
+      if (value == i)
       {
-        widget.searchFilters.chapterList.remove(_selectedChapter1);
-        _selectedChapter1 = null;
-      }
-      else
-      {
-        _selectedChapter1 = "اول";
-        widget.searchFilters.chapterList.add(_selectedChapter1);
-      }
-    }
-    else if (value == 2)
-    {
-      if (_selectedChapter2 == "دوم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter2);
-        _selectedChapter2 = null;
-      }
-      else
-      {
-        _selectedChapter2 = "دوم";
-        widget.searchFilters.chapterList.add(_selectedChapter2);
-      }
-    }
-    else if (value == 3)
-    {
-      if (_selectedChapter3 == "سوم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter3);
-        _selectedChapter3 = null;
-      }
-      else
-      {
-        _selectedChapter3 = "سوم";
-        widget.searchFilters.chapterList.add(_selectedChapter3);
-      }
-    }
-    else if (value == 4)
-    {
-      if (_selectedChapter4 == "چهارم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter4);
-        _selectedChapter4 = null;
-      }
-      else
-      {
-        _selectedChapter4 = "چهارم";
-        widget.searchFilters.chapterList.add(_selectedChapter4);
-      }
-    }
-    else if (value == 5)
-    {
-      if (_selectedChapter5 == "پنجم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter5);
-        _selectedChapter5 = null;
-      }
-      else
-      {
-        _selectedChapter5 = "پنجم";
-        widget.searchFilters.chapterList.add(_selectedChapter5);
-      }
-    }
-    else if (value == 6)
-    {
-      if (_selectedChapter6 == "ششم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter6);
-        _selectedChapter6 = null;
-      }
-      else
-      {
-        _selectedChapter6 = "ششم";
-        widget.searchFilters.chapterList.add(_selectedChapter6);
-      }
-    }
-    else if (value == 7)
-    {
-      if (_selectedChapter7 == "هفتم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter7);
-        _selectedChapter7 = null;
-      }
-      else
-      {
-        _selectedChapter7 = "هفتم";
-        widget.searchFilters.chapterList.add(_selectedChapter7);
-      }
-    }
-    else if (value == 8)
-    {
-      if (_selectedChapter8 == "هشتم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter8);
-        _selectedChapter8 = null;
-      }
-      else
-      {
-        _selectedChapter8 = "هشتم";
-        widget.searchFilters.chapterList.add(_selectedChapter8);
-      }
-    }
-    else if (value == 9)
-    {
-      if (_selectedChapter9 == "نهم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter9);
-        _selectedChapter9 = null;
-      }
-      else
-      {
-        _selectedChapter9 = "نهم";
-        widget.searchFilters.chapterList.add(_selectedChapter9);
-      }
-    }
-    else if (value == 10)
-    {
-      if (_selectedChapter10 == "دهم")
-      {
-        widget.searchFilters.chapterList.remove(_selectedChapter10);
-        _selectedChapter10 = null;
-      }
-      else
-      {
-        _selectedChapter10 = "دهم";
-        widget.searchFilters.chapterList.add(_selectedChapter10);
+        if (chapterMap[chapterkeys[i]])
+        {
+          widget.searchFilters.chapterList.remove(chapterkeys[i]);
+          chapterMap[chapterkeys[i]] = false;
+        }
+        else
+        {
+          widget.searchFilters.chapterList.add(chapterkeys[i]);
+          chapterMap[chapterkeys[i]] = true;
+        }
       }
     }
 
   });
   void onSelectedBookMenu(value) => setState((){
-    if (value == 1)
+    for(int i = 0;i<bookkeys.length;i++)
     {
-      if (_selectedBook1 == "ریاضی")
+      if (value == i)
       {
-        widget.searchFilters.bookList.remove(_selectedBook1);
-        _selectedBook1 = null;
-      }
-      else
-      {
-        _selectedBook1 = "ریاضی";
-        widget.searchFilters.bookList.add(_selectedBook1);
-      }
-    }
-    else if (value == 2)
-    {
-      if (_selectedBook2 == "فیزیک")
-      {
-        widget.searchFilters.bookList.remove(_selectedBook2);
-        _selectedBook2 = null;
-      }
-      else
-      {
-        _selectedBook2 = "فیزیک";
-        widget.searchFilters.bookList.add(_selectedBook2);
-      }
-    }
-    else if (value == 3)
-    {
-      if (_selectedBook3 == "شیمی")
-      {
-        widget.searchFilters.bookList.remove(_selectedBook3);
-        _selectedBook3 = null;
-      }
-      else
-      {
-        _selectedBook3 = "شیمی";
-        widget.searchFilters.bookList.add(_selectedBook3);
-      }
-    }
-    else if (value == 4)
-    {
-      if (_selectedBook4 == "زیست")
-      {
-        widget.searchFilters.bookList.remove(_selectedBook4);
-        _selectedBook4 = null;
-      }
-      else
-      {
-        _selectedBook4 = "زیست";
-        widget.searchFilters.bookList.add(_selectedBook4);
+        if (bookMap[bookkeys[i]])
+        {
+          widget.searchFilters.bookList.remove(bookkeys[i]);
+          bookMap[bookkeys[i]] = false;
+        }
+        else
+        {
+          widget.searchFilters.bookList.add(bookkeys[i]);
+          bookMap[bookkeys[i]] = true;
+        }
       }
     }
   });
   void onSelectedPayeMenu(value) => setState(() {
-    if (value == 1)
+    for(int i = 0;i<payekeys.length;i++)
     {
-      if (_selectedPaye1 == "دهم")
+      if (value == i)
       {
-        widget.searchFilters.payeList.remove(_selectedPaye1);
-        _selectedPaye1 = null;
-      }
-      else
-      {
-        _selectedPaye1 = "دهم";
-        widget.searchFilters.payeList.add(_selectedPaye1);
-      }
-    }
-    else if (value == 2)
-    {
-      if (_selectedPaye2 == "یازدهم")
-      {
-        widget.searchFilters.payeList.remove(_selectedPaye2);
-        _selectedPaye2 = null;
-      }
-      else
-      {
-        _selectedPaye2 = "یازدهم";
-        widget.searchFilters.payeList.add(_selectedPaye2);
-      }
-    }
-    else if (value == 3)
-    {
-      if (_selectedPaye3 == "دوازدهم")
-      {
-        widget.searchFilters.payeList.remove(_selectedPaye3);
-        _selectedPaye3 = null;
-      }
-      else
-      {
-        _selectedPaye3 = "دوازدهم";
-        widget.searchFilters.payeList.add(_selectedPaye3);
+        if (payeMap[payekeys[i]])
+        {
+          widget.searchFilters.payeList.remove(payekeys[i]);
+          payeMap[payekeys[i]] = false;
+        }
+        else
+        {
+          widget.searchFilters.payeList.add(payekeys[i]);
+          payeMap[payekeys[i]] = true;
+        }
       }
     }
   });
+
+  Map<String,bool> payeMap = {};
+  List<CheckedPopupMenuItem> payeList = [];
+  List payekeys = [];
+
+  Map<String,bool> bookMap = {};
+  List<CheckedPopupMenuItem> bookList = [];
+  List bookkeys = [];
+
+  Map<String,bool> chapterMap = {};
+  List<CheckedPopupMenuItem> chapterList = [];
+  List chapterkeys = [];
+
+  Map<String,bool> kindMap = {};
+  List<CheckedPopupMenuItem> kindList = [];
+  List kindkeys = [];
+
+  Map<String,bool> difficultyMap = {};
+  List<CheckedPopupMenuItem> difficultyList = [];
+  List difficultykeys = [];
+
+  @override
+  void initState() {
+    super.initState();
+    HomePage.maps.SPayeMap.forEach((k,v) => payeMap.putIfAbsent(v, () => false));
+    payekeys = payeMap.keys.toList();
+
+    HomePage.maps.SBookMap.forEach((k,v) => bookMap.putIfAbsent(v, () => false));
+    bookkeys = bookMap.keys.toList();
+
+    HomePage.maps.SChapterMap.forEach((k,v) => chapterMap.putIfAbsent(v, () => false));
+    chapterkeys = chapterMap.keys.toList();
+
+    HomePage.maps.SKindMap.forEach((k,v) => kindMap.putIfAbsent(v, () => false));
+    kindkeys = kindMap.keys.toList();
+
+    HomePage.maps.SDifficultyMap.forEach((k,v) => difficultyMap.putIfAbsent(v, () => false));
+    difficultykeys = difficultyMap.keys.toList();
+
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1077,23 +1060,17 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                   child: PopupMenuButton(
                     child: Text("پایه تحصیلی",textDirection: TextDirection.rtl),
                     onSelected: onSelectedPayeMenu,
-                    itemBuilder: (_) => [
-                      new CheckedPopupMenuItem(
-                        checked: _selectedPaye1 == 'دهم',
-                        value: 1,
-                        child: Text('دهم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedPaye2 == 'یازدهم',
-                        value: 2,
-                        child: Text('یازدهم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedPaye3 == 'دوازدهم',
-                        value: 3,
-                        child: Text('دوازدهم',textDirection: TextDirection.rtl,),
-                      ),
-                    ],
+                    itemBuilder: (_) {
+                      payeList = [];
+                      for(int i=0;i<payekeys.length;i++)
+                      {
+                        payeList.add(new CheckedPopupMenuItem(
+                          value: i,
+                          child: Text(payekeys[i],textDirection: TextDirection.rtl,),
+                          checked: (payeMap[payekeys[i]]),
+                        ));
+                      }
+                      return payeList;}
                   ),
                   )),
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
@@ -1101,28 +1078,19 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                   child:PopupMenuButton(
                     child: Text("درس",textDirection: TextDirection.rtl),
                     onSelected: onSelectedBookMenu,
-                    itemBuilder: (_) => [
-                      new CheckedPopupMenuItem(
-                        checked: _selectedBook1 == 'ریاضی',
-                        value: 1,
-                        child: Text('ریاضی',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedBook2 == 'فیزیک',
-                        value: 2,
-                        child: Text('فیزیک',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedBook3 == 'شیمی',
-                        value: 3,
-                        child: Text('شیمی',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedBook4 == 'زیست',
-                        value: 4,
-                        child: Text('زیست',textDirection: TextDirection.rtl,),
-                      ),
-                    ],
+                    itemBuilder: (_)
+                    {
+                      bookList = [];
+                      for(int i=0;i<bookkeys.length;i++)
+                      {
+                        bookList.add(new CheckedPopupMenuItem(
+                          value: i,
+                          child: Text(bookkeys[i],textDirection: TextDirection.rtl,),
+                          checked: (bookMap[bookkeys[i]]),
+                        ));
+                      }
+                      return bookList;
+                    }
                   ),
               )),
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
@@ -1130,58 +1098,19 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                   child: PopupMenuButton(
                     child: Text("فصل",textDirection: TextDirection.rtl),
                     onSelected: onSelectedChapterMenu,
-                    itemBuilder: (_) => [
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter1 == 'اول',
-                        value: 1,
-                        child: Text('اول',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter2 == 'دوم',
-                        value: 2,
-                        child: Text('دوم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter3 == 'سوم',
-                        value: 3,
-                        child: Text('سوم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter4 == 'چهارم',
-                        value: 4,
-                        child: Text('چهارم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter5 == 'پنجم',
-                        value: 5,
-                        child: Text('پنجم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter6 == 'ششم',
-                        value: 6,
-                        child: Text('ششم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter7 == 'هفتم',
-                        value: 7,
-                        child: Text('هفتم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter8 == 'هشتم',
-                        value: 8,
-                        child: Text('هشتم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter9 == 'نهم',
-                        value: 9,
-                        child: Text('نهم',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedChapter10 == 'دهم',
-                        value: 10,
-                        child: Text('دهم',textDirection: TextDirection.rtl,),
-                      ),
-                    ],
+                    itemBuilder: (_)
+                    {
+                      chapterList = [];
+                      for(int i=0;i<chapterkeys.length;i++)
+                      {
+                        chapterList.add(new CheckedPopupMenuItem(
+                          value: i,
+                          child: Text(chapterkeys[i],textDirection: TextDirection.rtl,),
+                          checked: (chapterMap[chapterkeys[i]]),
+                        ));
+                      }
+                      return chapterList;
+                    }
                   ),
               ))
             ],
@@ -1197,28 +1126,19 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                   child: PopupMenuButton(
                     child: Text("نوع سوال",textDirection: TextDirection.rtl),
                     onSelected: onSelectedKindMenu,
-                    itemBuilder: (_) => [
-                      new CheckedPopupMenuItem(
-                        checked: _selectedKind1 == 'تستی',
-                        value: 1,
-                        child: Text('تستی',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedKind2 == 'جایخالی',
-                        value: 2,
-                        child: Text('جایخالی',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedKind3 == 'چند گزینه ای',
-                        value: 3,
-                        child: Text('چند گزینه ای',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedKind4 == 'تشریحی',
-                        value: 4,
-                        child: Text('تشریحی',textDirection: TextDirection.rtl,),
-                      ),
-                    ],
+                    itemBuilder: (_)
+                    {
+                      kindList = [];
+                      for(int i=0;i<kindkeys.length;i++)
+                      {
+                        kindList.add(new CheckedPopupMenuItem(
+                          value: i,
+                          child: Text(kindkeys[i],textDirection: TextDirection.rtl,),
+                          checked: (kindMap[kindkeys[i]]),
+                        ));
+                      }
+                      return kindList;
+                    }
                   ),
               )),
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
@@ -1226,23 +1146,19 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                   child: PopupMenuButton(
                     child: Text("دشواری سوال",textDirection: TextDirection.rtl),
                     onSelected: onSelectedDifficultyMenu,
-                    itemBuilder: (_) => [
-                      new CheckedPopupMenuItem(
-                        checked: _selectedDifficulty1 == 'آسان',
-                        value: 1,
-                        child: Text('آسان',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedDifficulty2 == 'متوسط',
-                        value: 2,
-                        child: Text('متوسط',textDirection: TextDirection.rtl,),
-                      ),
-                      new CheckedPopupMenuItem(
-                        checked: _selectedDifficulty3 == 'سخت',
-                        value: 3,
-                        child: Text('سخت',textDirection: TextDirection.rtl,),
-                      ),
-                    ],
+                    itemBuilder: (_)
+                    {
+                      difficultyList = [];
+                      for(int i=0;i<difficultykeys.length;i++)
+                      {
+                        difficultyList.add(new CheckedPopupMenuItem(
+                          value: i,
+                          child: Text(difficultykeys[i],textDirection: TextDirection.rtl,),
+                          checked: (difficultyMap[difficultykeys[i]]),
+                        ));
+                      }
+                      return difficultyList;
+                    }
                   ),
               )),
             ],
