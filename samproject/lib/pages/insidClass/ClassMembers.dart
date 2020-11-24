@@ -1,15 +1,32 @@
 
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/pages/insidClass/InsidClassPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ClassMembers extends StatefulWidget {
+
+  final insidClassPageSetState;
+
+  ClassMembers( {@required void toggleCoinCallback() }):
+        insidClassPageSetState = toggleCoinCallback;
+
   @override
   _ClassMembersState createState() => _ClassMembersState();
 }
 
 class _ClassMembersState extends State<ClassMembers> {
+  bool isLoading = false;
+  String _getMembersOfClassInfoURL = "http://parham-backend.herokuapp.com/class/";
+  List<Person> classMembers = [];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,7 +37,7 @@ class _ClassMembersState extends State<ClassMembers> {
         //color: Colors.black45,
         child: FlatButton(
           onPressed: () {
-            membersListBottomSheet();
+            _getMembersListFromServer();
           },
           child: Center(
             child: Column(
@@ -68,6 +85,44 @@ class _ClassMembersState extends State<ClassMembers> {
     );
   }
 
+  void _getMembersListFromServer() async {
+    InsidClassPage.isLoading = true;
+    widget?.insidClassPageSetState();
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _getMembersOfClassInfoURL  + InsidClassPage.currentClass.classId + "/members";
+        final response = await get(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        classMembers = [];
+        var membersInfo = json.decode(utf8.decode(response.bodyBytes))["members"];
+        for(var memberInfo in membersInfo){
+          Person member = Person();
+          member.firstname = memberInfo["firstname"];
+          member.lastname = memberInfo["lastname"];
+          member.avatarUrl = memberInfo["avatar"];
+          member.username = memberInfo["username"];
+          member.email = memberInfo["email"];
+          classMembers.add(member);
+        }
+        membersListBottomSheet();
+        for(var member in classMembers)
+          print(member);
+      }
+    }on Exception catch(e){
+      print(e.toString());
+    }
+    InsidClassPage.isLoading = false;
+    widget?.insidClassPageSetState();
+  }
+
   void membersListBottomSheet() => showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -94,44 +149,58 @@ class _ClassMembersState extends State<ClassMembers> {
       ));
 
   Widget memberList(){
-    return ListView(
-      children:  <Widget>[
-        eachMemberCard(),
-        eachMemberCard(),
-        eachMemberCard(),
-        eachMemberCard(),
-      ],
+    return ListView.builder(
+      itemCount: classMembers.length,
+        itemBuilder: (BuildContext context, int index) {
+          return eachMemberCard(classMembers[index]);
+        }
     );
   }
 
-  Widget eachMemberCard(){
+  Widget eachMemberCard(Person member){
     return Card(
       child: FlatButton(
         padding: EdgeInsets.all(0),
         minWidth: double.infinity,
         onPressed: () {
-          _showCompleteUserInfo();
+          if(InsidClassPage.isAdmin)
+            _showCompleteUserInfo();
         },
         child: ListTile(
           //leading: Icon(Icons.more_vert),
-          title: Text('حمیدرضا آذرباد', textAlign: TextAlign.right,),
+          title: Text(member.firstname + " " + member.lastname, textAlign: TextAlign.right,),
           //trailing: FlutterLogo(size: 45,),
-          trailing: eachMemberCardAvatar(),
+          trailing: eachMemberCardAvatar(member.avatarUrl),
         ),
       ),
     );
   }
 
-  Widget eachMemberCardAvatar(){
-    return CircleAvatar(
-      radius: 30.0,
-      backgroundImage:
-      AssetImage("assets/img/unnamed.png"),
-      backgroundColor: Colors.transparent,
-    );
-  }
+  Widget eachMemberCardAvatar(String avatarUrl){
+    if(avatarUrl == null){
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage:
+        AssetImage("assets/img/unnamed.png"),
+        backgroundColor: Colors.transparent,
+      );
+    }
+    try{
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage:
+        NetworkImage(avatarUrl),
+        backgroundColor: Colors.transparent,
+      );
+    }on Exception catch(e){
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage:
+        AssetImage("assets/img/unnamed.png"),
+        backgroundColor: Colors.transparent,
+      );
+    }
 
-  void _getUsersListFromServer() {
   }
 
   Future<void> _showCompleteUserInfo() async {
@@ -167,4 +236,5 @@ class _ClassMembersState extends State<ClassMembers> {
       },
     );
   }
+
 }

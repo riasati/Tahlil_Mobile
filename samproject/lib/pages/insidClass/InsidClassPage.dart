@@ -6,6 +6,7 @@ import 'package:loading_overlay/loading_overlay.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:samproject/pages/editProfilePage.dart';
+import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/insidClass/ClassMembers.dart';
 import 'package:samproject/pages/insidClass/classInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,10 @@ import 'ClassNotification.dart';
 import 'EditAndCreateExamButtons.dart';
 
 class InsidClassPage extends StatefulWidget {
+  static Class currentClass = Class("", "", "");
+  static Person admin = Person();
+  static bool isLoading = true;
+  static bool isAdmin = false;
   final String classId;
 
 
@@ -25,11 +30,8 @@ class InsidClassPage extends StatefulWidget {
 }
 
 class _InsidClassPageState extends State<InsidClassPage> {
-  bool isLoading = true;
-  String _getClassInfoURL = "parham-backend.herokuapp.com";
+  String _getClassInfoURL = "http://parham-backend.herokuapp.com/class/";
   String classId;
-  Class currentClass;
-  Person admin;
 
   _InsidClassPageState(this.classId);
 
@@ -41,6 +43,11 @@ class _InsidClassPageState extends State<InsidClassPage> {
 
   @override
   Widget build(BuildContext context) {
+    var editAndCreateExamButtons;
+    if(InsidClassPage.isAdmin)
+      editAndCreateExamButtons = Expanded(child: EditAndCreateExamButtons());
+    else
+      editAndCreateExamButtons = Container();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -50,14 +57,12 @@ class _InsidClassPageState extends State<InsidClassPage> {
             child: Column(
               children: [
                 Expanded(child: ClassInfoCard(), flex: 3,),
-                Expanded(
-                    child: EditAndCreateExamButtons(),
-                ),
+                editAndCreateExamButtons,
                 Expanded(
                   flex: 3,
                   child: Row(
                     children: [
-                      Expanded(child: ClassMembers()),
+                      Expanded(child: ClassMembers(toggleCoinCallback: setIsLoading,)),
                       Expanded(child: ClassExams()),
                     ],
                   ),
@@ -66,7 +71,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
               ],
             ),
           ),
-          isLoading: isLoading,
+          isLoading: InsidClassPage.isLoading,
         ),
         appBar: AppBar(
           backgroundColor: Color(0xFF3D5A80),
@@ -91,7 +96,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
 
   void _getClassInformation() async{
     setState(() {
-      isLoading = true;
+      InsidClassPage.isLoading = true;
     });
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
@@ -99,39 +104,44 @@ class _InsidClassPageState extends State<InsidClassPage> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var queryParam = {
-          'classId': classId,
-        };
-        var url = Uri.http(_getClassInfoURL, "/class", queryParam);
-        print(url);
+        // var queryParam = {
+        //   'classId': classId,
+        // };
+        // var url = Uri.http(_getClassInfoURL, "/class", queryParam);
+        // print(url);
+        var url = _getClassInfoURL  + classId;
         final response = await get(url,
             headers: {
               'accept': 'application/json',
               'Authorization': token,
               'Content-Type': 'application/json',
             });
-        print(response.statusCode);
-        var userClassesInfo = json.decode(utf8.decode(response.bodyBytes));
-        print(userClassesInfo);
-        currentClass = Class(userClassesInfo["name"], "", userClassesInfo["classId"]);
-        currentClass.classDescription = userClassesInfo["description"];
+        var userClassesInfo = json.decode(utf8.decode(response.bodyBytes))["Class"];
+        InsidClassPage.currentClass = Class(userClassesInfo["name"], "", userClassesInfo["classId"]);
+        InsidClassPage.currentClass.classDescription = userClassesInfo["description"];
         var adminInfo = userClassesInfo["admin"];
-        admin.firstname = adminInfo["firstname"];
-        admin.lastname = adminInfo["lastname"];
-        admin.avatarUrl = adminInfo["avatar"];
-        admin.email = adminInfo["email"];
-        ClassInfoCard.className = currentClass.className;
-        ClassInfoCard.adminFullName = admin.firstname + " " + admin.lastname;
-        print(ClassInfoCard.className + " " + ClassInfoCard.adminFullName);
-        print(currentClass);
-        print(admin);
-
+        InsidClassPage.admin.firstname = adminInfo["firstname"];
+        InsidClassPage.admin.lastname = adminInfo["lastname"];
+        InsidClassPage.currentClass.ownerFullName = adminInfo["firstname"] + " " + adminInfo["lastname"];
+        InsidClassPage.admin.avatarUrl = adminInfo["avatar"];
+        InsidClassPage.admin.email = adminInfo["email"];
+        if(HomePage.user.email == InsidClassPage.admin.email)
+          InsidClassPage.isAdmin = true;
+        else
+          InsidClassPage.isAdmin = false;
+        print(InsidClassPage.currentClass);
+        print(userClassesInfo);
       }
     }on Exception catch(e){
       print(e.toString());
     }
     setState(() {
-      isLoading = false;
+      InsidClassPage.isLoading = false;
+    });
+  }
+
+  void setIsLoading(){
+    setState(() {
     });
   }
 }
