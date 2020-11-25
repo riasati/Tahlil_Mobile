@@ -45,7 +45,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
   Widget build(BuildContext context) {
     var editAndCreateExamButtons;
     if(InsidClassPage.isAdmin)
-      editAndCreateExamButtons = Expanded(child: EditAndCreateExamButtons());
+      editAndCreateExamButtons = Expanded(child: EditAndCreateExamButtons(toggleCoinCallback: insideClassSetState,));
     else
       editAndCreateExamButtons = Container();
     return MaterialApp(
@@ -62,7 +62,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
                   flex: 3,
                   child: Row(
                     children: [
-                      Expanded(child: ClassMembers(toggleCoinCallback: setIsLoading,)),
+                      Expanded(child: ClassMembers(toggleCoinCallback: insideClassSetState,)),
                       Expanded(child: ClassExams()),
                     ],
                   ),
@@ -140,7 +140,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
     });
   }
 
-  void setIsLoading(){
+  void insideClassSetState(){
     setState(() {
     });
   }

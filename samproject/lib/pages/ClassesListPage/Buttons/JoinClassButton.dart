@@ -169,18 +169,18 @@ class _JoinButtonState extends State<JoinButton> {
               context: context,
               type: AlertType.success,
               title: "به کلاس اضافه شدید",
-              buttons: [
-                DialogButton(
-                  child: Text(
-                    "حله",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => {
-                    Navigator.pop(context),
-                  },
-                  color: Color(0xFF3D5A80),
-                ),
-              ],
+              // buttons: [
+              //   DialogButton(
+              //     child: Text(
+              //       "حله",
+              //       style: TextStyle(color: Colors.white, fontSize: 20),
+              //     ),
+              //     onPressed: () => {
+              //       Navigator.pop(context),
+              //     },
+              //     color: Color(0xFF3D5A80),
+              //   ),
+              // ],
             ).show();
           });
           this.userClasses.add(joinedClass);
@@ -195,14 +195,6 @@ class _JoinButtonState extends State<JoinButton> {
               type: AlertType.error,
               title: errorMsg,
               buttons: [
-                DialogButton(
-                  child: Text(
-                    "حله",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.red,
-                ),
               ],
             ).show();
           });
@@ -216,14 +208,6 @@ class _JoinButtonState extends State<JoinButton> {
             type: AlertType.error,
             title: "ابتدا به حساب خود وارد شوید",
             buttons: [
-              DialogButton(
-                child: Text(
-                  "حله",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: () => Navigator.pop(context),
-                color: Colors.red,
-              ),
             ],
           ).show();
         });
@@ -237,14 +221,6 @@ class _JoinButtonState extends State<JoinButton> {
           type: AlertType.error,
           title: "به کلاس اضافه نشدید",
           buttons: [
-            DialogButton(
-              child: Text(
-                "حله",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              color: Colors.red,
-            ),
           ],
         ).show();
       });

@@ -212,7 +212,7 @@ class _CreateClassButtonState extends State<CreateClassButton> {
             Alert(
               context: context,
               type: AlertType.success,
-              title: "",
+              title: "عملیات موفق بود",
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -229,8 +229,6 @@ class _CreateClassButtonState extends State<CreateClassButton> {
                   ),
                   onPressed: () => {
                     Clipboard.setData(ClipboardData(text:newClassInfo['classId'])),
-
-                    Navigator.pop(context),
                   },
                   color: Color(0xFF3D5A80),
                 ),
@@ -250,14 +248,6 @@ class _CreateClassButtonState extends State<CreateClassButton> {
               type: AlertType.error,
               title: errorMsg,
               buttons: [
-                DialogButton(
-                  child: Text(
-                    "حله",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.red,
-                ),
               ],
             ).show();
           });
@@ -272,14 +262,6 @@ class _CreateClassButtonState extends State<CreateClassButton> {
             type: AlertType.error,
             title: "ابتدا به حساب خود وارد شوید",
             buttons: [
-              DialogButton(
-                child: Text(
-                  "حله",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: () => Navigator.pop(context),
-                color: Colors.red,
-              ),
             ],
           ).show();
         });
@@ -294,14 +276,6 @@ class _CreateClassButtonState extends State<CreateClassButton> {
           type: AlertType.error,
           title: "ساخت کلاس با موفقیت انجام نشد",
           buttons: [
-            DialogButton(
-              child: Text(
-                "حله",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              color: Colors.red,
-            ),
           ],
         ).show();
       });

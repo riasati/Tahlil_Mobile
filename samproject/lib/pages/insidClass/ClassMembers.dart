@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +26,7 @@ class ClassMembers extends StatefulWidget {
 class _ClassMembersState extends State<ClassMembers> {
   bool isLoading = false;
   String _getMembersOfClassInfoURL = "http://parham-backend.herokuapp.com/class/";
+  String _removeMemberURL = "http://parham-backend.herokuapp.com/class/";
   List<Person> classMembers = [];
 
   @override
@@ -167,13 +169,127 @@ class _ClassMembersState extends State<ClassMembers> {
             _showCompleteUserInfo();
         },
         child: ListTile(
-          //leading: Icon(Icons.more_vert),
+          leading: InsidClassPage.isAdmin?_userFunctionForAdmin(member):Container(),
           title: Text(member.firstname + " " + member.lastname, textAlign: TextAlign.right,),
           //trailing: FlutterLogo(size: 45,),
           trailing: eachMemberCardAvatar(member.avatarUrl),
         ),
       ),
     );
+  }
+
+  Widget _userFunctionForAdmin(Person member){
+    return PopupMenuButton<String>(
+      onSelected: (String value) {
+      },
+      child: Icon(
+        Icons.more_vert,
+        size: 35,
+        color: Colors.red,
+        //size: 1,
+        // onPressed: () {
+        //   print('Hello world');
+        // },
+      ),
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+         PopupMenuItem<String>(
+          child: FlatButton(
+            child: Center(child: Text('حذف کاربر', style: TextStyle(color: Colors.red),)),
+            padding: EdgeInsets.all(0),
+            onPressed: () {
+              _checkRemoveMember( member);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _checkRemoveMember( Person member){
+    setState(() {
+      Alert(
+          context: context,
+          type: AlertType.warning,
+          title: "مایل به ادامه کار هستید؟",
+          // content: Column(
+          //   children: [
+          //     Text(member.username),
+          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
+          //   ],
+          // ),
+          buttons: [
+            DialogButton(
+              child: Text("بله"),
+              onPressed: (){
+                Navigator.of(context, rootNavigator: true).pop();
+                _removeMember(member);
+              },
+              color: Colors.amber,
+            ),
+            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
+
+          ]
+      ).show();
+    });
+  }
+
+  void _removeMember(Person member) async {
+    Navigator.pop(context);
+    Navigator.pop(context);
+    InsidClassPage.isLoading = true;
+    widget?.insidClassPageSetState();
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _removeMemberURL  + InsidClassPage.currentClass.classId + "/members/" + member.username;
+        print(url);
+        final response = await get(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        print(response.body);
+        if(response.statusCode == 200){
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+        else{
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+      }
+    }on Exception catch(e){
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.insidClassPageSetState();
   }
 
   Widget eachMemberCardAvatar(String avatarUrl){
