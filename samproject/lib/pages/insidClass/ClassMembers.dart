@@ -153,7 +153,7 @@ class _ClassMembersState extends State<ClassMembers> {
             topRight: Radius.circular(25),
           )
       ),
-      barrierColor: Color(0xFF3D5A80).withOpacity(0.8),
+      barrierColor: Colors.black45.withOpacity(0.8),
       builder: (context) => Column(
         //mainAxisSize: MainAxisSize.min,
         children: [

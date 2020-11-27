@@ -139,7 +139,7 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
         )),
-        barrierColor: Color.fromRGBO(14, 145, 140, 0.8),
+        barrierColor: Colors.black45.withOpacity(0.8),
         builder: (BuildContext context) {
           return BottomSheet(
             shape: RoundedRectangleBorder(

@@ -119,6 +119,8 @@ class _InsidClassPageState extends State<InsidClassPage> {
         var userClassesInfo = json.decode(utf8.decode(response.bodyBytes))["Class"];
         InsidClassPage.currentClass = Class(userClassesInfo["name"], "", userClassesInfo["classId"]);
         InsidClassPage.currentClass.classDescription = userClassesInfo["description"];
+        if(InsidClassPage.currentClass.classDescription == null)
+          InsidClassPage.currentClass.classDescription = "";
         var adminInfo = userClassesInfo["admin"];
         InsidClassPage.admin.firstname = adminInfo["firstname"];
         InsidClassPage.admin.lastname = adminInfo["lastname"];
