@@ -104,22 +104,42 @@ class _ClassMembersState extends State<ClassMembers> {
               'Content-Type': 'application/json',
             });
         classMembers = [];
-        var membersInfo = json.decode(utf8.decode(response.bodyBytes))["members"];
-        for(var memberInfo in membersInfo){
-          Person member = Person();
-          member.firstname = memberInfo["firstname"];
-          member.lastname = memberInfo["lastname"];
-          member.avatarUrl = memberInfo["avatar"];
-          member.username = memberInfo["username"];
-          member.email = memberInfo["email"];
-          classMembers.add(member);
+        if(response.statusCode == 200) {
+          var membersInfo = json.decode(
+              utf8.decode(response.bodyBytes))["members"];
+          for (var memberInfo in membersInfo) {
+            Person member = Person();
+            member.firstname = memberInfo["firstname"];
+            member.lastname = memberInfo["lastname"];
+            member.avatarUrl = memberInfo["avatar"];
+            member.username = memberInfo["username"];
+            member.email = memberInfo["email"];
+            classMembers.add(member);
+          }
+          membersListBottomSheet();
+        }else{
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
         }
-        membersListBottomSheet();
-        for(var member in classMembers)
-          print(member);
       }
     }on Exception catch(e){
       print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
     }
     InsidClassPage.isLoading = false;
     widget?.insidClassPageSetState();
@@ -166,10 +186,10 @@ class _ClassMembersState extends State<ClassMembers> {
         minWidth: double.infinity,
         onPressed: () {
           if(InsidClassPage.isAdmin)
-            _showCompleteUserInfo();
+            _showCompleteUserInfo(member);
         },
         child: ListTile(
-          leading: InsidClassPage.isAdmin?_userFunctionForAdmin(member):Container(),
+          leading: InsidClassPage.isAdmin?_userFunctionForAdmin(member):Icon(Icons.perm_identity),
           title: Text(member.firstname + " " + member.lastname, textAlign: TextAlign.right,),
           //trailing: FlutterLogo(size: 45,),
           trailing: eachMemberCardAvatar(member.avatarUrl),
@@ -319,7 +339,7 @@ class _ClassMembersState extends State<ClassMembers> {
 
   }
 
-  Future<void> _showCompleteUserInfo() async {
+  Future<void> _showCompleteUserInfo(Person member) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -332,8 +352,8 @@ class _ClassMembersState extends State<ClassMembers> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                SelectableText('نام: حمیدرضا آذرباد', style: TextStyle(), textAlign: TextAlign.right,),
-                SelectableText('ایمیل: hamidrez@gamil.com', style: TextStyle(), textAlign: TextAlign.right,),
+                AutoSizeText(member.username + " :نام کاربری", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
+                AutoSizeText(member.email + ' :ایمیل', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
               ],
             ),
           ),

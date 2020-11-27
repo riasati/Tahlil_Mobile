@@ -35,7 +35,7 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
               child: Container(
                 alignment: Alignment.center,
                 child: AutoSizeText(
-                  InsidClassPage.currentClass.ownerFullName,
+                  "استاد: " + InsidClassPage.currentClass.ownerFullName,
                   maxLines: 1,
                   style: TextStyle(
                     color: Colors.white,
@@ -101,12 +101,15 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
+                AutoSizeText(InsidClassPage.currentClass.classId + ':کد کلاس', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
+                AutoSizeText(InsidClassPage.admin.email + ':ایمیل استاد', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
+                AutoSizeText(":توضیحات",  style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
                 AutoSizeText(
-                  "ClassInfoCard.classDescription",
+                  InsidClassPage.currentClass.classDescription,
                   style: TextStyle(),
                   textAlign: TextAlign.right,
                 ),
-                AutoSizeText(':ایمیل استاد' + InsidClassPage.admin.email, style: TextStyle(), textAlign: TextAlign.right,),
+
               ],
             ),
           ),
