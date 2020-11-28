@@ -63,11 +63,11 @@ class _InsidClassPageState extends State<InsidClassPage> {
                   child: Row(
                     children: [
                       Expanded(child: ClassMembers(toggleCoinCallback: insideClassSetState,)),
-                      Expanded(child: ClassExams()),
+                      Expanded(child: ClassExams(toggleCoinCallback: insideClassSetState,)),
                     ],
                   ),
                 ),
-                Expanded(child: ClassNotification(), flex: 3,),
+                Expanded(child: ClassNotification(toggleCoinCallback: insideClassSetState,), flex: 3,),
               ],
             ),
           ),
