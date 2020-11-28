@@ -56,7 +56,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
             color: Colors.black45.withOpacity(0.3),
             child: Column(
               children: [
-                Expanded(child: ClassInfoCard(), flex: 3,),
+                Expanded(child: ClassInfoCard(toggleCoinCallback: navigatorPop,), flex: 4,),
                 editAndCreateExamButtons,
                 Expanded(
                   flex: 3,
@@ -73,24 +73,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
           ),
           isLoading: InsidClassPage.isLoading,
         ),
-        appBar: AppBar(
-          backgroundColor: Color(0xFF3D5A80),
-          title: Padding(
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(
-                "Title",
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            padding: EdgeInsets.only(left: 20),
-          ),
-        ),),
+        ),
       );
   }
 
@@ -145,5 +128,9 @@ class _InsidClassPageState extends State<InsidClassPage> {
   void insideClassSetState(){
     setState(() {
     });
+  }
+
+  void navigatorPop(){
+    Navigator.pop(context);
   }
 }

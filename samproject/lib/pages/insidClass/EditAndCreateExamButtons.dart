@@ -148,12 +148,23 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
               topRight: Radius.circular(25),
             )),
             onClosing: () {},
+            enableDrag: true,
+
             builder: (BuildContext context) {
               return StatefulBuilder(
                   builder: (BuildContext context, setState) => Container(
-                        height: 400,
+                        height: 420,
                         child: Column(
                           children: [
+                            Container(
+                              child: Icon(FontAwesomeIcons.gripLines),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                                ),
+                              ),
+                            ),
                             Expanded(
                               flex: 3,
                               child: Padding(
@@ -290,7 +301,7 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
                                     ),
                                   ),
                                   onPressed: () {
-                                    _pressUpdateClass();
+                                    _pressEditClass();
                                   },
                                 )),
                               ),
@@ -304,7 +315,7 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
         },
       );
 
-  void _pressUpdateClass() async {
+  void _pressEditClass() async {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     try {
@@ -327,6 +338,8 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
               json.decode(utf8.decode(response.bodyBytes))["editedClass"];
           InsidClassPage.currentClass.className = editedClassInfo["name"];
           InsidClassPage.currentClass.classDescription = editedClassInfo["description"];
+          if(InsidClassPage.currentClass.classDescription == null)
+            InsidClassPage.currentClass.classDescription = "";
           InsidClassPage.currentClass.classId = editedClassInfo["classId"];
           btnCreateController.success();
           Navigator.pop(context);

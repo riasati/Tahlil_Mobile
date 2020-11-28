@@ -5,6 +5,12 @@ import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 
 
 class ClassInfoCard extends StatefulWidget {
+
+  final insidClassPageNavigatorPop;
+
+  ClassInfoCard( {@required void toggleCoinCallback() }):
+        insidClassPageNavigatorPop = toggleCoinCallback;
+
   @override
   _ClassInfoCardState createState() => _ClassInfoCardState();
 }
@@ -19,8 +25,22 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
         width: double.infinity,
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  child: FlatButton(
+                      onPressed: (){
+                        widget?.insidClassPageNavigatorPop();
+                      },
+                      child: Icon(FontAwesomeIcons.arrowLeft, color: Colors.white,),
+                  ),
+                  padding: EdgeInsets.only(top: 25),
+                )
+              ],
+            ),
             Padding(
-              padding: EdgeInsets.only(top: 30),
+              padding: EdgeInsets.only(top: 0),
               child: AutoSizeText(
                 InsidClassPage.currentClass.className,
                 maxLines: 1,
@@ -101,7 +121,7 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                AutoSizeText(InsidClassPage.currentClass.classId + ':کد کلاس', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
+                SelectableText(InsidClassPage.currentClass.classId + ':کد کلاس', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
                 AutoSizeText(InsidClassPage.admin.email + ':ایمیل استاد', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
                 AutoSizeText(":توضیحات",  style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
                 AutoSizeText(

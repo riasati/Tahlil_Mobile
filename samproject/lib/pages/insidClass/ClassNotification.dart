@@ -208,6 +208,150 @@ class _ClassNotificationState extends State<ClassNotification> {
         padding: EdgeInsets.only(bottom: 20),
       ));
 
+  void _createNewNotificationBottomSheet() => showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        )),
+    barrierColor: Colors.black45.withOpacity(0.8),
+    builder: (BuildContext context) {
+      return Container(
+        height: 550,
+        child: Column(
+          children: [
+            Container(
+              child: Icon(FontAwesomeIcons.gripLines),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child:
+                  Image.asset("assets/img/login_logo.png")),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 1,
+                            controller: notificationTitleController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder:
+                                new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color:
+                                        Color(0xFF3D5A80),
+                                        width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.bell,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'عنوان اعلان',
+                                labelStyle: TextStyle(
+                                    color: Color(0xFF3D5A80))),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 7,
+                            controller: notificationDescriptionController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder:
+                                new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color:
+                                        Color(0xFF3D5A80),
+                                        width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.fileSignature,
+                                  // FontAwesomeIcons.envelope,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'توضیحات',
+                                labelStyle: TextStyle(
+                                    color: Color(0xFF3D5A80),
+                                    fontSize: 25
+                                )),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              flex: 7,
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Container(
+                    child: RoundedLoadingButton(
+                      color: Color(0xFF3D5A80),
+                      controller: btnCreateController,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 42.0),
+                        child: Text(
+                          "ساخت",
+                          style: TextStyle(
+                            color: Colors.white,
+                            // fontSize: MediaQuery.of(context).size.width * 0.045,
+                            // fontFamily: "WorkSansBold"
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        _pressCreateNotification();
+                      },
+                    )),
+              ),
+              flex: 2,
+            )
+          ],
+        ),
+      );
+    },
+  );
+
   Widget notificationList(){
     return ListView.builder(
         itemCount: classNotifications.length,
@@ -229,8 +373,16 @@ class _ClassNotificationState extends State<ClassNotification> {
         child: Row(
           children: [
             InsidClassPage.isAdmin?adminActions(notification):Icon(Icons.expand_more_outlined),
-            Padding(child: AutoSizeText('تاریخ اعلان', textAlign: TextAlign.right,), padding: EdgeInsets.only(right: 10),),
-            Padding(child: AutoSizeText(notification.title, textAlign: TextAlign.right,), padding: EdgeInsets.only(right: 10),),
+            Padding(child: AutoSizeText('تاریخ اعلان', textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
+            Container(
+              child: Padding(
+                child: FittedBox(
+                  child: Text(notification.title , textAlign: TextAlign.right, style: TextStyle(fontSize: 5),),
+                  fit:BoxFit.fitWidth, ),
+                padding: EdgeInsets.only(right: 10),),
+              width: 70,
+
+            ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
@@ -389,149 +541,6 @@ class _ClassNotificationState extends State<ClassNotification> {
     );
   }
 
-  void _createNewNotificationBottomSheet() => showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        )),
-    barrierColor: Colors.black45.withOpacity(0.8),
-    builder: (BuildContext context) {
-      return BottomSheet(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            )),
-        onClosing: () {},
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, setState) => Container(
-                height: 400,
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child:
-                          Image.asset("assets/img/login_logo.png")),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 10),
-                        child: Container(
-                          child: FractionallySizedBox(
-                            widthFactor: 0.9,
-                            child: Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: TextField(
-                                textAlign: TextAlign.right,
-                                maxLines: 1,
-                                controller: notificationTitleController,
-                                keyboardType: TextInputType.text,
-                                style: TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                    focusedBorder:
-                                    new OutlineInputBorder(
-                                        borderSide: new BorderSide(
-                                            color:
-                                            Color(0xFF3D5A80),
-                                            width: 3)),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF3D5A80)),
-                                    ),
-                                    suffixIcon: Icon(
-                                      FontAwesomeIcons.chalkboard,
-                                      color: Colors.black,
-                                    ),
-                                    labelText: 'عنوان اعلان',
-                                    labelStyle: TextStyle(
-                                        color: Color(0xFF3D5A80))),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      flex: 2,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 0),
-                        child: Container(
-                          child: FractionallySizedBox(
-                            widthFactor: 0.9,
-                            child: Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: TextField(
-                                textAlign: TextAlign.right,
-                                maxLines: 2,
-                                controller: notificationDescriptionController,
-                                keyboardType: TextInputType.text,
-                                style: TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                    focusedBorder:
-                                    new OutlineInputBorder(
-                                        borderSide: new BorderSide(
-                                            color:
-                                            Color(0xFF3D5A80),
-                                            width: 3)),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF3D5A80)),
-                                    ),
-                                    suffixIcon: Icon(
-                                      FontAwesomeIcons.fileSignature,
-                                      // FontAwesomeIcons.envelope,
-                                      color: Colors.black,
-                                    ),
-                                    labelText: 'توضیحات',
-                                    labelStyle: TextStyle(
-                                        color: Color(0xFF3D5A80))),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      flex: 2,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: 20),
-                        child: Container(
-                            child: RoundedLoadingButton(
-                              color: Color(0xFF3D5A80),
-                              controller: btnCreateController,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10.0, horizontal: 42.0),
-                                child: Text(
-                                  "ساخت",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    // fontSize: MediaQuery.of(context).size.width * 0.045,
-                                    // fontFamily: "WorkSansBold"
-                                  ),
-                                ),
-                              ),
-                              onPressed: () {
-                                _pressCreateNotification();
-                              },
-                            )),
-                      ),
-                      flex: 2,
-                    )
-                  ],
-                ),
-              ));
-        },
-      );
-    },
-  );
-
   void _pressCreateNotification() async {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
@@ -550,9 +559,10 @@ class _ClassNotificationState extends State<ClassNotification> {
             },
             body: body);
         print(response);
-        if (response.statusCode == 200 && response.body != null) {
+        if (response.statusCode == 201 && response.body != null) {
           var notificationInfo =
           json.decode(utf8.decode(response.bodyBytes))["newClassNote"];
+          print(notificationInfo);
           SumNotification newNotification = SumNotification(notificationInfo["classNoteId"],
               notificationInfo["title"], notificationInfo["body"]);
           classNotifications.add(newNotification);
@@ -570,6 +580,8 @@ class _ClassNotificationState extends State<ClassNotification> {
           });
         } else {
           var errorMsg = json.decode(utf8.decode(response.bodyBytes))['error'];
+          if(errorMsg == null)
+            errorMsg = "";
           btnCreateController.error();
           Navigator.pop(context);
           setState(() {
