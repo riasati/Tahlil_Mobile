@@ -7,8 +7,9 @@ class Class{
   String _classId;
   String _classPassword;
   String _ownerFullName;
+  bool _isOwner = false;
 
-  Class(this._className, this._ownerFullName, this._classId);
+  Class(this._className, this._classId, this._ownerFullName, this._isOwner);
 
   String get className => _className;
 
@@ -53,8 +54,17 @@ class Class{
     _ownerFullName = value;
   }
 
+
+  bool get isOwner => _isOwner;
+
+  set isOwner(bool value) {
+    _isOwner = value;
+  }
+
   @override
   String toString() {
-    return 'Class{_className: $_className, _ownerFullName: $_ownerFullName, _classId: $_classId}';
+    return 'Class{_className: $_className, _classId: $_classId, _ownerFullName: $_ownerFullName, _isOwner: $_isOwner}';
   }
+
+
 }

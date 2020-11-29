@@ -9,6 +9,7 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../editProfilePage.dart';
 import '../../homePage.dart';
 
 // ignore: must_be_immutable
@@ -60,7 +61,7 @@ class _CreateClassButtonState extends State<CreateClassButton> {
             color: Colors.transparent,
             borderRadius: new BorderRadius.all(Radius.circular(40.0)),
             child: FlatButton(
-                onPressed: createBottomSheet,
+                onPressed: goEditProfile,
                 child: Center(
                   child: Text(
                     "ساخت کلاس جدید",
@@ -74,6 +75,34 @@ class _CreateClassButtonState extends State<CreateClassButton> {
         ),
       ),
     );
+  }
+
+  void goEditProfile(){
+    if(HomePage.user.firstname == "****" || HomePage.user.lastname == "****"){
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.warning,
+          title: "ابتدا باید نام خود را اصلاح کنید",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "حله",
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              onPressed: () => {
+                Navigator.pop(context),
+                Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage()))
+              },
+              color: Colors.yellow,
+            ),
+          ],
+        ).show();
+      });
+    }else{
+      createBottomSheet();
+    }
+
   }
 
   void createBottomSheet() => showModalBottomSheet(
@@ -205,7 +234,7 @@ class _CreateClassButtonState extends State<CreateClassButton> {
             }, body: body);
         if(response.statusCode == 200 && response.body != null){
           var newClassInfo = json.decode(utf8.decode(response.bodyBytes))["newClass"];
-          var newClass = Class(newClassInfo['name'], HomePage.user.firstname + " " + HomePage.user.lastname, newClassInfo['classId']);
+          var newClass = Class(newClassInfo['name'], newClassInfo['classId'] , HomePage.user.firstname + " " + HomePage.user.lastname, newClassInfo['isOwned']);
           btnCreateController.success();
           Navigator.pop(context);
           setState(() {

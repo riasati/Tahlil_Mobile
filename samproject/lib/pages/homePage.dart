@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     if( BottomNavigator.customIcon == 0){
       appBarTitle = "ایجاد سوال";
     }else if( BottomNavigator.customIcon == 1 ){
-      appBarTitle = "کلاس ها";
+      appBarTitle = HomePage.user.username == null?"":"کلاس ها";
     }else{
       appBarTitle = "بانک سوالات";
     }
@@ -50,20 +50,23 @@ class _HomePageState extends State<HomePage> {
         title: Padding(
           child: Container(
             alignment: Alignment.center,
-            child: Text(
-              appBarTitle,
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.0,
+            child: Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text(
+                appBarTitle,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.0,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
           padding: EdgeInsets.only(left: 20),
         ),
       ),
-      endDrawer: DrawerWidget(toggleCoinCallback: stopLoading,),
+      endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: stopLoading,),
       bottomNavigationBar: BottomNavigator(),
       body: LoadingOverlay(
         child: PageView(

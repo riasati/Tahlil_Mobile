@@ -22,10 +22,13 @@ class _ListOfClassesState extends State<ListOfClasses> {
       return Container(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon(
-                FontAwesomeIcons.frown,
+              Padding(
+                child: Icon(
+                  FontAwesomeIcons.frown,
+                ),
+                padding: EdgeInsets.only(top: 100),
               ),
               Text(
                   "شما در کلاسی حضور ندارید",
@@ -35,9 +38,8 @@ class _ListOfClassesState extends State<ListOfClasses> {
       );
     }
     return Container(
-      color: Colors.black45.withOpacity(0.3),
       child: Padding(
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.only(bottom: 15, right: 15, left: 15),
         child: GridView.count(
             crossAxisCount: 2,
           crossAxisSpacing: 10,
