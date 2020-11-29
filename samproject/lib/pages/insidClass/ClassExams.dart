@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:samproject/domain/Exam.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'InsidClassPage.dart';
@@ -20,8 +25,8 @@ class ClassExams extends StatefulWidget {
 class _ClassExamsState extends State<ClassExams> {
 
   String _getExamsOfClassInfoURL = "http://parham-backend.herokuapp.com/class/";
-  String _removeExamURL = "http://parham-backend.herokuapp.com/class/";
-  //List<Person> classMembers = [];
+  String _removeExamURL = "http://parham-backend.herokuapp.com/exam/";
+  List<Exam> classExams = [];
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +38,7 @@ class _ClassExamsState extends State<ClassExams> {
         //color: Colors.black45,
         child: FlatButton(
           onPressed: () {
-            examsListBottomSheet();
+            _getExamsListFromServer();
           },
           child: Center(
             child: Column(
@@ -67,6 +72,68 @@ class _ClassExamsState extends State<ClassExams> {
     );
   }
 
+  void _getExamsListFromServer() async {
+    InsidClassPage.isLoading = true;
+    widget?.insidClassPageSetState();
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _getExamsOfClassInfoURL  + InsidClassPage.currentClass.classId + "/exams";
+        final response = await get(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        classExams = [];
+        if(response.statusCode == 200) {
+          var examsInfo = json.decode(
+              utf8.decode(response.bodyBytes))["exams"];
+          for (var examInfo in examsInfo) {
+            Exam exam = Exam("", examInfo["name"],
+                DateTime.parse(examInfo["startDate"]), DateTime.parse(examInfo["endDate"]), examInfo['examLength']);
+            classExams.add(exam);
+            DateTime d = DateTime.parse(examInfo["startDate"]);
+            Jalali j = Jalali.fromDateTime(d);
+            int m = d.minute;
+            int h = d.hour;
+            print(d);
+            print("$h:$m");
+          }
+          classExams.sort((t1, t2) => t1.startDate.compareTo(t2.startDate));
+          classExams = classExams.reversed.toList();
+          examsListBottomSheet();
+        }else{
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+      }
+    }on Exception catch(e){
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.insidClassPageSetState();
+  }
+
   void examsListBottomSheet() => showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -93,38 +160,67 @@ class _ClassExamsState extends State<ClassExams> {
       ));
 
   Widget examsList(){
-    return ListView(
-      children:  <Widget>[
-        eachExamCard(),
-        eachExamCard(),
-        eachExamCard(),
-        eachExamCard(),
-      ],
+    return ListView.builder(
+        itemCount: classExams.length,
+        itemBuilder: (BuildContext context, int index) {
+          return eachExamCard(classExams[index]);
+        }
     );
   }
 
-  Widget eachExamCard(){
+  Widget eachExamCard(Exam exam){
+    String date = convertDateToJalaliString(exam.startDate);
+    String dateAndTime = addTimeToDate(date, exam.startDate);
     return Card(
       child: FlatButton(
         padding: EdgeInsets.all(0),
         minWidth: double.infinity,
-        onPressed: () {},
-        // child: ListTile(
-        //   leading: InsidClassPage.isAdmin?adminActions():Icon(Icons.more_vert),
-        //   title: Text('حمیدرضا آذرباد', textAlign: TextAlign.right,),
-        //
-        //   trailing: Text("عنوان آزمون", textAlign: TextAlign.right,),
-        // ),
+        onPressed: () {
+          _showInfoOfExam(exam);
+        },
         child: Row(
           children: [
-            InsidClassPage.isAdmin?adminActions():memberActions(),
-            Padding(child: AutoSizeText('حمیدرضا آذرباد', textAlign: TextAlign.right,), padding: EdgeInsets.only(right: 10),),
-            Padding(child: AutoSizeText("عنوان آزمون", textAlign: TextAlign.right,), padding: EdgeInsets.only(right: 10),),
+            InsidClassPage.isAdmin?adminActions(exam):memberActions(),
+            Padding(child: AutoSizeText(dateAndTime, textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
+            Container(
+              child: Padding(
+                child: FittedBox(
+                  child: Text(exam.name , textAlign: TextAlign.right, style: TextStyle(fontSize: 5),),
+                  fit:BoxFit.fitWidth, ),
+                padding: EdgeInsets.only(right: 10),),
+              width: 70,
+
+            ),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
         ),
       ),
+    );
+  }
+
+  Future<void> _showInfoOfExam(Exam exam) async {
+    String startDate = convertDateToJalaliString(exam.startDate);
+    String startDateAndTime = addTimeToDate(startDate, exam.startDate);
+    String endDate = convertDateToJalaliString(exam.endDate);
+    String endDateAndTime = addTimeToDate(endDate, exam.endDate);
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("اطلاعات آزمون", textAlign: TextAlign.center,),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                AutoSizeText(startDateAndTime + " :شروع آزمون", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
+                AutoSizeText(endDateAndTime + " :پایان آزمون", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
+                AutoSizeText( exam.examLength.toString() +  " :مدت زمان", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -154,7 +250,7 @@ class _ClassExamsState extends State<ClassExams> {
     );
   }
 
-  Widget adminActions() {
+  Widget adminActions(Exam exam) {
     return PopupMenuButton<String>(
       onSelected: (String value) {
       },
@@ -169,6 +265,7 @@ class _ClassExamsState extends State<ClassExams> {
             child: Center(child: Text('حذف ازمون', style: TextStyle(color: Colors.red),)),
             padding: EdgeInsets.all(0),
             onPressed: () {
+              _checkRemoveExam(exam);
             },
           ),
         ),
@@ -183,62 +280,108 @@ class _ClassExamsState extends State<ClassExams> {
       ],
     );
   }
+
+  void _checkRemoveExam( Exam exam){
+    setState(() {
+      Alert(
+          context: context,
+          type: AlertType.warning,
+          title: "مایل به ادامه کار هستید؟",
+          // content: Column(
+          //   children: [
+          //     Text(member.username),
+          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
+          //   ],
+          // ),
+          buttons: [
+            DialogButton(
+              child: Text("بله"),
+              onPressed: (){
+                Navigator.of(context, rootNavigator: true).pop();
+                _pressRemoveExam(exam);
+              },
+              color: Colors.amber,
+            ),
+            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
+
+          ]
+      ).show();
+    });
+  }
+
+  void _pressRemoveExam(Exam exam) async {
+    Navigator.pop(context);
+    Navigator.pop(context);
+    InsidClassPage.isLoading = true;
+    widget?.insidClassPageSetState();
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _removeExamURL  + InsidClassPage.currentClass.classId + exam.examId;
+        print(url);
+        final response = await delete(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        if(response.statusCode == 200){
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+        else{
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+      }
+    }on Exception catch(e){
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.insidClassPageSetState();
+  }
+
+  String convertDateToJalaliString(DateTime time){
+    Jalali jalaliTime = Jalali.fromDateTime(time);
+    int sal = jalaliTime.year;
+    int mah = jalaliTime.month;
+    int rooz = jalaliTime.day;
+    return "$sal/$mah/$rooz";
+  }
+
+  String addTimeToDate(String date, DateTime inputTime){
+    int hour = inputTime.hour;
+    String minute = inputTime.minute.toString();
+    if(inputTime.minute < 10)
+      minute = "0" + minute;
+    String time = " $hour:$minute";
+    return date + time;
+  }
 }
 
-//   void _getExamsListFromServer() async {
-//     InsidClassPage.isLoading = true;
-//     widget?.insidClassPageSetState();
-//     final prefs = await SharedPreferences.getInstance();
-//     print(prefs.getString("token"));
-//     String token = prefs.getString("token");
-//     try {
-//       if (token != null) {
-//         token = "Bearer " + token;
-//         var url = _getExamsOfClassInfoURL  + InsidClassPage.currentClass.classId + "exams";
-//         final response = await get(url,
-//             headers: {
-//               'accept': 'application/json',
-//               'Authorization': token,
-//               'Content-Type': 'application/json',
-//             });
-//         classMembers = [];
-//         if(response.statusCode == 200) {
-//           var membersInfo = json.decode(
-//               utf8.decode(response.bodyBytes))["members"];
-//           for (var memberInfo in membersInfo) {
-//             Person member = Person();
-//             member.firstname = memberInfo["firstname"];
-//             member.lastname = memberInfo["lastname"];
-//             member.avatarUrl = memberInfo["avatar"];
-//             member.username = memberInfo["username"];
-//             member.email = memberInfo["email"];
-//             classMembers.add(member);
-//           }
-//           membersListBottomSheet();
-//         }else{
-//           setState(() {
-//             Alert(
-//               context: context,
-//               type: AlertType.error,
-//               title: "عملیات ناموفق بود",
-//               buttons: [
-//               ],
-//             ).show();
-//           });
-//         }
-//       }
-//     }on Exception catch(e){
-//       print(e.toString());
-//       setState(() {
-//         Alert(
-//           context: context,
-//           type: AlertType.error,
-//           title: "عملیات ناموفق بود",
-//           buttons: [
-//           ],
-//         ).show();
-//       });
-//     }
-//     InsidClassPage.isLoading = false;
-//     widget?.insidClassPageSetState();
-// }

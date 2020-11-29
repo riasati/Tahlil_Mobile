@@ -176,40 +176,47 @@ class _ClassNotificationState extends State<ClassNotification> {
               ),
             ),
             Expanded(child: notificationList(), flex: 8,),
-            Expanded(
-              child: FlatButton(
-                onPressed: (){
-                  Navigator.pop(context, );
-                  _createNewNotificationBottomSheet();
-                },
-                child: Container(
-                  width: double.infinity,
-                  child: FractionallySizedBox(
-                    widthFactor: 0.8,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: new BorderRadius.all(Radius.circular(40.0)),
-                        color: Color(0xFF3D5A80),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "ساخت اعلان",
-                          style: TextStyle(
-                            //fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            )
+            _createNotificationButton()
 
           ],
         ),
         padding: EdgeInsets.only(bottom: 20),
       ));
+
+  Widget _createNotificationButton(){
+    if(InsidClassPage.isAdmin)
+      return Expanded(
+        child: FlatButton(
+          onPressed: (){
+            Navigator.pop(context, );
+            _createNewNotificationBottomSheet();
+          },
+          child: Container(
+            width: double.infinity,
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: new BorderRadius.all(Radius.circular(40.0)),
+                  color: Color(0xFF3D5A80),
+                ),
+                child: Center(
+                  child: Text(
+                    "ساخت اعلان",
+                    style: TextStyle(
+                      //fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    else
+      return Container(child: Text(""),);
+  }
 
   void _createNewNotificationBottomSheet() => showModalBottomSheet(
     context: context,
@@ -370,12 +377,11 @@ class _ClassNotificationState extends State<ClassNotification> {
         padding: EdgeInsets.all(0),
         minWidth: double.infinity,
         onPressed: () {
-          if(InsidClassPage.isAdmin)
-            _showBodyOfNotification(notification);
+          _showBodyOfNotification(notification);
         },
         child: Row(
           children: [
-            InsidClassPage.isAdmin?adminActions(notification):Icon(Icons.expand_more_outlined),
+            InsidClassPage.isAdmin?adminActions(notification):Text(""),
             Padding(child: AutoSizeText('تاریخ اعلان', textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
             Container(
               child: Padding(

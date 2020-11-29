@@ -189,7 +189,7 @@ class _ClassMembersState extends State<ClassMembers> {
             _showCompleteUserInfo(member);
         },
         child: ListTile(
-          leading: InsidClassPage.isAdmin?_userFunctionForAdmin(member):Icon(Icons.perm_identity),
+          leading: InsidClassPage.isAdmin?_userFunctionForAdmin(member):Text(""),
           title: Text(member.firstname + " " + member.lastname, textAlign: TextAlign.right,),
           //trailing: FlutterLogo(size: 45,),
           trailing: eachMemberCardAvatar(member.avatarUrl),
@@ -266,13 +266,12 @@ class _ClassMembersState extends State<ClassMembers> {
         token = "Bearer " + token;
         var url = _removeMemberURL  + InsidClassPage.currentClass.classId + "/members/" + member.username;
         print(url);
-        final response = await get(url,
+        final response = await delete(url,
             headers: {
               'accept': 'application/json',
               'Authorization': token,
               'Content-Type': 'application/json',
             });
-        print(response.body);
         if(response.statusCode == 200){
           setState(() {
             Alert(

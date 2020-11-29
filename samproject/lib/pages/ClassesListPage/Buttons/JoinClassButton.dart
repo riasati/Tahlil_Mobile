@@ -169,18 +169,8 @@ class _JoinButtonState extends State<JoinButton> {
               context: context,
               type: AlertType.success,
               title: "به کلاس اضافه شدید",
-              // buttons: [
-              //   DialogButton(
-              //     child: Text(
-              //       "حله",
-              //       style: TextStyle(color: Colors.white, fontSize: 20),
-              //     ),
-              //     onPressed: () => {
-              //       Navigator.pop(context),
-              //     },
-              //     color: Color(0xFF3D5A80),
-              //   ),
-              // ],
+              buttons: [
+              ],
             ).show();
           });
           this.userClasses.add(joinedClass);
