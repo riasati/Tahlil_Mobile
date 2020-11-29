@@ -98,10 +98,6 @@ class _ClassExamsState extends State<ClassExams> {
             classExams.add(exam);
             DateTime d = DateTime.parse(examInfo["startDate"]);
             Jalali j = Jalali.fromDateTime(d);
-            int m = d.minute;
-            int h = d.hour;
-            print(d);
-            print("$h:$m");
           }
           classExams.sort((t1, t2) => t1.startDate.compareTo(t2.startDate));
           classExams = classExams.reversed.toList();

@@ -2,8 +2,10 @@ class SumNotification{
   String _id;
   String _title;
   String _body;
+  DateTime _createTime;
 
-  SumNotification(this._id, this._title, this._body);
+
+  SumNotification(this._id, this._title, this._body, this._createTime);
 
   String get body => _body;
 
@@ -21,6 +23,13 @@ class SumNotification{
 
   set id(String value) {
     _id = value;
+  }
+
+
+  DateTime get createTime => _createTime;
+
+  set createTime(DateTime value) {
+    _createTime = value;
   }
 
   @override

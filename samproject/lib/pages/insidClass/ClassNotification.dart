@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:samproject/domain/Notification.dart';
 
@@ -121,9 +122,11 @@ class _ClassNotificationState extends State<ClassNotification> {
               utf8.decode(response.bodyBytes))["classNotes"];
           for (var notificationInfo in notificationsInfo) {
             SumNotification notification = SumNotification(notificationInfo["classNoteId"],
-                notificationInfo["title"], notificationInfo["body"]);
+                notificationInfo["title"], notificationInfo["body"], DateTime.parse(notificationInfo["createdAt"]));
             classNotifications.add(notification);
           }
+          classNotifications.sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
+          classNotifications = classNotifications.reversed.toList();
           notificationsListBottomSheet();
         }else{
           setState(() {
@@ -372,6 +375,7 @@ class _ClassNotificationState extends State<ClassNotification> {
   }
 
   Widget eachNotificationCard(SumNotification notification){
+    String date = convertDateToJalaliString(notification.createTime);
     return Card(
       child: FlatButton(
         padding: EdgeInsets.all(0),
@@ -382,7 +386,7 @@ class _ClassNotificationState extends State<ClassNotification> {
         child: Row(
           children: [
             InsidClassPage.isAdmin?adminActions(notification):Text(""),
-            Padding(child: AutoSizeText('تاریخ اعلان', textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
+            Padding(child: AutoSizeText(date, textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
             Container(
               child: Padding(
                 child: FittedBox(
@@ -719,8 +723,10 @@ class _ClassNotificationState extends State<ClassNotification> {
           json.decode(utf8.decode(response.bodyBytes))["newClassNote"];
           print(notificationInfo);
           SumNotification newNotification = SumNotification(notificationInfo["classNoteId"],
-              notificationInfo["title"], notificationInfo["body"]);
+              notificationInfo["title"], notificationInfo["body"], DateTime.parse(notificationInfo["createdAt"]));
           classNotifications.add(newNotification);
+          classNotifications.sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
+          classNotifications = classNotifications.reversed.toList();
           print(newNotification);
           btnCreateController.success();
           Navigator.pop(context);
@@ -801,8 +807,10 @@ class _ClassNotificationState extends State<ClassNotification> {
           json.decode(utf8.decode(response.bodyBytes))["editedClassNote"];
           print(notificationInfo);
           notification = SumNotification(notificationInfo["classNoteId"],
-              notificationInfo["title"], notificationInfo["body"]);
+              notificationInfo["title"], notificationInfo["body"], DateTime.parse(notificationInfo["createdAt"]));
           print(notification);
+          classNotifications.sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
+          classNotifications = classNotifications.reversed.toList();
           btnCreateController.success();
           Navigator.pop(context);
           setState(() {
@@ -854,5 +862,22 @@ class _ClassNotificationState extends State<ClassNotification> {
         ).show();
       });
     }
+  }
+
+  String convertDateToJalaliString(DateTime time){
+    Jalali jalaliTime = Jalali.fromDateTime(time);
+    int sal = jalaliTime.year;
+    int mah = jalaliTime.month;
+    int rooz = jalaliTime.day;
+    return "$sal/$mah/$rooz";
+  }
+
+  String addTimeToDate(String date, DateTime inputTime){
+    int hour = inputTime.hour;
+    String minute = inputTime.minute.toString();
+    if(inputTime.minute < 10)
+      minute = "0" + minute;
+    String time = " $hour:$minute";
+    return date + time;
   }
 }
