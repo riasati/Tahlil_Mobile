@@ -34,6 +34,9 @@ class _ClassNotificationState extends State<ClassNotification> {
   final TextEditingController notificationTitleController = TextEditingController();
   final TextEditingController notificationDescriptionController =
   TextEditingController();
+  final TextEditingController editNotificationTitleController = TextEditingController();
+  final TextEditingController editNotificationDescriptionController =
+  TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -368,7 +371,7 @@ class _ClassNotificationState extends State<ClassNotification> {
         minWidth: double.infinity,
         onPressed: () {
           if(InsidClassPage.isAdmin)
-            _showCompleteUserInfo(notification);
+            _showBodyOfNotification(notification);
         },
         child: Row(
           children: [
@@ -415,10 +418,189 @@ class _ClassNotificationState extends State<ClassNotification> {
             child: Center(child: Text('ویرایش اعلان', style: TextStyle(color: Colors.red),)),
             padding: EdgeInsets.all(0),
             onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+              editNotificationTitleController.text = notification.title;
+              editNotificationDescriptionController.text = notification.body;
+              _editNotificationBottomSheet(notification);
             },
           ),
         ),
       ],
+    );
+  }
+
+  void _editNotificationBottomSheet(SumNotification notification) => showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        )),
+    barrierColor: Colors.black45.withOpacity(0.8),
+    builder: (BuildContext context) {
+      return Container(
+        height: 550,
+        child: Column(
+          children: [
+            Container(
+              child: Icon(FontAwesomeIcons.gripLines),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child:
+                  Image.asset("assets/img/login_logo.png")),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 1,
+                            controller: editNotificationTitleController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder:
+                                new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color:
+                                        Color(0xFF3D5A80),
+                                        width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.bell,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'عنوان اعلان',
+                                labelStyle: TextStyle(
+                                    color: Color(0xFF3D5A80))),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 7,
+                            controller: editNotificationDescriptionController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder:
+                                new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color:
+                                        Color(0xFF3D5A80),
+                                        width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.fileSignature,
+                                  // FontAwesomeIcons.envelope,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'توضیحات',
+                                labelStyle: TextStyle(
+                                    color: Color(0xFF3D5A80),
+                                    fontSize: 25
+                                )),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              flex: 7,
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Container(
+                    child: RoundedLoadingButton(
+                      color: Color(0xFF3D5A80),
+                      controller: btnCreateController,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 42.0),
+                        child: Text(
+                          "ویرایش اعلان",
+                          style: TextStyle(
+                            color: Colors.white,
+                            // fontSize: MediaQuery.of(context).size.width * 0.045,
+                            // fontFamily: "WorkSansBold"
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        _pressEditNotification(notification);
+                      },
+                    )),
+              ),
+              flex: 2,
+            )
+          ],
+        ),
+      );
+    },
+  );
+
+  Future<void> _showBodyOfNotification(SumNotification notification) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("متن اعلان", textAlign: TextAlign.center,),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                AutoSizeText(notification.body, style: TextStyle(), textAlign: TextAlign.right, maxLines: 7,),
+              ],
+            ),
+          ),
+          // actions: <Widget>[
+          //   TextButton(
+          //     style: ButtonStyle(
+          //
+          //     ),
+          //     child: Text('Approve'),
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //   ),
+          // ],
+        );
+      },
     );
   }
 
@@ -439,7 +621,7 @@ class _ClassNotificationState extends State<ClassNotification> {
               child: Text("بله"),
               onPressed: (){
                 Navigator.of(context, rootNavigator: true).pop();
-                _removeNotification(notification);
+                _pressRemoveNotification(notification);
               },
               color: Colors.amber,
             ),
@@ -450,7 +632,7 @@ class _ClassNotificationState extends State<ClassNotification> {
     });
   }
 
-  void _removeNotification(SumNotification notification) async {
+  void _pressRemoveNotification(SumNotification notification) async {
     Navigator.pop(context);
     Navigator.pop(context);
     InsidClassPage.isLoading = true;
@@ -463,7 +645,7 @@ class _ClassNotificationState extends State<ClassNotification> {
         token = "Bearer " + token;
         var url = _removeNotificationURL  + InsidClassPage.currentClass.classId + "/notes/" + notification.id;
         print(url);
-        final response = await get(url,
+        final response = await delete(url,
             headers: {
               'accept': 'application/json',
               'Authorization': token,
@@ -508,39 +690,6 @@ class _ClassNotificationState extends State<ClassNotification> {
     widget?.insidClassPageSetState();
   }
 
-  Future<void> _showCompleteUserInfo(SumNotification notification) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Image(
-            image: AssetImage("assets/img/unnamed.png"),
-            height: 100,
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                AutoSizeText(notification.body, style: TextStyle(), textAlign: TextAlign.right, maxLines: 3,),
-              ],
-            ),
-          ),
-          // actions: <Widget>[
-          //   TextButton(
-          //     style: ButtonStyle(
-          //
-          //     ),
-          //     child: Text('Approve'),
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //     },
-          //   ),
-          // ],
-        );
-      },
-    );
-  }
-
   void _pressCreateNotification() async {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
@@ -567,6 +716,87 @@ class _ClassNotificationState extends State<ClassNotification> {
               notificationInfo["title"], notificationInfo["body"]);
           classNotifications.add(newNotification);
           print(newNotification);
+          btnCreateController.success();
+          Navigator.pop(context);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [
+              ],
+            ).show();
+          });
+        } else {
+          var errorMsg = json.decode(utf8.decode(response.bodyBytes))['error'];
+          if(errorMsg == null)
+            errorMsg = "";
+          btnCreateController.error();
+          Navigator.pop(context);
+          setState(() {
+            Alert(
+                context: context,
+                type: AlertType.error,
+                title: errorMsg,
+                buttons: []
+            ).show();
+          });
+        }
+      } else {
+        btnCreateController.error();
+        Navigator.pop(context);
+        setState(() {
+          Alert(
+              context: context,
+              type: AlertType.error,
+              title: "ابتدا به حساب خود وارد شوید",
+              buttons: []
+          ).show();
+        });
+      }
+    } on Exception catch (e) {
+      print(e.toString());
+      btnCreateController.error();
+      Navigator.pop(context);
+      setState(() {
+        Alert(
+            context: context,
+            type: AlertType.error,
+            title: "عملیات ناموفق بود",
+            buttons: []
+        ).show();
+      });
+    }
+    notificationDescriptionController.text = "";
+    notificationTitleController.text = "";
+  }
+
+  void _pressEditNotification(SumNotification notification) async {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        var body = jsonEncode(<String, Object>{
+          'title': editNotificationTitleController.text,
+          'body': editNotificationDescriptionController.text,
+        });
+        token = "Bearer " + token;
+        final response = await put(_createNewNotificationURL +
+            InsidClassPage.currentClass.classId + "/notes/" + notification.id,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            },
+            body: body);
+        print(response);
+        if (response.statusCode == 200 && response.body != null) {
+          var notificationInfo =
+          json.decode(utf8.decode(response.bodyBytes))["editedClassNote"];
+          print(notificationInfo);
+          notification = SumNotification(notificationInfo["classNoteId"],
+              notificationInfo["title"], notificationInfo["body"]);
+          print(notification);
           btnCreateController.success();
           Navigator.pop(context);
           setState(() {
