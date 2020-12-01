@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -94,7 +95,7 @@ class _ClassExamsState extends State<ClassExams> {
           var examsInfo = json.decode(
               utf8.decode(response.bodyBytes))["exams"];
           for (var examInfo in examsInfo) {
-            Exam exam = Exam("", examInfo["name"],
+            Exam exam = Exam(examInfo["_id"], examInfo["name"],
                 DateTime.parse(examInfo["startDate"]), DateTime.parse(examInfo["endDate"]), examInfo['examLength']);
             classExams.add(exam);
             DateTime d = DateTime.parse(examInfo["startDate"]);
@@ -271,6 +272,9 @@ class _ClassExamsState extends State<ClassExams> {
             child: Center(child: Text('ویرایش آزمون', style: TextStyle(color: Colors.red),)),
             padding: EdgeInsets.all(0),
             onPressed: () {
+              print(exam.examId);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EditExamPage(classId: InsidClassPage.currentClass.classId,examId: exam.examId,)));
+
             },
           ),
         ),
@@ -317,7 +321,7 @@ class _ClassExamsState extends State<ClassExams> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = _removeExamURL  + InsidClassPage.currentClass.classId + exam.examId;
+        var url = _removeExamURL  + InsidClassPage.currentClass.classId + "/" +exam.examId;
         print(url);
         final response = await delete(url,
             headers: {

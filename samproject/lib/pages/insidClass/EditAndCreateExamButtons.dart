@@ -7,11 +7,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'package:samproject/pages/createExamPage.dart';
 import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditAndCreateExamButtons extends StatefulWidget {
   final insidClassPageSetState;
+  //String classId;
 
   EditAndCreateExamButtons( {@required void toggleCoinCallback() }):
         insidClassPageSetState = toggleCoinCallback;
@@ -115,7 +117,10 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
             color: Colors.transparent,
             borderRadius: new BorderRadius.all(Radius.circular(40.0)),
             child: FlatButton(
-                //onPressed: ,
+                onPressed: ()
+                {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateExamPage(classId: InsidClassPage.currentClass.classId,)));
+                } ,
                 child: Center(
               child: Text(
                 "ساخت آزمون",

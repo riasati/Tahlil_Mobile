@@ -384,6 +384,9 @@ class EditExamPageState extends State<EditExamPage> {
       'Authorization': tokenplus,
     };
     String url = "https://parham-backend.herokuapp.com/class/" + widget.classId + "/exams/" + widget.examId;
+    print(widget.classId);
+    print(widget.examId);
+    print(url);
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200)
     {
@@ -432,7 +435,8 @@ class EditExamPageState extends State<EditExamPage> {
     }
     else
     {
-      //final responseJson = jsonDecode(response.body);
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
       ShowCorrectnessDialog(false, context);
 
     }
@@ -662,7 +666,7 @@ class EditExamPageState extends State<EditExamPage> {
       "endDate": endExamDatetime.toIso8601String(),
       "examLength": int.tryParse(examDurationTime.text),
       "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
-      "useInClass": "kuTwxu"//widget.classId,
+      "useInClass": widget.classId,//"kuTwxu"//
     });
     //print(data);
     final response = await http.put(url,
