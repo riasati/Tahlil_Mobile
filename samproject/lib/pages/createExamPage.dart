@@ -1,17 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/question.dart';
+import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/pages/searchQuestionPage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
-import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:shamsi_date/shamsi_date.dart';
 class QuestionViewInCreateExam extends StatefulWidget {
   Question question;
   CreateExamPageState parent;
-  QuestionViewInCreateExam({Key key,this.question,this.parent}) : super(key: key);
+  int index;
+  QuestionViewInCreateExam({Key key,this.question,this.parent,this.index}) : super(key: key);
   @override
   QuestionViewInCreateExamState createState() => QuestionViewInCreateExamState();
 }
@@ -26,40 +32,162 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
   popupMenuData kindData;
   popupMenuData difficultyData;
 
+
   Widget Editing(Question question,VoidCallback onCloseButton,Controllers controllers)//VoidCallback onEditButton,VoidCallback onCloseButton
   {
-    void onEditButton()
+    Question changedQuestion = widget.question.CopyQuestion();
+    void onEditButton() async
     {
-      widget.question.grade = double.tryParse(controllers.GradeController.text);
-      widget.question.text = controllers.QuestionTextController.text;
-      widget.question.paye = payeData.name;
-      widget.question.book = bookData.name;
-      widget.question.chapter = chapterData.name;
-      widget.question.kind = kindData.name;
-      widget.question.difficulty = difficultyData.name;
+      final prefs = await SharedPreferences.getInstance();
+      String token = prefs.getString("token");
+      if (token == null) {return;}
+      String tokenplus = "Bearer" + " " + token;
+      // widget.question.grade = double.tryParse(controllers.GradeController.text);
+      // widget.question.text = controllers.QuestionTextController.text;
+      // widget.question.paye = payeData.name;
+      // widget.question.book = bookData.name;
+      // widget.question.chapter = chapterData.name;
+      // widget.question.kind = kindData.name;
+      // widget.question.difficulty = difficultyData.name;
+      changedQuestion.grade = double.tryParse(controllers.GradeController.text);
+      changedQuestion.text = controllers.QuestionTextController.text;
+      changedQuestion.paye = payeData.name;
+      changedQuestion.book = bookData.name;
+      changedQuestion.chapter = chapterData.name;
+      changedQuestion.kind = kindData.name;
+      changedQuestion.difficulty = difficultyData.name;
+      changedQuestion.id = widget.question.id;
 
-      if (widget.question.kind == HomePage.maps.SKindMap["MULTICHOISE"])
+      String ServerPaye = HomePage.maps.RSPayeMap[changedQuestion.paye];
+      String ServerBook = HomePage.maps.RSBookMap[changedQuestion.book];
+      String ServerChapter = HomePage.maps.RSChapterMap[changedQuestion.chapter];
+      String ServerKind = HomePage.maps.RSKindMap[changedQuestion.kind];
+      String ServerDifficulty = HomePage.maps.RSDifficultyMap[changedQuestion.difficulty];
+
+      dynamic data;
+
+      //if (widget.question.kind == HomePage.maps.SKindMap["MULTICHOISE"])
+      if (changedQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"])
       {
-        widget.question.optionOne = controllers.MultiOptionText1Controller.text;
-        widget.question.optionTwo = controllers.MultiOptionText2Controller.text;
-        widget.question.optionThree = controllers.MultiOptionText3Controller.text;
-        widget.question.optionFour = controllers.MultiOptionText4Controller.text;
+        // widget.question.optionOne = controllers.MultiOptionText1Controller.text;
+        // widget.question.optionTwo = controllers.MultiOptionText2Controller.text;
+        // widget.question.optionThree = controllers.MultiOptionText3Controller.text;
+        // widget.question.optionFour = controllers.MultiOptionText4Controller.text;
+        changedQuestion.optionOne = controllers.MultiOptionText1Controller.text;
+        changedQuestion.optionTwo = controllers.MultiOptionText2Controller.text;
+        changedQuestion.optionThree = controllers.MultiOptionText3Controller.text;
+        changedQuestion.optionFour = controllers.MultiOptionText4Controller.text;
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": ServerKind,
+          "public": qs.public,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
+          "options" : qs.options,
+          "chapter" : ServerChapter,
+        });
       }
-      else if (widget.question.kind == HomePage.maps.SKindMap["TEST"])
+      //else if (widget.question.kind == HomePage.maps.SKindMap["TEST"])
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["TEST"])
       {
-        widget.question.optionOne = controllers.TestText1Controller.text;
-        widget.question.optionTwo = controllers.TestText2Controller.text;
-        widget.question.optionThree = controllers.TestText3Controller.text;
-        widget.question.optionFour = controllers.TestText4Controller.text;
+        // widget.question.optionOne = controllers.TestText1Controller.text;
+        // widget.question.optionTwo = controllers.TestText2Controller.text;
+        // widget.question.optionThree = controllers.TestText3Controller.text;
+        // widget.question.optionFour = controllers.TestText4Controller.text;
+        changedQuestion.optionOne = controllers.TestText1Controller.text;
+        changedQuestion.optionTwo = controllers.TestText2Controller.text;
+        changedQuestion.optionThree = controllers.TestText3Controller.text;
+        changedQuestion.optionFour = controllers.TestText4Controller.text;
+
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": ServerKind,
+          "public": qs.public,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
+          "options" : qs.options,
+          "chapter" : ServerChapter,
+        });
       }
-      else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]){
-        widget.question.answerString = controllers.TashrihiTextController.text;
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"]){
+     // else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]){
+        //widget.question.answerString = controllers.TashrihiTextController.text;
+        changedQuestion.answerString = controllers.TashrihiTextController.text;
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": ServerKind,
+          "public": qs.public,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+          if(changedQuestion.answerImage != null) "imageAnswer" : changedQuestion.answerImage,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
+          "chapter" : ServerChapter,
+        });
       }
-      else if (widget.question.kind == HomePage.maps.SKindMap["SHORTANSWER"])
-      {
-        widget.question.answerString = controllers.BlankTextController.text;
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"]){
+        changedQuestion.answerString = controllers.BlankTextController.text;
+        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+        data = jsonEncode(<String,dynamic>{
+          "questionId":qs.id,
+          "type": ServerKind,
+          "public": qs.public,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness" : ServerDifficulty,
+          "course": ServerBook,
+          "chapter" : ServerChapter,
+        });
+     // else if (widget.question.kind == HomePage.maps.SKindMap["SHORTANSWER"])
+      //{
+      //  widget.question.answerString = controllers.BlankTextController.text;
+      }
+      final response = await http.put('https://parham-backend.herokuapp.com/question',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': tokenplus,
+            'Content-Type': 'application/json',
+          },
+          body: data
+      );
+      if (response.statusCode == 200){
+       // ShowCorrectnessDialog(true,context);
+        print("Question changed ");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
+        widget.question = changedQuestion.CopyQuestion();
+
+      }
+      else{
+        ShowCorrectnessDialog(false,context);
+        print("Question failed");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+
       }
 
+      setState(() {
+        IsEdit = false;
+      });
+    }
+    void onCancelClick()
+    {
       setState(() {
         IsEdit = false;
       });
@@ -73,17 +201,17 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
           children: [
             Row(
               children: [
-                Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
-                Flexible(flex: 12,child: EditingOneLineQuestionSpecification(question: widget.question,payeData: payeData,bookData: bookData,kindData: kindData,chapterData: chapterData,difficultyData: difficultyData,parent2: this,)),
+             //   Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
+                Flexible(flex: 8,child: EditingOneLineQuestionSpecification(question: changedQuestion,payeData: payeData,bookData: bookData,kindData: kindData,chapterData: chapterData,difficultyData: difficultyData,parent2: this,)),
               ],
             ),
-            EditingQuestionText(controllers: controllers,question: widget.question,),
-            if (kindData.name == HomePage.maps.SKindMap["MULTICHOISE"]) EditingMultiChoiceOption(controllers: controllers,question: widget.question,)
-            else if (kindData.name == HomePage.maps.SKindMap["TEST"]) EditingTest(question: widget.question,controllers: controllers,)
-            else if (kindData.name == HomePage.maps.SKindMap["SHORTANSWER"]) EditingShortAnswer(question: widget.question,controllers: controllers,)
-            else if (kindData.name == HomePage.maps.SKindMap["LONGANSWER"]) EditingLongAnswer(question: widget.question,controllers: controllers,),
+            EditingQuestionText(controllers: controllers,question: changedQuestion,),
+            if (kindData.name == HomePage.maps.SKindMap["MULTICHOISE"]) EditingMultiChoiceOption(controllers: controllers,question: changedQuestion,)
+            else if (kindData.name == HomePage.maps.SKindMap["TEST"]) EditingTest(question: changedQuestion,controllers: controllers,)
+            else if (kindData.name == HomePage.maps.SKindMap["SHORTANSWER"]) EditingShortAnswer(question: changedQuestion,controllers: controllers,)
+            else if (kindData.name == HomePage.maps.SKindMap["LONGANSWER"]) EditingLongAnswer(question: changedQuestion,controllers: controllers,),
             EditingGrade(controllers: controllers,),
-            EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false),
+            EditAndAddtoExamButton(onEditPressed: onEditButton,onCancelPressed: onCancelClick,IsAddtoExamEnable: false,IsEditing: true,),
           ],
         ),
       ),
@@ -93,6 +221,24 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
   {
     void onEditButton()
     {
+      controllers.FillQuestionTextController(widget.question.text);
+      controllers.FillMultiOptionText1Controller(widget.question.optionOne);
+      controllers.FillMultiOptionText2Controller(widget.question.optionTwo);
+      controllers.FillMultiOptionText3Controller(widget.question.optionThree);
+      controllers.FillMultiOptionText4Controller(widget.question.optionFour);
+      controllers.FillTestText1Controller(widget.question.optionOne);
+      controllers.FillTestText2Controller(widget.question.optionTwo);
+      controllers.FillTestText3Controller(widget.question.optionThree);
+      controllers.FillTestText4Controller(widget.question.optionFour);
+      controllers.FillTashrihiTextController(widget.question.answerString);
+      controllers.FillBlankTextController(widget.question.answerString);
+      controllers.FillGradeController(widget.question.grade.toString());
+      if (widget.question.grade == null)
+      {
+        controllers.FillGradeController("0.0");
+      }
+      kindData.name = widget.question.kind;
+      //print(widget.question.text);
       setState(() {
         IsEdit = true;
       });
@@ -109,7 +255,8 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
                   Row(
                     children: [
                       Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
-                      Flexible(flex: 12,child: NotEditingQuestionSpecification(question: question,)),
+                      Flexible(flex: 7,child: NotEditingQuestionSpecification(question: question,)),
+                      (widget.index != 0)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_upward),onPressed: onUpwardArrowClick,)):Container(),
                     ],
                   ),
                   //    NotEditingQuestionSpecification(question: question,),
@@ -122,13 +269,37 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
               ),
               Padding(
                 padding: const EdgeInsets.all(4.0),
-                child: Container(alignment: Alignment.centerRight,child: (question.grade == null) ? Text("بارم : 0.0",textDirection: TextDirection.rtl):Text("نبارم : "+ question.grade.toString(),textDirection: TextDirection.rtl)),
+                child: Row(
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    (widget.index != CreateExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
+                    Flexible(flex: 9,child:(question.grade == null) ? Text("بارم : 0.0",textDirection: TextDirection.rtl):Text("بارم : "+ question.grade.toString(),textDirection: TextDirection.rtl)),
+                  ],
+                ),
               ),
-              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false),
+              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
             ],
           )
       ),
     );
+  }
+  void onUpwardArrowClick()
+  {
+    Question previousQuestion = CreateExamPage.questionList[widget.index-1].CopyQuestion();
+    CreateExamPage.questionList[widget.index-1] = widget.question.CopyQuestion();
+    CreateExamPage.questionList[widget.index] = previousQuestion.CopyQuestion();
+    widget.parent.setState(() {
+     // widget.question = previousQuestion.CopyQuestion();
+    });
+  }
+  void onDownwardArrowClick()
+  {
+    Question nextQuestion = CreateExamPage.questionList[widget.index+1].CopyQuestion();
+    CreateExamPage.questionList[widget.index+1] = widget.question.CopyQuestion();
+    CreateExamPage.questionList[widget.index] = nextQuestion.CopyQuestion();
+    widget.parent.setState(() {
+      //widget.question = nextQuestion.CopyQuestion();
+    });
   }
   void onCloseButton() async
   {
@@ -139,29 +310,29 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
   @override
   void initState() {
     super.initState();
-    controllers.FillQuestionTextController(widget.question.text);
-    controllers.FillMultiOptionText1Controller(widget.question.optionOne);
-    controllers.FillMultiOptionText2Controller(widget.question.optionTwo);
-    controllers.FillMultiOptionText3Controller(widget.question.optionThree);
-    controllers.FillMultiOptionText4Controller(widget.question.optionFour);
-    controllers.FillTestText1Controller(widget.question.optionOne);
-    controllers.FillTestText2Controller(widget.question.optionTwo);
-    controllers.FillTestText3Controller(widget.question.optionThree);
-    controllers.FillTestText4Controller(widget.question.optionFour);
-    controllers.FillTashrihiTextController(widget.question.answerString);
-    controllers.FillBlankTextController(widget.question.answerString);
-    controllers.FillGradeController(widget.question.grade.toString());
-    if (widget.question.grade == null)
-    {
-      controllers.FillGradeController("0.0");
-    }
+    // controllers.FillQuestionTextController(widget.question.text);
+    // controllers.FillMultiOptionText1Controller(widget.question.optionOne);
+    // controllers.FillMultiOptionText2Controller(widget.question.optionTwo);
+    // controllers.FillMultiOptionText3Controller(widget.question.optionThree);
+    // controllers.FillMultiOptionText4Controller(widget.question.optionFour);
+    // controllers.FillTestText1Controller(widget.question.optionOne);
+    // controllers.FillTestText2Controller(widget.question.optionTwo);
+    // controllers.FillTestText3Controller(widget.question.optionThree);
+    // controllers.FillTestText4Controller(widget.question.optionFour);
+    // controllers.FillTashrihiTextController(widget.question.answerString);
+    // controllers.FillBlankTextController(widget.question.answerString);
+    // controllers.FillGradeController(widget.question.grade.toString());
+    // if (widget.question.grade == null)
+    // {
+    //   controllers.FillGradeController("0.0");
+    // }
 
     payeData = new popupMenuData("پایه تحصیلی");
     bookData = new popupMenuData("درس");
     chapterData = new popupMenuData("فصل");
     kindData = new popupMenuData("نوع سوال");
     difficultyData = new popupMenuData("دشواری سوال");
-    kindData.name = widget.question.kind;
+    // kindData.name = widget.question.kind;
 
   }
   @override
@@ -181,6 +352,8 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
 
 class CreateExamPage extends StatefulWidget {
   static List<Question> questionList = [];
+  String classId;
+  CreateExamPage({Key key,this.classId}) : super(key: key);
   @override
   CreateExamPageState createState() => CreateExamPageState();
 }
@@ -201,16 +374,15 @@ class CreateExamPageState extends State<CreateExamPage> {
   popupMenuData kindData = new popupMenuData("نوع سوال");
   popupMenuData difficultyData = new popupMenuData("دشواری سوال");
 
-  //List<DragAndDropList> _contents = [];
 
   void ClickAddQuestion()
   {
     setState(() {
       (presedCreatedNewQuestion == false) ? presedCreatedNewQuestion = true : presedCreatedNewQuestion = false;
     });
-
   }
-  void onCreateQuestion()
+
+  void onCreateQuestion() async
   {
     newQuestion.text = controller.QuestionTextController.text;
     newQuestion.paye = payeData.name;
@@ -224,9 +396,35 @@ class CreateExamPageState extends State<CreateExamPage> {
       ShowCorrectnessDialog(false, context);
       return ;
     }
+    String ServerPaye = HomePage.maps.RSPayeMap[newQuestion.paye];
+    String ServerBook = HomePage.maps.RSBookMap[newQuestion.book];
+    String ServerChapter = HomePage.maps.RSChapterMap[newQuestion.chapter];
+    String ServerKind = HomePage.maps.RSKindMap[newQuestion.kind];
+    String ServerDifficulty = HomePage.maps.RSDifficultyMap[newQuestion.difficulty];
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    if (token == null) {
+      return;
+    }
+    String tokenplus = "Bearer" + " " + token;
+    dynamic data;
+    String url = "https://parham-backend.herokuapp.com/question";
     if (newQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"])
     {
       newQuestion.answerString = controller.BlankTextController.text;
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
+
+      data = jsonEncode(<String, dynamic>{
+        "type": ServerKind,
+        "public": qs.public,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
+        "question": qs.question,
+        "answers": qs.answer,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
+        "chapter": ServerChapter,
+      });
     }
     else if (newQuestion.kind == HomePage.maps.SKindMap["TEST"])
     {
@@ -234,6 +432,19 @@ class CreateExamPageState extends State<CreateExamPage> {
       newQuestion.optionTwo = controller.TestText2Controller.text;
       newQuestion.optionThree = controller.TestText3Controller.text;
       newQuestion.optionFour = controller.TestText4Controller.text;
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
+      data = jsonEncode(<String, dynamic>{
+        "type": ServerKind,
+        "public": qs.public,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
+        "question": qs.question,
+        "answers": qs.answer,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
+        "options": qs.options,
+        "chapter": ServerChapter,
+      });
     }
     else if (newQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"])
     {
@@ -241,19 +452,68 @@ class CreateExamPageState extends State<CreateExamPage> {
       newQuestion.optionTwo = controller.MultiOptionText2Controller.text;
       newQuestion.optionThree = controller.MultiOptionText3Controller.text;
       newQuestion.optionFour = controller.MultiOptionText4Controller.text;
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
+      data = jsonEncode(<String, dynamic>{
+        "type": ServerKind,
+        "public": qs.public,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
+        "question": qs.question,
+        "answers": qs.answer,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
+        "options": qs.options,
+        "chapter": ServerChapter,
+      });
     }
     else if (newQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"])
     {
       newQuestion.answerString = controller.TashrihiTextController.text;
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
+      data = jsonEncode(<String, dynamic>{
+        "type": ServerKind,
+        "public": qs.public,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
+        if(newQuestion.answerImage != null) "imageAnswer" : newQuestion.answerImage,
+        "question": qs.question,
+        "answers": qs.answer,
+        "base": ServerPaye,
+        "hardness": ServerDifficulty,
+        "course": ServerBook,
+        "chapter": ServerChapter,
+      });
     }
-    print(newQuestion.text);
-    print(newQuestion.paye);
-    print(newQuestion.book);
-    print(newQuestion.chapter);
-    print(newQuestion.difficulty);
-    print(newQuestion.answerString);
-    print(newQuestion.optionOne);
-    print(newQuestion.numberOne);
+    final response = await http.post(url,
+        headers: {
+          'accept': 'application/json',
+          'Authorization': tokenplus,
+          'Content-Type': 'application/json',
+        },
+        body: data);
+    if (response.statusCode == 200) {
+      ShowCorrectnessDialog(true, context);
+      print("Question Created");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      newQuestion.id = responseJson["questionId"];
+      //_btnController.stop();
+    } else {
+      ShowCorrectnessDialog(false, context);
+      print("Question failed");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      return;
+      //_btnController.stop();
+    }
+    //
+    // print(newQuestion.text);
+    // print(newQuestion.paye);
+    // print(newQuestion.book);
+    // print(newQuestion.chapter);
+    // print(newQuestion.difficulty);
+    // print(newQuestion.answerString);
+    // print(newQuestion.optionOne);
+    // print(newQuestion.numberOne);
 
     Question addQuestion = newQuestion.CopyQuestion();
     CreateExamPage.questionList.add(addQuestion);
@@ -271,9 +531,6 @@ class CreateExamPageState extends State<CreateExamPage> {
         builder: (context) => MyQuestionPage(IsAddtoExamEnable: true,parent:this),
       ),
     );
-    // setState(() {
-    //   dragAndDrop();
-    // });
   }
   void ClickSearchQuestion()
   {
@@ -284,83 +541,88 @@ class CreateExamPageState extends State<CreateExamPage> {
       ),
     );
    // Navigator.pop(context);
-   //  setState(() {
-   // //   dragAndDrop();
-   //  });
   }
-  // _onItemReorder(int oldItemIndex, int oldListIndex, int newItemIndex, int newListIndex) {
-  //   setState(() {
-  //     var movedItem = _contents[oldListIndex].children.removeAt(oldItemIndex);
-  //     _contents[newListIndex].children.insert(newItemIndex, movedItem);
-  //   });
-  // }
-  //
-  // _onListReorder(int oldListIndex, int newListIndex) {
-  //   setState(() {
-  //     var movedList = _contents.removeAt(oldListIndex);
-  //     _contents.insert(newListIndex, movedList);
-  //   });
-  // }
-  // void dragAndDrop()
-  // {
-  //   List<DragAndDropItem> items = [];
-  //   for (int i = 0 ;i<CreateExamPage.questionList.length;i++)
-  //   {
-  //     items.add(DragAndDropItem(child: QuestionView(question: CreateExamPage.questionList[i] ,parent: this,)));
-  //   }
-  //   _contents.clear();
-  //   _contents.add(DragAndDropList(
-  //       children: items)
-  //   );
-  //   setState(() {
-  //
-  //   });
-  //
-  //   // Flexible(
-  //   //   child: DragAndDropLists(
-  //   //     children: _contents,
-  //   //     onItemReorder: _onItemReorder,
-  //   //     onListReorder: _onListReorder,
-  //   //   ),
-  //   // ),
-  //
-  //
-  //   // return DragAndDropList(
-  //   //   children: items
-  //   // );
-  // }
-  @override
-  void initState() {
-    super.initState();
- //   dragAndDrop();
-  //  _contents = [];
-  //  _contents.add(dragAndDrop());
 
-    // _contents.add(
-    //   DragAndDropList(
-    //     children: [
-    //       DragAndDropItem(
-    //        child: QuestionView(question: CreateExamPage.questionList[0] ,parent: this,))
-    //     ]
-    //   )
-    // );
-  //   _contents = List.generate(10, (index) {
-  //     return DragAndDropList(
-  // //      header: Text('Header $index'),
-  //       children: <DragAndDropItem>[
-  //         DragAndDropItem(
-  //           child: Text('$index.1'),
-  //         ),
-  //         DragAndDropItem(
-  //           child: Text('$index.2'),
-  //         ),
-  //         DragAndDropItem(
-  //           child: Text('$index.3'),
-  //         ),
-  //       ],
-  //     );
-  //   });
+  void CreateExam() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    if (token == null) {
+      return;
+    }
+    String tokenplus = "Bearer" + " " + token;
+    dynamic data;
+    String url = "https://parham-backend.herokuapp.com/exam";
+    List questionObjects = [];
+    for (int i = 0;i<CreateExamPage.questionList.length;i++)
+    {
+      String id = CreateExamPage.questionList[i].id;
+      print(CreateExamPage.questionList[i].id);
+      double grade = CreateExamPage.questionList[i].grade;
+      questionObjects.add({"question" : id , "grade" : grade});
+      //print(CreateExamPage.questionList[i].id);
+    }
+    if (examDate.text.isEmpty || examStartTime.text.isEmpty || examFinishTime.text.isEmpty || examDurationTime.text.isEmpty)
+    {
+      ShowCorrectnessDialog(false, context);
+      return;
+    }
+    List<String> dates = examDate.text.split("/");
+    List<String> startTimes = examStartTime.text.split(":");
+    List<String> finishTimes = examFinishTime.text.split(":");
+    Jalali j = new Jalali(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
+    Gregorian g = j.toGregorian();
+    print(g.year.toString() + "-" + g.month.toString() + "-" + g.day.toString() + " " + examStartTime.text);
+    DateTime startExamDatetime;
+    DateTime endExamDatetime;
+    if (startTimes.length == 1)
+    {
+      startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),);
+    }
+    else
+      {
+        startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),int.tryParse(startTimes[1]));
+      }
+    if(finishTimes.length == 1)
+    {
+      endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]));
+    }
+    else
+      {
+        endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]),int.tryParse(finishTimes[1]));
+      }
+    //print(startExamDatetime.toIso8601String());
+    //print(endExamDatetime.toIso8601String());
+    data = jsonEncode(<String, dynamic>{
+      "name": examTopic.text,
+      "startDate": startExamDatetime.toIso8601String(),
+      "endDate": endExamDatetime.toIso8601String(),
+      "examLength": int.tryParse(examDurationTime.text),
+      "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
+      "useInClass": "kuTwxu"//widget.classId,
+    });
+    //print(data);
+    final response = await http.post(url,
+        headers: {
+          'accept': 'application/json',
+          'Authorization': tokenplus,
+          'Content-Type': 'application/json',
+        },
+        body: data);
+    if (response.statusCode == 200)
+    {
+      ShowCorrectnessDialog(true, context);
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+    }
+    else
+      {
+        ShowCorrectnessDialog(false, context);
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
+      }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -744,7 +1006,7 @@ class CreateExamPageState extends State<CreateExamPage> {
                       itemCount:  CreateExamPage.questionList.length,
                       itemBuilder: (BuildContext context, int index)
                       {
-                        return QuestionViewInCreateExam(question: CreateExamPage.questionList[index],parent: this,);
+                        return QuestionViewInCreateExam(question: CreateExamPage.questionList[index],parent: this,index: index,);
                       }
                   ),
                 ),
@@ -802,6 +1064,12 @@ class CreateExamPageState extends State<CreateExamPage> {
                       ],
                     ),
                   ),
+                ),
+                RaisedButton(
+                    textColor: Colors.white,
+                    color: Color(0xFF3D5A80),
+                    child: Text("ایجاد آزمون"),
+                    onPressed: CreateExam
                 ),
               ],
             ),

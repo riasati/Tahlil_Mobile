@@ -5,6 +5,7 @@ import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/editExanPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +19,8 @@ class QuestionViewInMyQuestion extends StatefulWidget {
   CreateExamPageState parent;
   bool IsAddtoExamEnable;
   MyQuestionPageState parent2;
-  QuestionViewInMyQuestion({Key key,this.question,this.IsAddtoExamEnable = false,this.parent,this.parent2}) : super(key: key);
+  EditExamPageState parent3;
+  QuestionViewInMyQuestion({Key key,this.question,this.IsAddtoExamEnable = false,this.parent,this.parent2,this.parent3}) : super(key: key);
   @override
   QuestionViewInMyQuestionState createState() => QuestionViewInMyQuestionState();
 }
@@ -69,6 +71,7 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
           "type": ServerKind,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
@@ -90,6 +93,7 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
           "type": ServerKind,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
@@ -107,6 +111,8 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
           "type": ServerKind,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+          if(changedQuestion.answerImage != null) "imageAnswer" : changedQuestion.answerImage,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
@@ -123,6 +129,7 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
         data = jsonEncode(<String,dynamic>{
           "questionId":qs.id,
           "type": ServerKind,
+          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
           "public": qs.public,
           "question": qs.question,
           "answers": qs.answer,
@@ -231,10 +238,22 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
   }
   void onAddtoExamButton()
   {
-    CreateExamPage.questionList.add(widget.question);
-    widget.parent.setState(() {
+    if (widget.parent != null)
+    {
+      CreateExamPage.questionList.add(widget.question);
+      widget.parent.setState(() {
 
-    });
+      });
+    }
+    if (widget.parent3 != null)
+    {
+      EditExamPage.questionList.add(widget.question);
+      widget.parent3.setState(() {
+
+      });
+    }
+
+
     Navigator.pop(context);
   }
   void onCloseButton() async
@@ -317,7 +336,8 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
 class MyQuestionPage extends StatefulWidget {
   bool IsAddtoExamEnable;
   CreateExamPageState parent;
-  MyQuestionPage({Key key,this.IsAddtoExamEnable = false,this.parent}) : super(key: key);
+  EditExamPageState parent2;
+  MyQuestionPage({Key key,this.IsAddtoExamEnable = false,this.parent,this.parent2}) : super(key: key);
   @override
   MyQuestionPageState createState() => MyQuestionPageState();
 }
@@ -350,6 +370,7 @@ class MyQuestionPageState extends State<MyQuestionPage> {
     if (response.statusCode == 200)
     {
       final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
       totalpage = responseJson["totalPages"];
       for (int i=0;i<responseJson["questions"].length;i++)
       {
@@ -364,6 +385,8 @@ class MyQuestionPageState extends State<MyQuestionPage> {
         qs.options = responseJson["questions"][i]["options"];
         qs.public = responseJson["questions"][i]["public"];
         qs.id = responseJson["questions"][i]["_id"];
+        qs.imageQuestion = responseJson["questions"][i]["imageQuestion"];
+        qs.imageAnswer = responseJson["questions"][i]["imageAnswer"];
 
         Question q = Question.QuestionServerToQuestion(qs,qs.type);
         questionList.add(q);
@@ -374,7 +397,16 @@ class MyQuestionPageState extends State<MyQuestionPage> {
     }
     else
     {
-      ShowCorrectnessDialog(false, context);
+      final responseJson = jsonDecode(response.body);
+      if (responseJson["error"] == "nothing found")
+      {
+        ShowCorrectnessDialog(true, context);
+      }
+      else
+        {
+          ShowCorrectnessDialog(false, context);
+        }
+
     }
 
   }
@@ -416,7 +448,7 @@ class MyQuestionPageState extends State<MyQuestionPage> {
                     itemCount: questionList.length,
                     itemBuilder: (BuildContext context, int index)
                     {
-                      return QuestionViewInMyQuestion(question: questionList[index],IsAddtoExamEnable: widget.IsAddtoExamEnable,parent : widget.parent,parent2: this,);
+                      return QuestionViewInMyQuestion(question: questionList[index],IsAddtoExamEnable: widget.IsAddtoExamEnable,parent : widget.parent,parent2: this,parent3:widget.parent2);
                     }
                 ),
               ),

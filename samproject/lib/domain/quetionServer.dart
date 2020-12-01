@@ -11,6 +11,9 @@ class QuestionServer
   String chapter;
   dynamic options = [];
   String id;
+  String imageQuestion;
+  String imageAnswer;
+  double grade;
   QuestionServer();
 
   static QuestionServer QuestionToQuestionServer(Question Q,String Serverkind)
@@ -18,6 +21,7 @@ class QuestionServer
     QuestionServer QS = new QuestionServer();
     QS.question = Q.text;
     QS.id = Q.id;
+    QS.grade = Q.grade;
 
 
     if (Q.isPublic != null)

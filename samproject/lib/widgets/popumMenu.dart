@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/editExanPage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
 
 class PopupMenu extends StatefulWidget {
@@ -9,7 +10,9 @@ class PopupMenu extends StatefulWidget {
   QuestionViewInMyQuestionState parent;
   QuestionViewInCreateExamState parent2;
   CreateExamPageState parent3;
-  PopupMenu({Key key, this.Data,this.parent,this.parent2,this.parent3}) : super(key: key);
+  EditExamPageState parent4;
+  QuestionViewInEditExamState parent5;
+  PopupMenu({Key key, this.Data,this.parent,this.parent2,this.parent3,this.parent4,this.parent5}) : super(key: key);
   @override
   _PopupMenuState createState() => _PopupMenuState();
 }
@@ -36,6 +39,16 @@ class _PopupMenuState extends State<PopupMenu> {
         if (widget.parent3 != null)
         {
           widget.parent3.setState(() {
+          });
+        }
+        if (widget.parent4 != null)
+        {
+          widget.parent4.setState(() {
+          });
+        }
+        if (widget.parent5 != null)
+        {
+          widget.parent5.setState(() {
           });
         }
       }

@@ -4,7 +4,7 @@ import 'package:samproject/pages/homePage.dart';
 class Question
 {
   String text;
-  String questinImage;
+  String questionImage;
   String answerImage;
   String paye;
   String book;
@@ -29,7 +29,7 @@ class Question
   {
     Question q = new Question();
     q.text = this.text;
-    q.questinImage = this.questinImage;
+    q.questionImage = this.questionImage;
     q.answerImage = this.answerImage;
     q.paye = this.paye;
     q.book = this.book;
@@ -60,6 +60,9 @@ class Question
     Q.chapter = HomePage.maps.SChapterMap[QS.chapter];
     Q.kind = HomePage.maps.SKindMap[QS.type];
     Q.difficulty = HomePage.maps.SDifficultyMap[QS.hardness];
+    Q.questionImage = QS.imageQuestion;
+    Q.answerImage = QS.imageAnswer;
+    Q.grade = QS.grade;
 
 
     if (QS.public != null)

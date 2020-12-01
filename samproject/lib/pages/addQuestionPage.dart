@@ -699,7 +699,14 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
     String tokenplus = "Bearer" + " " + token;
     dynamic data;
     String url = "https://parham-backend.herokuapp.com/question";
-
+    if (_QuestionImage != null)
+    {
+      newQuestion.questionImage = base64Encode(_QuestionImage.readAsBytesSync());
+    }
+    if(_AnswerImage != null)
+    {
+      newQuestion.answerImage = base64Encode(_AnswerImage.readAsBytesSync());
+    }
     if (newQuestion.kind == HomePage.maps.SKindMap["TEST"]) {
       newQuestion.optionOne = TestText1Controller.text;
       newQuestion.optionTwo = TestText2Controller.text;
@@ -711,6 +718,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       data = jsonEncode(<String, dynamic>{
         "type": ServerKind,
         "public": qs.public,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
         "question": qs.question,
         "answers": qs.answer,
         "base": ServerPaye,
@@ -746,6 +754,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
 
       data = jsonEncode(<String, dynamic>{
         "type": ServerKind,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
@@ -765,10 +774,14 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       if (response.statusCode == 200) {
         ShowCorrectnessDialog(true, context);
         print("Question Created in jayekhali");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
         _btnController.stop();
       } else {
         ShowCorrectnessDialog(false, context);
         print("Question failed in jayekhali");
+        final responseJson = jsonDecode(response.body);
+        print(responseJson.toString());
         _btnController.stop();
       }
     } else if (newQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"]) {
@@ -784,6 +797,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
       data = jsonEncode(<String, dynamic>{
         "type": ServerKind,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
@@ -819,6 +833,8 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
       QuestionServer qs = QuestionServer.QuestionToQuestionServer(newQuestion,ServerKind);
       data = jsonEncode(<String, dynamic>{
         "type": ServerKind,
+        if(newQuestion.questionImage != null) "imageQuestion" : newQuestion.questionImage,
+        if(newQuestion.answerImage != null) "imageAnswer" : newQuestion.answerImage,
         "public": qs.public,
         "question": qs.question,
         "answers": qs.answer,
@@ -827,7 +843,7 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
         "course": ServerBook,
         "chapter": ServerChapter,
       });
-      //print(data);
+      print(data);
       final response = await http.post(url,
           headers: {
             'accept': 'application/json',

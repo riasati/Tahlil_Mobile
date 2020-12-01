@@ -7,6 +7,7 @@ import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/domain/searchFilters.dart';
 import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/editExanPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
@@ -17,7 +18,8 @@ class QuestionView extends StatefulWidget {
   Question question;
   bool IsAddtoExamEnable;
   CreateExamPageState parent;
-  QuestionView({Key key,this.question,this.IsAddtoExamEnable = false,this.parent}) : super(key: key);
+  EditExamPageState parent2;
+  QuestionView({Key key,this.question,this.IsAddtoExamEnable = false,this.parent,this.parent2}) : super(key: key);
   @override
   _QuestionViewState createState() => _QuestionViewState();
 }
@@ -79,10 +81,20 @@ class _QuestionViewState extends State<QuestionView> {
   }
   void onAddtoExamButton()
   {
-    CreateExamPage.questionList.add(widget.question);
-    widget.parent.setState(() {
-      //_contents.add(dragAndDrop());
-    });
+    if (widget.parent != null)
+    {
+      CreateExamPage.questionList.add(widget.question);
+      widget.parent.setState(() {
+        //_contents.add(dragAndDrop());
+      });
+    }
+    if (widget.parent2 != null)
+    {
+      EditExamPage.questionList.add(widget.question);
+      widget.parent2.setState(() {
+        //_contents.add(dragAndDrop());
+      });
+    }
     Navigator.pop(context);
   }
 
@@ -200,7 +212,8 @@ class _QuestionViewState extends State<QuestionView> {
 class SearchQuestionPage extends StatefulWidget {
   bool IsAddtoExamEnable;
   CreateExamPageState parent;
-  SearchQuestionPage({Key key,this.IsAddtoExamEnable = false,this.parent}) : super(key: key);
+  EditExamPageState parent2;
+  SearchQuestionPage({Key key,this.IsAddtoExamEnable = false,this.parent,this.parent2}) : super(key: key);
   @override
   _SearchQuestionPageState createState() => _SearchQuestionPageState();
 }
@@ -305,9 +318,9 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
         headers: headers,
       body: data,
     );
-    print(url);
-    print(headers);
-    print(data);
+    // print(url);
+    // print(headers);
+    // print(data);
     if (response.statusCode == 200){
       print("ok");
       final responseJson = jsonDecode(response.body);
@@ -339,6 +352,9 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
         qs.hardness = responseJson["questions"][i]["hardness"];
         qs.answer = responseJson["questions"][i]["answers"];
         qs.options = responseJson["questions"][i]["options"];
+        qs.imageQuestion = responseJson["questions"][i]["imageQuestion"];
+        qs.imageAnswer = responseJson["questions"][i]["imageAnswer"];
+        qs.id = responseJson["questions"][i]["qId"];
 
         Question q = Question.QuestionServerToQuestion(qs,qs.type);
         questionList.add(q);
@@ -414,7 +430,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                         itemCount: questionList.length,
                         itemBuilder: (BuildContext context, int index)
                         {
-                          return QuestionView(question: questionList[index],IsAddtoExamEnable: widget.IsAddtoExamEnable,parent: widget.parent,);
+                          return QuestionView(question: questionList[index],IsAddtoExamEnable: widget.IsAddtoExamEnable,parent: widget.parent,parent2:widget.parent2);
                         }
                     ),
                   ),

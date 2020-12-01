@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
+import 'package:samproject/pages/editExanPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/widgets/popumMenu.dart';
@@ -31,10 +34,23 @@ class NotEditingQuestionSpecification extends StatelessWidget {
     );
   }
 }
-
-class NotEditingQuestionText extends StatelessWidget {
+class NotEditingQuestionText extends StatefulWidget {
   Question question;
-  NotEditingQuestionText({Key key, @required this.question}) : super(key: key);
+  NotEditingQuestionText({Key key, this.question}) : super(key: key);
+  @override
+  _NotEditingQuestionTextState createState() => _NotEditingQuestionTextState();
+}
+
+class _NotEditingQuestionTextState extends State<NotEditingQuestionText> {
+  // Uint8List QuestionServerImage;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   if (widget.question.questionImage != null)
+  //   {
+  //     QuestionServerImage = base64Decode(widget.question.questionImage);
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -43,8 +59,8 @@ class NotEditingQuestionText extends StatelessWidget {
         textDirection: TextDirection.rtl,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(alignment: Alignment.centerRight,child: Text("سوال : " + question.text,textDirection: TextDirection.rtl)),
-          (question.questinImage != null) ? Text(question.questinImage) : Container(),
+          Container(alignment: Alignment.centerRight,child: Text("سوال : " + widget.question.text,textDirection: TextDirection.rtl)),
+          (widget.question.questionImage != null) ? Image.memory(base64Decode(widget.question.questionImage),fit: BoxFit.cover,height: 200,) : Container(),
         ],
       ),
     );
@@ -214,7 +230,8 @@ class EditingOneLineQuestionSpecification extends StatefulWidget {
   popupMenuData difficultyData;
   QuestionViewInMyQuestionState parent;
   QuestionViewInCreateExamState parent2;
-  EditingOneLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData,this.parent,this.parent2}) : super(key: key);
+  QuestionViewInEditExamState parent3;
+  EditingOneLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData,this.parent,this.parent2,this.parent3}) : super(key: key);
   @override
   _EditingOneLineQuestionSpecificationState createState() => _EditingOneLineQuestionSpecificationState();
 }
@@ -268,7 +285,7 @@ class _EditingOneLineQuestionSpecificationState extends State<EditingOneLineQues
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.bookData,))),
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.chapterData,))),
 
-          Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.kindData,parent: widget.parent,parent2: widget.parent2,))),
+          Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.kindData,parent: widget.parent,parent2: widget.parent2,parent5:widget.parent3))),
        //   Flexible(flex: 2,child: Text((widget.question.kind != null) ? widget.kindData.name : widget.kindData.popupMenuBottonName,textDirection: TextDirection.rtl)),//PopupMenu(Data: widget.kindData,)
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.difficultyData,))),
         ],
@@ -285,8 +302,9 @@ class EditingTwoLineQuestionSpecification extends StatefulWidget {
   popupMenuData kindData;
   popupMenuData difficultyData;
   CreateExamPageState parent;
+  EditExamPageState parent2;
 
-  EditingTwoLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData,this.parent}) : super(key: key);
+  EditingTwoLineQuestionSpecification({Key key, this.question,this.payeData,this.bookData,this.chapterData,this.kindData,this.difficultyData,this.parent,this.parent2}) : super(key: key);
   @override
   _EditingTwoLineQuestionSpecificationState createState() => _EditingTwoLineQuestionSpecificationState();
 }
@@ -349,7 +367,7 @@ class _EditingTwoLineQuestionSpecificationState extends State<EditingTwoLineQues
               textDirection: TextDirection.rtl,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(flex: 1,child: Container(alignment: Alignment.center,child:PopupMenu(Data: widget.kindData,parent3: widget.parent,))),
+                Expanded(flex: 1,child: Container(alignment: Alignment.center,child:PopupMenu(Data: widget.kindData,parent3: widget.parent,parent4:widget.parent2))),
                 SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
                 Expanded(flex: 1,child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.difficultyData,))),
               ],
@@ -377,6 +395,7 @@ class _EditingQuestionTextState extends State<EditingQuestionText> {
     setState(() {
       if (pickedFile != null ) {
         _QuestionImage = File(pickedFile.path);
+        widget.question.questionImage = base64Encode(_QuestionImage.readAsBytesSync());
       }
     });
   }
@@ -384,7 +403,23 @@ class _EditingQuestionTextState extends State<EditingQuestionText> {
   {
     setState(() {
       _QuestionImage = null;
+      widget.question.questionImage = null;
     });
+  }
+  void _deleteQuestionServerImage()
+  {
+    setState(() {
+      widget.question.questionImage = null;
+    });
+  }
+  Uint8List QuestionServerImage;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.question.questionImage != null)
+    {
+      QuestionServerImage = base64Decode(widget.question.questionImage);
+    }
   }
 
   @override
@@ -419,8 +454,10 @@ class _EditingQuestionTextState extends State<EditingQuestionText> {
             ],
           ),
         ),
-        (_QuestionImage != null) ? Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-            : Container(),
+        if (_QuestionImage == null && widget.question.questionImage == null) Container()
+        else if (_QuestionImage != null && widget.question.questionImage == null) Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
+        else if (_QuestionImage == null && widget.question.questionImage != null) Container(child: InkWell(onTap:() => _deleteQuestionServerImage(),child: Image.memory(QuestionServerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
+        else if (_QuestionImage != null && widget.question.questionImage != null) Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),),
       ],
     );
   }
@@ -633,9 +670,23 @@ class EditingGrade extends StatelessWidget {
   }
 }
 
-class NotEditingAnswerString extends StatelessWidget {
+class NotEditingAnswerString extends StatefulWidget {
   Question question;
   NotEditingAnswerString({Key key,this.question}) : super(key: key);
+  @override
+  _NotEditingAnswerStringState createState() => _NotEditingAnswerStringState();
+}
+
+class _NotEditingAnswerStringState extends State<NotEditingAnswerString> {
+  // Uint8List QuestionServerImage = null;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   if (widget.question.answerImage != null)
+  //   {
+  //     QuestionServerImage = base64Decode(widget.question.answerImage);
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -644,8 +695,8 @@ class NotEditingAnswerString extends StatelessWidget {
         textDirection: TextDirection.rtl,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(alignment: Alignment.centerRight,child: Text("جواب : "+ question.answerString,textDirection: TextDirection.rtl)),
-          (question.answerImage != null) ? Text(question.answerImage) : Container(),
+          Container(alignment: Alignment.centerRight,child: Text("جواب : "+ widget.question.answerString,textDirection: TextDirection.rtl)),
+          (widget.question.answerImage != null) ? Image.memory(base64Decode(widget.question.answerImage),fit: BoxFit.cover,height: 200,) : Container(),
         ],
       ),
     );
@@ -755,6 +806,7 @@ class _EditingLongAnswerState extends State<EditingLongAnswer> {
     setState(() {
       if (pickedFile != null ) {
         _AnswerImage = File(pickedFile.path);
+        widget.question.answerImage = base64Encode(_AnswerImage.readAsBytesSync());
       }
     });
   }
@@ -762,9 +814,24 @@ class _EditingLongAnswerState extends State<EditingLongAnswer> {
   {
     setState(() {
       _AnswerImage = null;
+      widget.question.answerImage = null;
     });
   }
-
+  void _deleteQuestionServerImage()
+  {
+    setState(() {
+      widget.question.answerImage = null;
+    });
+  }
+  Uint8List QuestionServerImage;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.question.answerImage != null)
+    {
+      QuestionServerImage = base64Decode(widget.question.answerImage);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -794,8 +861,12 @@ class _EditingLongAnswerState extends State<EditingLongAnswer> {
             ],
           ),
         ),
-        (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-            : Container(),
+        if (_AnswerImage == null && widget.question.answerImage == null) Container()
+        else if (_AnswerImage != null && widget.question.answerImage == null) Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
+        else if (_AnswerImage == null && widget.question.answerImage != null) Container(child: InkWell(onTap:() => _deleteQuestionServerImage(),child: Image.memory(QuestionServerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
+        else if (_AnswerImage != null && widget.question.answerImage != null) Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),),
+        // (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
+        //     : Container(),
       ],
     );
   }
@@ -915,9 +986,32 @@ class SearchFilterWidget extends StatefulWidget {
 
 class _SearchFilterWidgetState extends State<SearchFilterWidget> {
   void onSelectedDifficultyMenu(value) => setState((){
+    if (value == 0)
+    {
+      if(allOrNothingInDifficulty)
+      {
+        allOrNothingInDifficulty = false;
+        widget.searchFilters.difficultyList.clear();
+        for (int i = 0;i<difficultykeys.length;i++)
+        {
+          widget.searchFilters.difficultyList.remove(difficultykeys[i]);
+          difficultyMap[difficultykeys[i]] = false;
+        }
+      }
+      else
+        {
+          allOrNothingInDifficulty = true;
+          widget.searchFilters.difficultyList.clear();
+          for (int i = 0;i<difficultykeys.length;i++)
+          {
+            widget.searchFilters.difficultyList.add(difficultykeys[i]);
+            difficultyMap[difficultykeys[i]] = true;
+          }
+        }
+    }
     for(int i = 0;i<difficultykeys.length;i++)
     {
-      if (value == i)
+      if (value == i+1)
       {
         if (difficultyMap[difficultykeys[i]])
         {
@@ -933,9 +1027,32 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
     }
   });
   void onSelectedKindMenu(value) => setState((){
+    if (value == 0)
+    {
+      if (allOrNothingInKind)
+      {
+        allOrNothingInKind = false;
+        widget.searchFilters.kindList.clear();
+        for (int i = 0;i<kindkeys.length;i++)
+        {
+          widget.searchFilters.kindList.remove(kindkeys[i]);
+          kindMap[kindkeys[i]] = false;
+        }
+      }
+      else
+        {
+          allOrNothingInKind = true;
+          widget.searchFilters.kindList.clear();
+          for (int i = 0;i<kindkeys.length;i++)
+          {
+            widget.searchFilters.kindList.add(kindkeys[i]);
+            kindMap[kindkeys[i]] = true;
+          }
+        }
+    }
     for(int i = 0;i<kindkeys.length;i++)
     {
-      if (value == i)
+      if (value == i+1)
       {
         if (kindMap[kindkeys[i]])
         {
@@ -951,9 +1068,32 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
     }
   });
   void onSelectedChapterMenu(value) => setState((){
+    if (value == 0)
+    {
+      if (allOrNothingInChapter)
+      {
+        allOrNothingInChapter = false;
+        widget.searchFilters.chapterList.clear();
+        for (int i = 0;i<chapterkeys.length;i++)
+        {
+          widget.searchFilters.chapterList.remove(chapterkeys[i]);
+          chapterMap[chapterkeys[i]] = false;
+        }
+      }
+      else
+        {
+          allOrNothingInChapter = true;
+          widget.searchFilters.chapterList.clear();
+          for (int i = 0;i<chapterkeys.length;i++)
+          {
+            widget.searchFilters.chapterList.add(chapterkeys[i]);
+            chapterMap[chapterkeys[i]] = true;
+          }
+        }
+    }
     for(int i = 0;i<chapterkeys.length;i++)
     {
-      if (value == i)
+      if (value == i+1)
       {
         if (chapterMap[chapterkeys[i]])
         {
@@ -970,9 +1110,32 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
 
   });
   void onSelectedBookMenu(value) => setState((){
+    if (value == 0)
+    {
+      if (allOrNothingInBook)
+      {
+        allOrNothingInBook = false;
+        widget.searchFilters.bookList.clear();
+        for (int i = 0;i<bookkeys.length;i++)
+        {
+          widget.searchFilters.bookList.remove(bookkeys[i]);
+          bookMap[bookkeys[i]] = false;
+        }
+      }
+      else
+      {
+        allOrNothingInBook = true;
+        widget.searchFilters.bookList.clear();
+        for (int i = 0;i<bookkeys.length;i++)
+        {
+          widget.searchFilters.bookList.add(bookkeys[i]);
+          bookMap[bookkeys[i]] = true;
+        }
+      }
+    }
     for(int i = 0;i<bookkeys.length;i++)
     {
-      if (value == i)
+      if (value == i+1)
       {
         if (bookMap[bookkeys[i]])
         {
@@ -988,9 +1151,32 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
     }
   });
   void onSelectedPayeMenu(value) => setState(() {
+    if (value == 0)
+    {
+      if (allOrNothingInPaye)
+      {
+        allOrNothingInPaye = false;
+        widget.searchFilters.payeList.clear();
+        for (int i = 0;i<payekeys.length;i++)
+        {
+          widget.searchFilters.payeList.remove(payekeys[i]);
+          payeMap[payekeys[i]] = false;
+        }
+      }
+      else
+        {
+          allOrNothingInPaye = true;
+          widget.searchFilters.payeList.clear();
+          for (int i = 0;i<payekeys.length;i++)
+          {
+            widget.searchFilters.payeList.add(payekeys[i]);
+            payeMap[payekeys[i]] = true;
+          }
+        }
+    }
     for(int i = 0;i<payekeys.length;i++)
     {
-      if (value == i)
+      if (value == i+1)
       {
         if (payeMap[payekeys[i]])
         {
@@ -1025,6 +1211,12 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
   Map<String,bool> difficultyMap = {};
   List<CheckedPopupMenuItem> difficultyList = [];
   List difficultykeys = [];
+
+  bool allOrNothingInPaye = false;
+  bool allOrNothingInBook = false;
+  bool allOrNothingInChapter = false;
+  bool allOrNothingInKind = false;
+  bool allOrNothingInDifficulty = false;
 
   @override
   void initState() {
@@ -1062,10 +1254,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                     onSelected: onSelectedPayeMenu,
                     itemBuilder: (_) {
                       payeList = [];
+                      payeList.add(new CheckedPopupMenuItem(
+                        value: 0,
+                        child: Text("انتخاب همه/هیچ",textDirection: TextDirection.rtl,),
+                        checked: allOrNothingInPaye,
+                      ));
                       for(int i=0;i<payekeys.length;i++)
                       {
                         payeList.add(new CheckedPopupMenuItem(
-                          value: i,
+                          value: i+1,
                           child: Text(payekeys[i],textDirection: TextDirection.rtl,),
                           checked: (payeMap[payekeys[i]]),
                         ));
@@ -1081,10 +1278,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                     itemBuilder: (_)
                     {
                       bookList = [];
+                      bookList.add(new CheckedPopupMenuItem(
+                        value: 0,
+                        child: Text("انتخاب همه/هیچ",textDirection: TextDirection.rtl,),
+                        checked: allOrNothingInBook,
+                      ));
                       for(int i=0;i<bookkeys.length;i++)
                       {
                         bookList.add(new CheckedPopupMenuItem(
-                          value: i,
+                          value: i+1,
                           child: Text(bookkeys[i],textDirection: TextDirection.rtl,),
                           checked: (bookMap[bookkeys[i]]),
                         ));
@@ -1101,10 +1303,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                     itemBuilder: (_)
                     {
                       chapterList = [];
+                      chapterList.add(new CheckedPopupMenuItem(
+                        value: 0,
+                        child: Text("انتخاب همه/هیچ",textDirection: TextDirection.rtl,),
+                        checked: allOrNothingInChapter,
+                      ));
                       for(int i=0;i<chapterkeys.length;i++)
                       {
                         chapterList.add(new CheckedPopupMenuItem(
-                          value: i,
+                          value: i+1,
                           child: Text(chapterkeys[i],textDirection: TextDirection.rtl,),
                           checked: (chapterMap[chapterkeys[i]]),
                         ));
@@ -1129,10 +1336,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                     itemBuilder: (_)
                     {
                       kindList = [];
+                      kindList.add(new CheckedPopupMenuItem(
+                        value: 0,
+                        child: Text("انتخاب همه/هیچ",textDirection: TextDirection.rtl,),
+                        checked: allOrNothingInKind,
+                      ));
                       for(int i=0;i<kindkeys.length;i++)
                       {
                         kindList.add(new CheckedPopupMenuItem(
-                          value: i,
+                          value: i+1,
                           child: Text(kindkeys[i],textDirection: TextDirection.rtl,),
                           checked: (kindMap[kindkeys[i]]),
                         ));
@@ -1149,10 +1361,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                     itemBuilder: (_)
                     {
                       difficultyList = [];
+                      difficultyList.add(new CheckedPopupMenuItem(
+                        value: 0,
+                        child: Text("انتخاب همه/هیچ",textDirection: TextDirection.rtl,),
+                        checked: allOrNothingInDifficulty,
+                      ));
                       for(int i=0;i<difficultykeys.length;i++)
                       {
                         difficultyList.add(new CheckedPopupMenuItem(
-                          value: i,
+                          value: i+1,
                           child: Text(difficultykeys[i],textDirection: TextDirection.rtl,),
                           checked: (difficultyMap[difficultykeys[i]]),
                         ));
