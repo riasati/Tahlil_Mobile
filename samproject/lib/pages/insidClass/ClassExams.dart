@@ -78,6 +78,7 @@ class _ClassExamsState extends State<ClassExams> {
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
+    print(token);
     try {
       if (token != null) {
         token = "Bearer " + token;

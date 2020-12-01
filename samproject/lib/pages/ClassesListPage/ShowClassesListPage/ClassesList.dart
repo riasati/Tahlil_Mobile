@@ -76,9 +76,8 @@ class _ClassesListState extends State<ClassesList> {
               'Content-Type': 'application/json',
             });
         var userClassesJson = json.decode(utf8.decode(response.bodyBytes));
-        print(userClassesJson);
         for(var userClass in userClassesJson["classes"]){
-          userClasses.add(Class(userClass["name"], userClass["classId"] ,userClass["ownerFullname"], userClass["isOwned"]));
+          userClasses.add(Class(userClass["name"], userClass["ownerFullname"], userClass["classId"], userClass["isOwned"]));
         }
         for(var userClass in userClasses)
           print(userClass);

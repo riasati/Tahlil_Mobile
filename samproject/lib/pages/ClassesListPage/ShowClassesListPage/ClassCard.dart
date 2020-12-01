@@ -58,15 +58,13 @@ class _ClassCardState extends State<ClassCard> {
     if(!(classCard.ownerFullName == null || classCard.ownerFullName == "**** ****"))
       classOwnerName = Padding(
         padding: EdgeInsets.only(top: 8),
-        child: Container(
-          alignment: Alignment.centerRight,
-          child: AutoSizeText(
-            "استاد:" + classCard.ownerFullName,
-            maxLines: 1,
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
+        child: AutoSizeText(
+          "استاد:" + classCard.ownerFullName,
+          maxLines: 1,
+          textAlign: TextAlign.right,
+          style: TextStyle(
+            color: Colors.black,
+            //fontWeight: FontWeight.w600,
           ),
         ),
       );
@@ -125,14 +123,17 @@ class _ClassCardState extends State<ClassCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               classIcon,
-              Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: AutoSizeText(
-                  classCard.className,
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w900,
+              Container(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 5),
+                  child: FittedBox(
+                    child: Text(
+                      classCard.className,
+                      style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                    ),),
+                    fit:BoxFit.fitWidth,
                   ),
                 ),
               ),

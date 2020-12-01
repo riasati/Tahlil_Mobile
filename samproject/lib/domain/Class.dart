@@ -9,7 +9,7 @@ class Class{
   String _ownerFullName;
   bool _isOwner = false;
 
-  Class(this._className, this._classId, this._ownerFullName, this._isOwner);
+  Class(this._className, this._ownerFullName, this._classId, this._isOwner);
 
   String get className => _className;
 

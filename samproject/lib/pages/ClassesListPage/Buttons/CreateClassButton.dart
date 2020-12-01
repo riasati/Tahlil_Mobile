@@ -234,7 +234,7 @@ class _CreateClassButtonState extends State<CreateClassButton> {
             }, body: body);
         if(response.statusCode == 200 && response.body != null){
           var newClassInfo = json.decode(utf8.decode(response.bodyBytes))["newClass"];
-          var newClass = Class(newClassInfo['name'], newClassInfo['classId'] , HomePage.user.firstname + " " + HomePage.user.lastname, newClassInfo['isOwned']);
+          var newClass = Class(newClassInfo['name'], HomePage.user.firstname + " " + HomePage.user.lastname, newClassInfo['classId'] , newClassInfo['isOwned']);
           btnCreateController.success();
           Navigator.pop(context);
           setState(() {

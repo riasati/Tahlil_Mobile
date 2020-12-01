@@ -16,7 +16,7 @@ import 'ClassNotification.dart';
 import 'EditAndCreateExamButtons.dart';
 
 class InsidClassPage extends StatefulWidget {
-  static Class currentClass = Class("", "", "");
+  static Class currentClass = Class("", "", "", false);
   static Person admin = Person();
   static bool isLoading = true;
   static bool isAdmin = false;
@@ -99,8 +99,9 @@ class _InsidClassPageState extends State<InsidClassPage> {
               'Authorization': token,
               'Content-Type': 'application/json',
             });
+        print(classId);
         var userClassesInfo = json.decode(utf8.decode(response.bodyBytes))["Class"];
-        InsidClassPage.currentClass = Class(userClassesInfo["name"], "", userClassesInfo["classId"]);
+        InsidClassPage.currentClass = Class(userClassesInfo["name"], "", userClassesInfo["classId"] , false);
         InsidClassPage.currentClass.classDescription = userClassesInfo["description"];
         if(InsidClassPage.currentClass.classDescription == null)
           InsidClassPage.currentClass.classDescription = "";
