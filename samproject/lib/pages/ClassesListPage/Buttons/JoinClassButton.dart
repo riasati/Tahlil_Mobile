@@ -9,6 +9,7 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../editProfilePage.dart';
 import '../../homePage.dart';
 
 class JoinButton extends StatefulWidget {
@@ -58,7 +59,7 @@ class _JoinButtonState extends State<JoinButton> {
             color: Colors.transparent,
             borderRadius: new BorderRadius.all(Radius.circular(40.0)),
             child: FlatButton(
-                onPressed: joinBottomSheet,
+                onPressed: goEditProfile,
                 child: Text(
                   "اضافه شدن به کلاس",
                   style: TextStyle(
@@ -70,6 +71,34 @@ class _JoinButtonState extends State<JoinButton> {
         ),
       ),
     );
+  }
+
+  void goEditProfile(){
+    if(HomePage.user.firstname == "****" || HomePage.user.lastname == "****"){
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.warning,
+          title: "ابتدا باید نام خود را اصلاح کنید",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "حله",
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              onPressed: () => {
+                Navigator.pop(context),
+                Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage()))
+              },
+              color: Colors.yellow,
+            ),
+          ],
+        ).show();
+      });
+    }else{
+      joinBottomSheet();
+    }
+
   }
 
   void joinBottomSheet() => showModalBottomSheet(
@@ -162,7 +191,7 @@ class _JoinButtonState extends State<JoinButton> {
         print("hie");
         if(response.statusCode == 200 && response.body != null){
           var joinedClassInfo = json.decode(utf8.decode(response.bodyBytes))["joinedClass"];
-          var joinedClass = Class(joinedClassInfo['name'], joinedClassInfo['ownerFullname'], joinedClassInfo['classId']);
+          var joinedClass = Class(joinedClassInfo['name'], joinedClassInfo['ownerFullname'], joinedClassInfo['classId'], joinedClassInfo['isOwned']);
           Navigator.pop(context);
           setState(() {
             Alert(
@@ -170,16 +199,6 @@ class _JoinButtonState extends State<JoinButton> {
               type: AlertType.success,
               title: "به کلاس اضافه شدید",
               buttons: [
-                DialogButton(
-                  child: Text(
-                    "حله",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => {
-                    Navigator.pop(context),
-                  },
-                  color: Color(0xFF3D5A80),
-                ),
               ],
             ).show();
           });
@@ -195,14 +214,6 @@ class _JoinButtonState extends State<JoinButton> {
               type: AlertType.error,
               title: errorMsg,
               buttons: [
-                DialogButton(
-                  child: Text(
-                    "حله",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.red,
-                ),
               ],
             ).show();
           });
@@ -216,14 +227,6 @@ class _JoinButtonState extends State<JoinButton> {
             type: AlertType.error,
             title: "ابتدا به حساب خود وارد شوید",
             buttons: [
-              DialogButton(
-                child: Text(
-                  "حله",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: () => Navigator.pop(context),
-                color: Colors.red,
-              ),
             ],
           ).show();
         });
@@ -237,14 +240,6 @@ class _JoinButtonState extends State<JoinButton> {
           type: AlertType.error,
           title: "به کلاس اضافه نشدید",
           buttons: [
-            DialogButton(
-              child: Text(
-                "حله",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: () => Navigator.pop(context),
-              color: Colors.red,
-            ),
           ],
         ).show();
       });
