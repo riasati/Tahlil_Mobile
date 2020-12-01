@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/pages/createExamPage.dart';
-import 'package:samproject/pages/editExanPage.dart';
+import 'package:samproject/pages/editExamPage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
 
 class PopupMenu extends StatefulWidget {

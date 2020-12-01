@@ -614,6 +614,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       ShowCorrectnessDialog(true, context);
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
+      CreateExamPage.questionList.clear();
     }
     else
       {

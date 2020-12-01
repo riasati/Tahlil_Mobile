@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/popupMenuData.dart';
-import 'package:samproject/pages/editExanPage.dart';
+import 'package:samproject/pages/editExamPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/widgets/popumMenu.dart';

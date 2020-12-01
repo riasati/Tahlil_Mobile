@@ -389,34 +389,39 @@ class EditExamPageState extends State<EditExamPage> {
     {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-      examTopic.text = responseJson["name"];
-      examDurationTime.text = responseJson["examLength"].toString();
-      List<String> dateAndTime =  responseJson["startDate"].toString().split("T");
+      examTopic.text = responseJson["exam"]["name"];
+      examDurationTime.text = responseJson["exam"]["examLength"].toString();
+      List<String> dateAndTime =  responseJson["exam"]["startDate"].toString().split("T");
+      print(dateAndTime.toString());
       List<String> dates = dateAndTime[0].split("-");
+      print(dates.toString());
       Gregorian g = new Gregorian(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
       Jalali j = g.toJalali();
-      examDate.text = j.year.toString() + "\\" + j.month.toString() + "\\" + j.day.toString();
+      examDate.text = j.year.toString() + "/" + j.month.toString() + "/" + j.day.toString();
       List<String> startExamTime = dateAndTime[1].split(":");
       examStartTime.text = startExamTime[0] + ":" + startExamTime[1];
-      List<String> finishExamTime = responseJson["endDate"].toString().split("T")[1].split(":");
+      List<String> finishExamTime = responseJson["exam"]["endDate"].toString().split("T")[1].split(":");
       examFinishTime.text = finishExamTime[0] + ":" + finishExamTime[1];
       // totalpage = responseJson["totalPages"];
-      for (int i=0;i<responseJson["questions"].length;i++)
+      for (int i=0;i<responseJson["exam"]["questions"].length;i++)
       {
         QuestionServer qs = new QuestionServer();
-        qs.type = responseJson["questions"][i]["question"]["type"];
-        qs.question = responseJson["questions"][i]["question"]["question"];
-        qs.base = responseJson["questions"][i]["question"]["base"];
-        qs.course = responseJson["questions"][i]["question"]["course"];
-        qs.chapter = responseJson["questions"][i]["question"]["chapter"];
-        qs.hardness = responseJson["questions"][i]["question"]["hardness"];
-        qs.answer = responseJson["questions"][i]["question"]["answers"];
-        qs.options = responseJson["questions"][i]["question"]["options"];
-        qs.public = responseJson["questions"][i]["question"]["public"];
-        qs.id = responseJson["questions"][i]["question"]["_id"];
-        qs.imageQuestion = responseJson["questions"][i]["question"]["imageQuestion"];
-        qs.imageAnswer = responseJson["questions"][i]["question"]["imageAnswer"];
-        qs.grade = double.tryParse(responseJson["questions"][i]["grade"]);
+        qs.type = responseJson["exam"]["questions"][i]["question"]["type"];
+        qs.question = responseJson["exam"]["questions"][i]["question"]["question"];
+        qs.base = responseJson["exam"]["questions"][i]["question"]["base"];
+        qs.course = responseJson["exam"]["questions"][i]["question"]["course"];
+        qs.chapter = responseJson["exam"]["questions"][i]["question"]["chapter"];
+        qs.hardness = responseJson["exam"]["questions"][i]["question"]["hardness"];
+        qs.answer = responseJson["exam"]["questions"][i]["question"]["answers"];
+        qs.options = responseJson["exam"]["questions"][i]["question"]["options"];
+        qs.public = responseJson["exam"]["questions"][i]["question"]["public"];
+        qs.id = responseJson["exam"]["questions"][i]["question"]["_id"];
+        qs.imageQuestion = responseJson["exam"]["questions"][i]["question"]["imageQuestion"];
+        qs.imageAnswer = responseJson["exam"]["questions"][i]["question"]["imageAnswer"];
+        if (responseJson["exam"]["questions"][i]["grade"] != null)
+        {
+          qs.grade = responseJson["exam"]["questions"][i]["grade"];
+        }
 
         Question q = Question.QuestionServerToQuestion(qs,qs.type);
         EditExamPage.questionList.add(q);
@@ -672,6 +677,7 @@ class EditExamPageState extends State<EditExamPage> {
       ShowCorrectnessDialog(true, context);
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
+      EditExamPage.questionList.clear();
     }
     else
     {
@@ -679,6 +685,11 @@ class EditExamPageState extends State<EditExamPage> {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
     }
+  }
+  @override
+  void initState() {
+    super.initState();
+    GetExamSpecification();
   }
   @override
   Widget build(BuildContext context) {

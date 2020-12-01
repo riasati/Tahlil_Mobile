@@ -7,7 +7,7 @@ import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/domain/searchFilters.dart';
 import 'package:samproject/pages/createExamPage.dart';
-import 'package:samproject/pages/editExanPage.dart';
+import 'package:samproject/pages/editExamPage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';

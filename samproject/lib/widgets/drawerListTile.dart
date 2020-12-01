@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:samproject/pages/LoginSignupPage/LoginPage.dart';
 import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/editExamPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
@@ -120,11 +121,34 @@ class _DrawerListTileState extends State<DrawerListTile> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => CreateExamPage(),
+                builder: (context) => CreateExamPage(classId: "kuTwxu"),
               ),
             );
           },
         ),
+        ListTile(
+          //leading: Icon(Icons.alarm),
+          title: Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Icon(Icons.book),
+              Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: Text('ویرایش آزمون'),
+              ),
+            ],
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditExamPage(classId: "kuTwxu",examId: "5fc6119b1d2a9d001767a3bc",),
+              ),
+            );
+          },
+        ),
+
         Divider(color: Colors.grey),
         ListTile(
           title:Row(
