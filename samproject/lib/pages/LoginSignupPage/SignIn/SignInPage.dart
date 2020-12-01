@@ -158,7 +158,8 @@ class _SignInPageState extends State<SignInPage> {
                   // ),
                   child: RoundedLoadingButton(
                     // curve: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                    color: Color.fromRGBO(14, 145, 140, 1),
+                    color: Color.fromRGBO(238, 108,77 ,1.0),
+                    borderRadius: 10,
                     controller: btnController,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -176,19 +177,19 @@ class _SignInPageState extends State<SignInPage> {
               ),
             ],
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 15.0),
-            child: FlatButton(
-                onPressed: () {},
-                child: Text(
-                  "فراموشی رمز عبور؟",
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.red,
-                      fontSize: MediaQuery.of(context).size.width * 0.03,
-                      fontFamily: "WorkSansMedium"),
-                )),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.only(top: 15.0),
+          //   child: FlatButton(
+          //       onPressed: () {},
+          //       child: Text(
+          //         "فراموشی رمز عبور؟",
+          //         style: TextStyle(
+          //             decoration: TextDecoration.underline,
+          //             color: Colors.red,
+          //             fontSize: MediaQuery.of(context).size.width * 0.03,
+          //             fontFamily: "WorkSansMedium"),
+          //       )),
+          // ),
         ],
       ),
     );

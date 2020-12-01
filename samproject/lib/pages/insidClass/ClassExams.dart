@@ -47,7 +47,7 @@ class _ClassExamsState extends State<ClassExams> {
               children: [
                 Container(
                   child: Icon(
-                    FontAwesomeIcons.users,
+                    FontAwesomeIcons.questionCircle,
                     size: 50,
                     color: Color(0xFF3D5A80),
                   ),
