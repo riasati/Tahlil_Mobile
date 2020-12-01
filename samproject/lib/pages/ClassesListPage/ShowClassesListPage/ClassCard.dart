@@ -130,9 +130,9 @@ class _ClassCardState extends State<ClassCard> {
                     child: Text(
                       classCard.className,
                       style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                    ),),
+                        color: Colors.black,
+                        fontWeight: FontWeight.w900,
+                      ),),
                     fit:BoxFit.fitWidth,
                   ),
                 ),

@@ -321,7 +321,7 @@ class _ClassExamsState extends State<ClassExams> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = _removeExamURL  + InsidClassPage.currentClass.classId + "/" +exam.examId;
+        var url = _removeExamURL  + exam.examId;
         print(url);
         final response = await delete(url,
             headers: {

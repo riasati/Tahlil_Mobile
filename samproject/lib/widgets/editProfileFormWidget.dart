@@ -12,6 +12,11 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 
 class EditProfileFormWidget extends StatefulWidget {
+  final callHomePageBiuld;
+
+  EditProfileFormWidget( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   @override
   _EditProfileFormWidgetState createState() => _EditProfileFormWidgetState();
 }
@@ -76,6 +81,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
       ShowCorrectnessDialog(false, context);
       _btnController.stop();
     }
+    widget?.callHomePageBiuld();
   }
 
 
@@ -98,6 +104,14 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
 
   String _validateUsername(String value) {
     return value.length < 6 ? 'نام کاربری باید حداقل 6 کاراکتر باشد' : null;
+  }
+
+  String _validateFirstName(String value) {
+    return value.length < 4 ? 'نام  باید حداقل 4 کاراکتر باشد' : null;
+  }
+
+  String _validateLastName(String value) {
+    return value.length < 4 ? 'نام خانوادگی باید حداقل 4 کاراکتر باشد' : null;
   }
   String _validatePassword(String value)
   {
@@ -176,6 +190,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                      border: OutlineInputBorder(),
                    ),
                   onSaved: (value) => HomePage.user.firstname = value,
+                  validator: (value) => _validateFirstName(value),
                 ),
               ),
             ),
@@ -197,6 +212,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                     border: OutlineInputBorder(),
                   ),
                   onSaved: (value) => HomePage.user.lastname = value,
+                  validator: (value) => _validateLastName(value),
                 ),
               ),
             ),

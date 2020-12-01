@@ -76,7 +76,7 @@ class _DrawerListTileState extends State<DrawerListTile> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditProfilePage(),
+                builder: (context) => EditProfilePage(toggleCoinCallback: callHomePageBiuld,),
               ),
             );
           },

@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:samproject/widgets/editProfileFormWidget.dart';
 
 class EditProfilePage extends StatefulWidget {
+  final callHomePageBiuld;
+
+  EditProfilePage( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  _EditProfilePageState createState() => _EditProfilePageState(toggleCoinCallback: callHomePageBiuld);
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final callHomePageBiuld;
+
+  _EditProfilePageState( {@required void toggleCoinCallback() }):
+        callHomePageBiuld = toggleCoinCallback;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +45,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               Column(
                 children: [
-                  EditProfileFormWidget(),
+                  EditProfileFormWidget(toggleCoinCallback: callHomePageBiuld,),
                 ],
               ),
             ],
