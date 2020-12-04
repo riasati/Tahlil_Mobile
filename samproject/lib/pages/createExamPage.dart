@@ -546,6 +546,7 @@ class CreateExamPageState extends State<CreateExamPage> {
   void CreateExam() async
   {
     final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
     String token = prefs.getString("token");
     if (token == null) {
       return;
@@ -599,7 +600,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       "endDate": endExamDatetime.toIso8601String(),
       "examLength": int.tryParse(examDurationTime.text),
       "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
-      "useInClass": "kuTwxu"//widget.classId,
+      "useInClass": widget.classId,
     });
     //print(data);
     final response = await http.post(url,
