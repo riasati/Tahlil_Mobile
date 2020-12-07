@@ -171,8 +171,10 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
 
+        // CreateExamPage.totalGrade += changedQuestion.grade;
+        CreateExamPage.questionList.insert(CreateExamPage.questionList.indexOf(widget.question), changedQuestion.CopyQuestion());
+        CreateExamPage.questionList.removeAt(CreateExamPage.questionList.indexOf(widget.question));
         widget.question = changedQuestion.CopyQuestion();
-
       }
       else{
         ShowCorrectnessDialog(false,context);
@@ -181,16 +183,26 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
         print(responseJson.toString());
 
       }
-
+      CreateExamPageState.calculateTotalGrade(widget.parent);
       setState(() {
         IsEdit = false;
       });
+      // widget.parent.setState(() {
+      //   CreateExamPageState.calculateTotalGrade();
+      // });
     }
     void onCancelClick()
     {
+      // if (widget.question.grade != null)
+      // {
+      //   CreateExamPage.totalGrade += widget.question.grade;
+      // }
       setState(() {
         IsEdit = false;
       });
+      // widget.parent.setState(() {
+      //
+      // });
     }
 
     return Card(
@@ -233,6 +245,11 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
       controllers.FillTashrihiTextController(widget.question.answerString);
       controllers.FillBlankTextController(widget.question.answerString);
       controllers.FillGradeController(widget.question.grade.toString());
+      // if (widget.question.grade != null)
+      // {
+      //   CreateExamPage.totalGrade -= widget.question.grade;
+      //   print(CreateExamPage.totalGrade);
+      // }
       if (widget.question.grade == null)
       {
         controllers.FillGradeController("0.0");
@@ -256,7 +273,7 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
                     children: [
                       Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
                       Flexible(flex: 7,child: NotEditingQuestionSpecification(question: question,)),
-                      (widget.index != 0)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_upward),onPressed: onUpwardArrowClick,)):Container(),
+                      (widget.index != 0)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_upward),onPressed: onUpwardArrowClick,tooltip: "جا به جایی با سوال بالا",)):Container(),
                     ],
                   ),
                   //    NotEditingQuestionSpecification(question: question,),
@@ -272,12 +289,32 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
                 child: Row(
                   textDirection: TextDirection.rtl,
                   children: [
-                    (widget.index != CreateExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
+                    //(widget.index != CreateExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
                     Flexible(flex: 9,child:(question.grade == null) ? Text("بارم : 0.0",textDirection: TextDirection.rtl):Text("بارم : "+ question.grade.toString(),textDirection: TextDirection.rtl)),
                   ],
                 ),
               ),
-              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
+              (widget.index != CreateExamPage.questionList.length-1) ?
+              Row(
+                textDirection: TextDirection.rtl,
+             //     mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,tooltip: "جه به جایی با سوال پایین",)),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 70),
+                      child: RaisedButton(
+                  textColor: Colors.white,
+                  color: Color(0xFF3D5A80),
+                      child: Text("ويرايش"),
+                  onPressed: onEditButton),
+                    )
+                ],
+              ):
+              RaisedButton(
+                  textColor: Colors.white,
+                  color: Color(0xFF3D5A80),
+                  child: Text("ويرايش"),
+                  onPressed: onEditButton),
             ],
           )
       ),
@@ -304,9 +341,15 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
   void onCloseButton() async
   {
     CreateExamPage.questionList.remove(widget.question);
+    // if (widget.question.grade != null)
+    // {
+    //   CreateExamPage.totalGrade -= widget.question.grade;
+    // }
     widget.parent.setState(() {
+      CreateExamPageState.calculateTotalGrade(widget.parent);
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -352,6 +395,7 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
 
 class CreateExamPage extends StatefulWidget {
   static List<Question> questionList = [];
+  static double totalGrade = 0;
   String classId;
   CreateExamPage({Key key,this.classId}) : super(key: key);
   @override
@@ -374,7 +418,20 @@ class CreateExamPageState extends State<CreateExamPage> {
   popupMenuData kindData = new popupMenuData("نوع سوال");
   popupMenuData difficultyData = new popupMenuData("دشواری سوال");
 
+  static void calculateTotalGrade(CreateExamPageState state)
+  {
+    CreateExamPage.totalGrade = 0;
+    for (int i=0;i<CreateExamPage.questionList.length;i++)
+    {
+      if (CreateExamPage.questionList[i].grade != null)
+      {
+        CreateExamPage.totalGrade += CreateExamPage.questionList[i].grade;
+      }
+    }
+    state.setState(() {
 
+    });
+  }
   void ClickAddQuestion()
   {
     setState(() {
@@ -517,6 +574,11 @@ class CreateExamPageState extends State<CreateExamPage> {
 
     Question addQuestion = newQuestion.CopyQuestion();
     CreateExamPage.questionList.add(addQuestion);
+    calculateTotalGrade(this);
+    // if (newQuestion.grade != null)
+    // {
+    //   CreateExamPage.totalGrade += newQuestion.grade;
+    // }
     newQuestion = new Question();
     controller = new Controllers();
     setState(() {
@@ -616,6 +678,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       CreateExamPage.questionList.clear();
+      CreateExamPage.totalGrade = 0;
     }
     else
       {
@@ -631,6 +694,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       appBar: AppBar(
         backgroundColor: Color(0xFF3D5A80),
         title: Container(
+          padding: EdgeInsets.only(right: 40),
           alignment: Alignment.center,
           child: Text(
             "ایجاد آزمون",
@@ -995,6 +1059,22 @@ class CreateExamPageState extends State<CreateExamPage> {
                               // )
                             ],
                           ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text( "جمع نمرات : "+CreateExamPage.totalGrade.toString() ,textDirection: TextDirection.rtl,),
+                              RaisedButton(
+                                  textColor: Colors.white,
+                                  color: Color(0xFF3D5A80),
+                                  child: Text("ایجاد آزمون"),
+                                  onPressed: CreateExam
+                              ),
+                            ],
+                          ),
                         )
                       ],
                     ),
@@ -1067,12 +1147,12 @@ class CreateExamPageState extends State<CreateExamPage> {
                     ),
                   ),
                 ),
-                RaisedButton(
-                    textColor: Colors.white,
-                    color: Color(0xFF3D5A80),
-                    child: Text("ایجاد آزمون"),
-                    onPressed: CreateExam
-                ),
+                // RaisedButton(
+                //     textColor: Colors.white,
+                //     color: Color(0xFF3D5A80),
+                //     child: Text("ایجاد آزمون"),
+                //     onPressed: CreateExam
+                // ),
               ],
             ),
           ),

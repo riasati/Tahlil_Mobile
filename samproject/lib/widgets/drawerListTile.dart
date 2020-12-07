@@ -104,50 +104,50 @@ class _DrawerListTileState extends State<DrawerListTile> {
             );
           },
         ),
-        ListTile(
-          //leading: Icon(Icons.alarm),
-          title: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Icon(Icons.book),
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Text('ایجاد آزمون'),
-              ),
-            ],
-          ),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CreateExamPage(classId: "kuTwxu"),
-              ),
-            );
-          },
-        ),
-        ListTile(
-          //leading: Icon(Icons.alarm),
-          title: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Icon(Icons.book),
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Text('ویرایش آزمون'),
-              ),
-            ],
-          ),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditExamPage(classId: "kuTwxu",examId: "5fc6119b1d2a9d001767a3bc",),
-              ),
-            );
-          },
-        ),
+        // ListTile(
+        //   //leading: Icon(Icons.alarm),
+        //   title: Row(
+        //     textDirection: TextDirection.rtl,
+        //     children: [
+        //       Icon(Icons.book),
+        //       Padding(
+        //         padding: const EdgeInsets.only(right: 10.0),
+        //         child: Text('ایجاد آزمون'),
+        //       ),
+        //     ],
+        //   ),
+        //   onTap: () {
+        //     Navigator.pop(context);
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(
+        //         builder: (context) => CreateExamPage(classId: "kuTwxu"),
+        //       ),
+        //     );
+        //   },
+        // ),
+        // ListTile(
+        //   //leading: Icon(Icons.alarm),
+        //   title: Row(
+        //     textDirection: TextDirection.rtl,
+        //     children: [
+        //       Icon(Icons.book),
+        //       Padding(
+        //         padding: const EdgeInsets.only(right: 10.0),
+        //         child: Text('ویرایش آزمون'),
+        //       ),
+        //     ],
+        //   ),
+        //   onTap: () {
+        //     Navigator.pop(context);
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(
+        //         builder: (context) => EditExamPage(classId: "kuTwxu",examId: "5fc6119b1d2a9d001767a3bc",),
+        //       ),
+        //     );
+        //   },
+        // ),
 
         Divider(color: Colors.grey),
         ListTile(
