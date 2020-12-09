@@ -1,3 +1,5 @@
+import 'package:shamsi_date/shamsi_date.dart';
+
 class Exam{
   String _examId;
   String _name;
@@ -9,6 +11,31 @@ class Exam{
   Exam(this._examId, this._name, this._startDate, this._endDate, this._examLength);
 
 
+  DateTime CreateDateTimeFromJalali(String JalaliDate,String Time)
+  {
+    DateTime returnDateTime;
+    List<String> dates = JalaliDate.split("/");
+    List<String> Times = Time.split(":");
+    Jalali j = new Jalali(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
+    Gregorian g = j.toGregorian();
+    if (Times.length == 1)
+    {
+      returnDateTime = new DateTime(g.year,g.month,g.day,int.tryParse(Times[0]),);
+    }
+    else
+    {
+      returnDateTime = new DateTime(g.year,g.month,g.day,int.tryParse(Times[0]),int.tryParse(Times[1]));
+    }
+    return returnDateTime;
+  }
+  String GetJalaliOfServerGregorian(DateTime serverDateTime)
+  {
+    Gregorian g = new Gregorian(serverDateTime.year,serverDateTime.month,serverDateTime.day);
+    Jalali j = g.toJalali();
+    String jalaliDate = j.year.toString() + "/" + j.month.toString() + "/" + j.day.toString();
+    String returnString = jalaliDate + " " + serverDateTime.hour.toString() + ":" + serverDateTime.minute.toString();
+    return returnString;
+  }
   String get examId => _examId;
 
   set examId(String value) {

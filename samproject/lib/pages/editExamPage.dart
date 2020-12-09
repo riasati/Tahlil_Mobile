@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/question.dart';
@@ -392,20 +393,15 @@ class EditExamPageState extends State<EditExamPage> {
     {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
+
       examTopic.text = responseJson["exam"]["name"];
       examDurationTime.text = responseJson["exam"]["examLength"].toString();
-      List<String> dateAndTime =  responseJson["exam"]["startDate"].toString().split("T");
-      print(dateAndTime.toString());
-      List<String> dates = dateAndTime[0].split("-");
-      print(dates.toString());
-      Gregorian g = new Gregorian(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
-      Jalali j = g.toJalali();
-      examDate.text = j.year.toString() + "/" + j.month.toString() + "/" + j.day.toString();
-      List<String> startExamTime = dateAndTime[1].split(":");
-      examStartTime.text = startExamTime[0] + ":" + startExamTime[1];
-      List<String> finishExamTime = responseJson["exam"]["endDate"].toString().split("T")[1].split(":");
-      examFinishTime.text = finishExamTime[0] + ":" + finishExamTime[1];
-      // totalpage = responseJson["totalPages"];
+      Exam editExam = new Exam(responseJson["exam"]["_id"],responseJson["exam"]["name"],DateTime.parse(responseJson["exam"]["startDate"]),DateTime.parse(responseJson["exam"]["endDate"]),responseJson["exam"]["examLength"]);
+      String jalaliDateTimeStart = editExam.GetJalaliOfServerGregorian(editExam.startDate);
+      String jalaliDateTimeFinish = editExam.GetJalaliOfServerGregorian(editExam.endDate);
+      examDate.text = jalaliDateTimeStart.split(" ")[0];
+      examStartTime.text = jalaliDateTimeStart.split(" ")[1];
+      examFinishTime.text = jalaliDateTimeFinish.split(" ")[1];
       for (int i=0;i<responseJson["exam"]["questions"].length;i++)
       {
         QuestionServer qs = new QuestionServer();

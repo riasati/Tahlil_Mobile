@@ -193,7 +193,7 @@ class EditAndAddtoExamButton extends StatelessWidget {
         //     onPressed: onEditPressed),
         RaisedButton(
             textColor: Colors.white,
-            color: Color(0xFF3D5A80),
+            color: Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
             child: Text("اضافه کردن به آزمون"),
             onPressed: onAddtoExamPressed),
       ],
@@ -209,7 +209,7 @@ class EditAndAddtoExamButton extends StatelessWidget {
                 onPressed: onEditPressed),
             RaisedButton(
                 textColor: Colors.white,
-                color: Color(0xFF3D5A80),
+                color: Color(0xFF0e918c),//Color(0xFF3D5A80),
                 child: Text("انصراف"),
                 onPressed: onCancelPressed)
           ],
