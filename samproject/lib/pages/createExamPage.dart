@@ -421,14 +421,14 @@ class CreateExamPageState extends State<CreateExamPage> {
   popupMenuData kindData = new popupMenuData("نوع سوال");
   popupMenuData difficultyData = new popupMenuData("دشواری سوال");
 
-  int endTime2 = DateTime.now().millisecondsSinceEpoch + 1000 * 60 * 60;
-  int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 60;
-  @override
-  void initState() {
-    super.initState();
-    print(endTime);
-    print(endTime2);
-  }
+  // int endTime2 = DateTime.now().millisecondsSinceEpoch + 1000 * 60 * 60;
+  // int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 60;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   print(endTime);
+  //   print(endTime2);
+  // }
   void  _showDatePicker() {
     showDialog(
       context: context,
@@ -1100,7 +1100,7 @@ class CreateExamPageState extends State<CreateExamPage> {
                               RaisedButton(
                                   textColor: Colors.white,
                                   color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
-                                  child: Text("ایجاد آزمون"),
+                                  child: Text("ایجاد آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
                                   onPressed: CreateExam
                               ),
                             ],
@@ -1177,10 +1177,10 @@ class CreateExamPageState extends State<CreateExamPage> {
                     ),
                   ),
                 ),
-                CountdownTimer(
-                  endTime: endTime,
-
-                ),
+                // CountdownTimer(
+                //   endTime: endTime,
+                //
+                // ),
                 // RaisedButton(
                 //     textColor: Colors.white,
                 //     color: Color(0xFF3D5A80),
