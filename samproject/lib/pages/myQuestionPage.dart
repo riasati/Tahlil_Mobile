@@ -191,7 +191,7 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
             if (kindData.name == HomePage.maps.SKindMap["MULTICHOISE"]) EditingMultiChoiceOption(controllers: controllers,question: changedQuestion,)
             else if (kindData.name == HomePage.maps.SKindMap["TEST"]) EditingTest(question: changedQuestion,controllers: controllers,)
             else if (kindData.name == HomePage.maps.SKindMap["SHORTANSWER"]) EditingShortAnswer(question: changedQuestion,controllers: controllers,)
-            else if (kindData.name == HomePage.maps.SKindMap["LONGANSWER"]) EditingLongAnswer(question: changedQuestion,controllers: controllers,),
+              else if (kindData.name == HomePage.maps.SKindMap["LONGANSWER"]) EditingLongAnswer(question: changedQuestion,controllers: controllers,),
             AddInBankOption(question: changedQuestion,),
             EditAndAddtoExamButton(onEditPressed: onEditButton,onCancelPressed: onCancelClick,IsEditing: true,IsAddtoExamEnable: widget.IsAddtoExamEnable,onAddtoExamPressed: onAddtoExamButton,),
           ],
@@ -203,6 +203,17 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
   {
     void onEditButton()
     {
+      controllers.FillQuestionTextController(widget.question.text);
+      controllers.FillMultiOptionText1Controller(widget.question.optionOne);
+      controllers.FillMultiOptionText2Controller(widget.question.optionTwo);
+      controllers.FillMultiOptionText3Controller(widget.question.optionThree);
+      controllers.FillMultiOptionText4Controller(widget.question.optionFour);
+      controllers.FillTestText1Controller(widget.question.optionOne);
+      controllers.FillTestText2Controller(widget.question.optionTwo);
+      controllers.FillTestText3Controller(widget.question.optionThree);
+      controllers.FillTestText4Controller(widget.question.optionFour);
+      controllers.FillTashrihiTextController(widget.question.answerString);
+      controllers.FillBlankTextController(widget.question.answerString);
       setState(() {
         IsEdit = true;
       });
@@ -222,12 +233,12 @@ class QuestionViewInMyQuestionState extends State<QuestionViewInMyQuestion> {
                       Flexible(flex: 12,child: NotEditingQuestionSpecification(question: question,)),
                     ],
                   ),
-              //    NotEditingQuestionSpecification(question: question,),
+                  //    NotEditingQuestionSpecification(question: question,),
                   NotEditingQuestionText(question: question,),
                   if (widget.question.kind == HomePage.maps.SKindMap["MULTICHOISE"]) NotEditingMultiChoiceOption(question: question,isNull: true,)
                   else if (widget.question.kind == HomePage.maps.SKindMap["TEST"]) NotEditingTest(question: question)
                   else if (widget.question.kind == HomePage.maps.SKindMap["SHORTANSWER"]) NotEditingAnswerString(question: question)
-                  else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]) NotEditingAnswerString(question: question),
+                    else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]) NotEditingAnswerString(question: question),
                 ],
               ),
               EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: widget.IsAddtoExamEnable,onAddtoExamPressed: onAddtoExamButton,),
@@ -403,9 +414,9 @@ class MyQuestionPageState extends State<MyQuestionPage> {
         ShowCorrectnessDialog(true, context);
       }
       else
-        {
-          ShowCorrectnessDialog(false, context);
-        }
+      {
+        ShowCorrectnessDialog(false, context);
+      }
 
     }
 
@@ -413,8 +424,8 @@ class MyQuestionPageState extends State<MyQuestionPage> {
 
   @override
   void initState() {
-   super.initState();
-   getMyQuestion();
+    super.initState();
+    getMyQuestion();
   }
 
   bool IsDelete = false;

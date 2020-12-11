@@ -81,24 +81,56 @@ class _NotEditingMultiChoiceOptionState extends State<NotEditingMultiChoiceOptio
     setState(() {
       optionOne = newValue;
     });
+    if (newValue)
+    {
+      widget.question.numberOne = 1;
+    }
+    else
+    {
+      widget.question.numberOne = 0;
+    }
   }
   bool optionTwo = false;
   void optionTwoChange(bool newValue) {
     setState(() {
       optionTwo = newValue;
     });
+    if (newValue)
+    {
+      widget.question.numberTwo = 1;
+    }
+    else
+    {
+      widget.question.numberTwo = 0;
+    }
   }
   bool optionThree = false;
   void optionThreeChange(bool newValue) {
     setState(() {
       optionThree = newValue;
     });
+    if (newValue)
+    {
+      widget.question.numberThree = 1;
+    }
+    else
+    {
+      widget.question.numberThree = 0;
+    }
   }
   bool optionFour = false;
   void optionFourChange(bool newValue) {
     setState(() {
       optionFour = newValue;
     });
+    if (newValue)
+    {
+      widget.question.numberFour = 1;
+    }
+    else
+    {
+      widget.question.numberFour = 0;
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -198,26 +230,26 @@ class EditAndAddtoExamButton extends StatelessWidget {
             onPressed: onAddtoExamPressed),
       ],
     ) :(IsEditing) ?
-        Row(
-          textDirection: TextDirection.rtl,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RaisedButton(
-                textColor: Colors.white,
-                color: Color(0xFF3D5A80),
-                child: Text("ويرايش"),
-                onPressed: onEditPressed),
-            RaisedButton(
-                textColor: Colors.white,
-                color: Color(0xFF3D5A80),
-                child: Text("انصراف"),
-                onPressed: onCancelPressed)
-          ],
-        ): RaisedButton(
+    Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        RaisedButton(
             textColor: Colors.white,
             color: Color(0xFF3D5A80),
             child: Text("ويرايش"),
-              onPressed: onEditPressed);
+            onPressed: onEditPressed),
+        RaisedButton(
+            textColor: Colors.white,
+            color: Color(0xFF3D5A80),
+            child: Text("انصراف"),
+            onPressed: onCancelPressed)
+      ],
+    ): RaisedButton(
+        textColor: Colors.white,
+        color: Color(0xFF3D5A80),
+        child: Text("ويرايش"),
+        onPressed: onEditPressed);
   }
 }
 
@@ -286,7 +318,7 @@ class _EditingOneLineQuestionSpecificationState extends State<EditingOneLineQues
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.chapterData,))),
 
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.kindData,parent: widget.parent,parent2: widget.parent2,parent5:widget.parent3))),
-       //   Flexible(flex: 2,child: Text((widget.question.kind != null) ? widget.kindData.name : widget.kindData.popupMenuBottonName,textDirection: TextDirection.rtl)),//PopupMenu(Data: widget.kindData,)
+          //   Flexible(flex: 2,child: Text((widget.question.kind != null) ? widget.kindData.name : widget.kindData.popupMenuBottonName,textDirection: TextDirection.rtl)),//PopupMenu(Data: widget.kindData,)
           Flexible(child: Container(alignment: Alignment.center,child: PopupMenu(Data: widget.difficultyData,))),
         ],
       ),
@@ -457,7 +489,7 @@ class _EditingQuestionTextState extends State<EditingQuestionText> {
         if (_QuestionImage == null && widget.question.questionImage == null) Container()
         else if (_QuestionImage != null && widget.question.questionImage == null) Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
         else if (_QuestionImage == null && widget.question.questionImage != null) Container(child: InkWell(onTap:() => _deleteQuestionServerImage(),child: Image.memory(QuestionServerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-        else if (_QuestionImage != null && widget.question.questionImage != null) Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),),
+          else if (_QuestionImage != null && widget.question.questionImage != null) Container(child: InkWell(onTap:() => _deleteQuestionImage(),child: Image.file(_QuestionImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),),
       ],
     );
   }
@@ -656,14 +688,14 @@ class EditingGrade extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 22),
             child: Text("بارم",textDirection: TextDirection.rtl,),
           ),
-        //  SizedBox(width: 30,),
+          //  SizedBox(width: 30,),
           Expanded(
             child: TextFormField(
-            textDirection: TextDirection.rtl,
-            controller: controllers.GradeController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(border: OutlineInputBorder()),
-          ),)
+              textDirection: TextDirection.rtl,
+              controller: controllers.GradeController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(border: OutlineInputBorder()),
+            ),)
         ],
       ),
     );
@@ -705,17 +737,28 @@ class _NotEditingAnswerStringState extends State<NotEditingAnswerString> {
 
 class NotEditingTest extends StatefulWidget {
   Question question;
-  NotEditingTest({Key key,this.question}) : super(key: key);
+  bool isNull = true;
+  NotEditingTest({Key key,this.question,this.isNull = true}) : super(key: key);
   @override
   _NotEditingTestState createState() => _NotEditingTestState();
 }
 
 class _NotEditingTestState extends State<NotEditingTest> {
   int _radioGroupValue = 0;
+  void _radioOnChanged(int index) {
+    setState(() {
+      _radioGroupValue = index;
+    });
+    widget.question.numberOne = index;
+  }
   @override
   void initState() {
     super.initState();
-    _radioGroupValue = widget.question.numberOne;
+    if (widget.isNull)
+    {
+      _radioGroupValue = widget.question.numberOne;
+    }
+
   }
   @override
   Widget build(BuildContext context) {
@@ -728,28 +771,28 @@ class _NotEditingTestState extends State<NotEditingTest> {
           Row(
             textDirection: TextDirection.rtl,
             children: [
-              Radio(visualDensity: VisualDensity.compact,value: 1, groupValue: _radioGroupValue, onChanged: null),
+              Radio(visualDensity: VisualDensity.compact,value: 1, groupValue: _radioGroupValue, onChanged: (widget.isNull) ? null :(index) => _radioOnChanged(index),toggleable: (widget.isNull) ? false : true,),
               Expanded(child: Text(widget.question.optionOne,textDirection: TextDirection.rtl))
             ],
           ),
           Row(
             textDirection: TextDirection.rtl,
             children: [
-              Radio(visualDensity: VisualDensity.compact,value: 2, groupValue: _radioGroupValue, onChanged: null),
+              Radio(visualDensity: VisualDensity.compact,value: 2, groupValue: _radioGroupValue, onChanged: (widget.isNull) ? null :(index) => _radioOnChanged(index),toggleable: (widget.isNull) ? false : true,),
               Expanded(child: Text(widget.question.optionTwo,textDirection: TextDirection.rtl,))
             ],
           ),
           Row(
             textDirection: TextDirection.rtl,
             children: [
-              Radio(visualDensity: VisualDensity.compact,value: 3, groupValue: _radioGroupValue, onChanged: null),
+              Radio(visualDensity: VisualDensity.compact,value: 3, groupValue: _radioGroupValue, onChanged: (widget.isNull) ? null :(index) => _radioOnChanged(index),toggleable: (widget.isNull) ? false : true,),
               Expanded(child: Text(widget.question.optionThree,textDirection: TextDirection.rtl,))
             ],
           ),
           Row(
             textDirection: TextDirection.rtl,
             children: [
-              Radio(visualDensity: VisualDensity.compact,value: 4, groupValue: _radioGroupValue, onChanged: null),
+              Radio(visualDensity: VisualDensity.compact,value: 4, groupValue: _radioGroupValue, onChanged: (widget.isNull) ? null :(index) => _radioOnChanged(index),toggleable: (widget.isNull) ? false : true,),
               Expanded(child: Text(widget.question.optionFour,textDirection: TextDirection.rtl,))
             ],
           ),
@@ -864,7 +907,7 @@ class _EditingLongAnswerState extends State<EditingLongAnswer> {
         if (_AnswerImage == null && widget.question.answerImage == null) Container()
         else if (_AnswerImage != null && widget.question.answerImage == null) Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
         else if (_AnswerImage == null && widget.question.answerImage != null) Container(child: InkWell(onTap:() => _deleteQuestionServerImage(),child: Image.memory(QuestionServerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
-        else if (_AnswerImage != null && widget.question.answerImage != null) Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),),
+          else if (_AnswerImage != null && widget.question.answerImage != null) Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),),
         // (_AnswerImage != null) ? Container(child: InkWell(onTap:() => _deleteAnswerImage(),child: Image.file(_AnswerImage,fit: BoxFit.cover)),height: 200,alignment: Alignment.center,padding: EdgeInsets.all(8.0),)
         //     : Container(),
       ],
@@ -999,15 +1042,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
         }
       }
       else
+      {
+        allOrNothingInDifficulty = true;
+        widget.searchFilters.difficultyList.clear();
+        for (int i = 0;i<difficultykeys.length;i++)
         {
-          allOrNothingInDifficulty = true;
-          widget.searchFilters.difficultyList.clear();
-          for (int i = 0;i<difficultykeys.length;i++)
-          {
-            widget.searchFilters.difficultyList.add(difficultykeys[i]);
-            difficultyMap[difficultykeys[i]] = true;
-          }
+          widget.searchFilters.difficultyList.add(difficultykeys[i]);
+          difficultyMap[difficultykeys[i]] = true;
         }
+      }
     }
     for(int i = 0;i<difficultykeys.length;i++)
     {
@@ -1040,15 +1083,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
         }
       }
       else
+      {
+        allOrNothingInKind = true;
+        widget.searchFilters.kindList.clear();
+        for (int i = 0;i<kindkeys.length;i++)
         {
-          allOrNothingInKind = true;
-          widget.searchFilters.kindList.clear();
-          for (int i = 0;i<kindkeys.length;i++)
-          {
-            widget.searchFilters.kindList.add(kindkeys[i]);
-            kindMap[kindkeys[i]] = true;
-          }
+          widget.searchFilters.kindList.add(kindkeys[i]);
+          kindMap[kindkeys[i]] = true;
         }
+      }
     }
     for(int i = 0;i<kindkeys.length;i++)
     {
@@ -1081,15 +1124,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
         }
       }
       else
+      {
+        allOrNothingInChapter = true;
+        widget.searchFilters.chapterList.clear();
+        for (int i = 0;i<chapterkeys.length;i++)
         {
-          allOrNothingInChapter = true;
-          widget.searchFilters.chapterList.clear();
-          for (int i = 0;i<chapterkeys.length;i++)
-          {
-            widget.searchFilters.chapterList.add(chapterkeys[i]);
-            chapterMap[chapterkeys[i]] = true;
-          }
+          widget.searchFilters.chapterList.add(chapterkeys[i]);
+          chapterMap[chapterkeys[i]] = true;
         }
+      }
     }
     for(int i = 0;i<chapterkeys.length;i++)
     {
@@ -1164,15 +1207,15 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
         }
       }
       else
+      {
+        allOrNothingInPaye = true;
+        widget.searchFilters.payeList.clear();
+        for (int i = 0;i<payekeys.length;i++)
         {
-          allOrNothingInPaye = true;
-          widget.searchFilters.payeList.clear();
-          for (int i = 0;i<payekeys.length;i++)
-          {
-            widget.searchFilters.payeList.add(payekeys[i]);
-            payeMap[payekeys[i]] = true;
-          }
+          widget.searchFilters.payeList.add(payekeys[i]);
+          payeMap[payekeys[i]] = true;
         }
+      }
     }
     for(int i = 0;i<payekeys.length;i++)
     {
@@ -1249,7 +1292,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
-                  child: PopupMenuButton(
+                child: PopupMenuButton(
                     child: Text("پایه تحصیلی",textDirection: TextDirection.rtl),
                     onSelected: onSelectedPayeMenu,
                     itemBuilder: (_) {
@@ -1268,11 +1311,11 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                         ));
                       }
                       return payeList;}
-                  ),
-                  )),
+                ),
+              )),
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
-                  child:PopupMenuButton(
+                child:PopupMenuButton(
                     child: Text("درس",textDirection: TextDirection.rtl),
                     onSelected: onSelectedBookMenu,
                     itemBuilder: (_)
@@ -1293,11 +1336,11 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                       }
                       return bookList;
                     }
-                  ),
+                ),
               )),
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
-                  child: PopupMenuButton(
+                child: PopupMenuButton(
                     child: Text("فصل",textDirection: TextDirection.rtl),
                     onSelected: onSelectedChapterMenu,
                     itemBuilder: (_)
@@ -1318,7 +1361,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                       }
                       return chapterList;
                     }
-                  ),
+                ),
               ))
             ],
           ),
@@ -1330,7 +1373,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
-                  child: PopupMenuButton(
+                child: PopupMenuButton(
                     child: Text("نوع سوال",textDirection: TextDirection.rtl),
                     onSelected: onSelectedKindMenu,
                     itemBuilder: (_)
@@ -1351,11 +1394,11 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                       }
                       return kindList;
                     }
-                  ),
+                ),
               )),
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
-                  child: PopupMenuButton(
+                child: PopupMenuButton(
                     child: Text("دشواری سوال",textDirection: TextDirection.rtl),
                     onSelected: onSelectedDifficultyMenu,
                     itemBuilder: (_)
@@ -1376,7 +1419,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
                       }
                       return difficultyList;
                     }
-                  ),
+                ),
               )),
             ],
           ),
