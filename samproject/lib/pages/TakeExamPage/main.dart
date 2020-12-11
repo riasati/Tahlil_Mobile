@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 
 import 'BottomNavigator.dart';
+import 'LastPage.dart';
 
-void main() => runApp(MaterialApp(
-  home: Scaffold(
-    bottomNavigationBar: BottomNavigator(),
-  ),
-));
+void main() => runApp(LastPage());
