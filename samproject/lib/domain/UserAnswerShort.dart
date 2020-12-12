@@ -1,6 +1,4 @@
-
-
-import 'file:///E:/Courses/Term7/Tahlil_Mobile/samproject/lib/domain/UserAnswer.dart';
+import 'package:samproject/domain/UserAnswer.dart';
 
 class UserAnswerShort extends UserAnswer{
 
