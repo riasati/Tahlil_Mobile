@@ -1,5 +1,5 @@
 import 'package:samproject/domain/quetionServer.dart';
-import 'package:samproject/pages/TakeExamPage/UserAnswer/UserAnswer.dart';
+import 'file:///E:/Courses/Term7/Tahlil_Mobile/samproject/lib/domain/UserAnswer.dart';
 import 'package:samproject/pages/homePage.dart';
 
 class Question
