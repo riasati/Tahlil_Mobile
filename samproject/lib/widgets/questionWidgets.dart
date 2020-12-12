@@ -836,7 +836,8 @@ class EditingShortAnswer extends StatelessWidget {
 class EditingLongAnswer extends StatefulWidget {
   Question question;
   Controllers controllers;
-  EditingLongAnswer({Key key, @required this.controllers,this.question}) : super(key: key);
+  bool showChooseImage = true;
+  EditingLongAnswer({Key key, @required this.controllers,this.question,this.showChooseImage = true}) : super(key: key);
   @override
   _EditingLongAnswerState createState() => _EditingLongAnswerState();
 }
@@ -885,12 +886,14 @@ class _EditingLongAnswerState extends State<EditingLongAnswer> {
           child: Row(
             textDirection: TextDirection.rtl,
             children: [
+              (widget.showChooseImage) ?
               Column(
                 children: [
                   Text("پاسخ سوال",textDirection: TextDirection.rtl,),
                   IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
                 ],
-              ),
+              )
+              : Text("پاسخ سوال",textDirection: TextDirection.rtl,),
               Expanded(
                   child:TextFormField(
                     textDirection: TextDirection.rtl,
