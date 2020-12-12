@@ -1,4 +1,5 @@
 import 'package:samproject/domain/quetionServer.dart';
+import 'file:///E:/Courses/Term7/Tahlil_Mobile/samproject/lib/domain/UserAnswer.dart';
 import 'package:samproject/pages/homePage.dart';
 
 class Question
@@ -23,6 +24,7 @@ class Question
   bool isPublic;
   String id;
   double grade;
+  UserAnswer userAnswer;
 
   Question();
   Question CopyQuestion()
