@@ -1,9 +1,12 @@
+import 'package:samproject/domain/question.dart';
+
 class Exam{
   String _examId;
   String _name;
   DateTime _startDate;
   DateTime _endDate;
   int _examLength;
+  List<Question> _questions = [];
 
 
   Exam(this._examId, this._name, this._startDate, this._endDate, this._examLength);
@@ -37,5 +40,11 @@ class Exam{
 
   set startDate(DateTime value) {
     _startDate = value;
+  }
+
+  List<Question> get questions => _questions;
+
+  set questions(List<Question> value) {
+    _questions = value;
   }
 }
