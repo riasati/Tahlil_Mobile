@@ -273,12 +273,33 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
                 child: Row(
                   textDirection: TextDirection.rtl,
                   children: [
-                    (widget.index != EditExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
+                    //(widget.index != EditExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
                     Flexible(flex: 9,child:(question.grade == null) ? Text("بارم : 0.0",textDirection: TextDirection.rtl):Text("بارم : "+ question.grade.toString(),textDirection: TextDirection.rtl)),
                   ],
                 ),
               ),
-              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
+              //EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
+              (widget.index != EditExamPage.questionList.length-1) ?
+              Row(
+                textDirection: TextDirection.rtl,
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,tooltip: "جه به جایی با سوال پایین",)),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 70),
+                    child: RaisedButton(
+                        textColor: Colors.white,
+                        color: Color(0xFF3D5A80),
+                        child: Text("ويرايش"),
+                        onPressed: onEditButton),
+                  )
+                ],
+              ):
+              RaisedButton(
+                  textColor: Colors.white,
+                  color: Color(0xFF3D5A80),
+                  child: Text("ويرايش"),
+                  onPressed: onEditButton),
             ],
           )
       ),
