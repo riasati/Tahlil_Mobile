@@ -180,6 +180,7 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
         print("Question failed");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
+        widget.question.grade = changedQuestion.grade;
 
       }
       EditExamPageState.calculateTotalGrade(widget.parent);
