@@ -436,6 +436,7 @@ class MyQuestionPageState extends State<MyQuestionPage> {
       appBar: AppBar(
         backgroundColor: Color(0xFF3D5A80),
         title: Container(
+          padding: EdgeInsets.only(right: 40),
           alignment: Alignment.center,
           child: Text(
             "سوالات من",

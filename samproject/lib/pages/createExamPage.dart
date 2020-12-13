@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/question.dart';
@@ -13,6 +14,8 @@ import 'package:samproject/widgets/questionWidgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:shamsi_date/shamsi_date.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 class QuestionViewInCreateExam extends StatefulWidget {
   Question question;
   CreateExamPageState parent;
@@ -171,8 +174,10 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
 
+        // CreateExamPage.totalGrade += changedQuestion.grade;
+        CreateExamPage.questionList.insert(CreateExamPage.questionList.indexOf(widget.question), changedQuestion.CopyQuestion());
+        CreateExamPage.questionList.removeAt(CreateExamPage.questionList.indexOf(widget.question));
         widget.question = changedQuestion.CopyQuestion();
-
       }
       else{
         ShowCorrectnessDialog(false,context);
@@ -181,16 +186,26 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
         print(responseJson.toString());
 
       }
-
+      CreateExamPageState.calculateTotalGrade(widget.parent);
       setState(() {
         IsEdit = false;
       });
+      // widget.parent.setState(() {
+      //   CreateExamPageState.calculateTotalGrade();
+      // });
     }
     void onCancelClick()
     {
+      // if (widget.question.grade != null)
+      // {
+      //   CreateExamPage.totalGrade += widget.question.grade;
+      // }
       setState(() {
         IsEdit = false;
       });
+      // widget.parent.setState(() {
+      //
+      // });
     }
 
     return Card(
@@ -233,6 +248,11 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
       controllers.FillTashrihiTextController(widget.question.answerString);
       controllers.FillBlankTextController(widget.question.answerString);
       controllers.FillGradeController(widget.question.grade.toString());
+      // if (widget.question.grade != null)
+      // {
+      //   CreateExamPage.totalGrade -= widget.question.grade;
+      //   print(CreateExamPage.totalGrade);
+      // }
       if (widget.question.grade == null)
       {
         controllers.FillGradeController("0.0");
@@ -256,7 +276,7 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
                     children: [
                       Flexible(flex: 1,child: IconButton(icon: Icon(Icons.clear),onPressed: onCloseButton,)),
                       Flexible(flex: 7,child: NotEditingQuestionSpecification(question: question,)),
-                      (widget.index != 0)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_upward),onPressed: onUpwardArrowClick,)):Container(),
+                      (widget.index != 0)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_upward),onPressed: onUpwardArrowClick,tooltip: "جا به جایی با سوال بالا",)):Container(),
                     ],
                   ),
                   //    NotEditingQuestionSpecification(question: question,),
@@ -272,12 +292,32 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
                 child: Row(
                   textDirection: TextDirection.rtl,
                   children: [
-                    (widget.index != CreateExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
+                    //(widget.index != CreateExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
                     Flexible(flex: 9,child:(question.grade == null) ? Text("بارم : 0.0",textDirection: TextDirection.rtl):Text("بارم : "+ question.grade.toString(),textDirection: TextDirection.rtl)),
                   ],
                 ),
               ),
-              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
+              (widget.index != CreateExamPage.questionList.length-1) ?
+              Row(
+                textDirection: TextDirection.rtl,
+             //     mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,tooltip: "جه به جایی با سوال پایین",)),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 70),
+                      child: RaisedButton(
+                  textColor: Colors.white,
+                  color: Color(0xFF3D5A80),
+                      child: Text("ويرايش"),
+                  onPressed: onEditButton),
+                    )
+                ],
+              ):
+              RaisedButton(
+                  textColor: Colors.white,
+                  color: Color(0xFF3D5A80),
+                  child: Text("ويرايش"),
+                  onPressed: onEditButton),
             ],
           )
       ),
@@ -304,9 +344,15 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
   void onCloseButton() async
   {
     CreateExamPage.questionList.remove(widget.question);
+    // if (widget.question.grade != null)
+    // {
+    //   CreateExamPage.totalGrade -= widget.question.grade;
+    // }
     widget.parent.setState(() {
+      CreateExamPageState.calculateTotalGrade(widget.parent);
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -352,6 +398,7 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
 
 class CreateExamPage extends StatefulWidget {
   static List<Question> questionList = [];
+  static double totalGrade = 0;
   String classId;
   CreateExamPage({Key key,this.classId}) : super(key: key);
   @override
@@ -374,7 +421,65 @@ class CreateExamPageState extends State<CreateExamPage> {
   popupMenuData kindData = new popupMenuData("نوع سوال");
   popupMenuData difficultyData = new popupMenuData("دشواری سوال");
 
+  // int endTime2 = DateTime.now().millisecondsSinceEpoch + 1000 * 60 * 60;
+  // int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 60;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   print(endTime);
+  //   print(endTime2);
+  // }
+  void  _showDatePicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext _) {
+        return  PersianDateTimePicker(
+          type: 'date',
+          onSelect: (date) {
+            print(date);
+            examDate.text = date;
+          },
+        );
+      },
+    );
+  }
+  void  _showTimePicker(bool IsStart) {
+    showDialog(
+      context: context,
+      builder: (BuildContext _) {
+        return  PersianDateTimePicker(
+          type: 'time',
+          onSelect: (time) {
+            print(time);
+            if (IsStart)
+            {
+              examStartTime.text = time;
+            }
+            else
+              {
+                examFinishTime.text = time;
+              }
 
+          },
+        );
+      },
+    );
+  }
+
+  static void calculateTotalGrade(CreateExamPageState state)
+  {
+    CreateExamPage.totalGrade = 0;
+    for (int i=0;i<CreateExamPage.questionList.length;i++)
+    {
+      if (CreateExamPage.questionList[i].grade != null)
+      {
+        CreateExamPage.totalGrade += CreateExamPage.questionList[i].grade;
+      }
+    }
+    state.setState(() {
+
+    });
+  }
   void ClickAddQuestion()
   {
     setState(() {
@@ -517,6 +622,11 @@ class CreateExamPageState extends State<CreateExamPage> {
 
     Question addQuestion = newQuestion.CopyQuestion();
     CreateExamPage.questionList.add(addQuestion);
+    calculateTotalGrade(this);
+    // if (newQuestion.grade != null)
+    // {
+    //   CreateExamPage.totalGrade += newQuestion.grade;
+    // }
     newQuestion = new Question();
     controller = new Controllers();
     setState(() {
@@ -568,37 +678,16 @@ class CreateExamPageState extends State<CreateExamPage> {
       ShowCorrectnessDialog(false, context);
       return;
     }
-    List<String> dates = examDate.text.split("/");
-    List<String> startTimes = examStartTime.text.split(":");
-    List<String> finishTimes = examFinishTime.text.split(":");
-    Jalali j = new Jalali(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
-    Gregorian g = j.toGregorian();
-    print(g.year.toString() + "-" + g.month.toString() + "-" + g.day.toString() + " " + examStartTime.text);
-    DateTime startExamDatetime;
-    DateTime endExamDatetime;
-    if (startTimes.length == 1)
-    {
-      startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),);
-    }
-    else
-      {
-        startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),int.tryParse(startTimes[1]));
-      }
-    if(finishTimes.length == 1)
-    {
-      endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]));
-    }
-    else
-      {
-        endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]),int.tryParse(finishTimes[1]));
-      }
-    //print(startExamDatetime.toIso8601String());
-    //print(endExamDatetime.toIso8601String());
+    Exam newExam = new Exam(null,examTopic.text,null,null,int.tryParse(examDurationTime.text));
+    DateTime startExamDatetime = newExam.CreateDateTimeFromJalali(examDate.text, examStartTime.text);
+    DateTime endExamDatetime = newExam.CreateDateTimeFromJalali(examDate.text, examFinishTime.text);
+    newExam.startDate = startExamDatetime;
+    newExam.endDate = endExamDatetime;
     data = jsonEncode(<String, dynamic>{
-      "name": examTopic.text,
-      "startDate": startExamDatetime.toIso8601String(),
-      "endDate": endExamDatetime.toIso8601String(),
-      "examLength": int.tryParse(examDurationTime.text),
+      "name": newExam.name,//examTopic.text,
+      "startDate": newExam.startDate.toIso8601String(),
+      "endDate": newExam.endDate.toIso8601String(),
+      "examLength": newExam.examLength,
       "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
       "useInClass": widget.classId,
     });
@@ -616,6 +705,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       CreateExamPage.questionList.clear();
+      CreateExamPage.totalGrade = 0;
     }
     else
       {
@@ -631,6 +721,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       appBar: AppBar(
         backgroundColor: Color(0xFF3D5A80),
         title: Container(
+          padding: EdgeInsets.only(right: 40),
           alignment: Alignment.center,
           child: Text(
             "ایجاد آزمون",
@@ -826,7 +917,8 @@ class CreateExamPageState extends State<CreateExamPage> {
                                             textDirection: TextDirection.rtl,
                                             controller: examDate,
                                             textAlign: TextAlign.right,
-                                            keyboardType: TextInputType.datetime,
+                                            onTap: _showDatePicker,
+                                            //keyboardType: TextInputType.datetime,
                                             decoration: InputDecoration(
                                               labelText: "تاریخ آزمون",
                                               hintText: "1399/9/2",
@@ -899,7 +991,8 @@ class CreateExamPageState extends State<CreateExamPage> {
                                         child: TextFormField(
                                           textDirection: TextDirection.rtl,
                                           controller: examStartTime,
-                                          keyboardType: TextInputType.number,
+                                          onTap: (){_showTimePicker(true);},
+                                          //keyboardType: TextInputType.number,
                                           textAlign: TextAlign.right,
                                           decoration: InputDecoration(
                                             labelText: "شروع آزمون",
@@ -932,7 +1025,8 @@ class CreateExamPageState extends State<CreateExamPage> {
                                           textDirection: TextDirection.rtl,
                                           controller: examFinishTime,
                                           textAlign: TextAlign.right,
-                                          keyboardType: TextInputType.number,
+                                          onTap: (){_showTimePicker(false);},
+                                          //keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                             labelText: "اتمام آزمون",
                                             hintText: "18:00",
@@ -995,6 +1089,22 @@ class CreateExamPageState extends State<CreateExamPage> {
                               // )
                             ],
                           ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text( "جمع نمرات : "+CreateExamPage.totalGrade.toString() ,textDirection: TextDirection.rtl,),
+                              RaisedButton(
+                                  textColor: Colors.white,
+                                  color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
+                                  child: Text("ایجاد آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                  onPressed: CreateExam
+                              ),
+                            ],
+                          ),
                         )
                       ],
                     ),
@@ -1025,19 +1135,19 @@ class CreateExamPageState extends State<CreateExamPage> {
                           children: [
                             RaisedButton(
                               textColor: Colors.white,
-                              color: Color(0xFF3D5A80),
+                              color: Color(0xFF3D5A80),//Color(0xFF3D5A80),
                               child: Text("ایجاد سوال"),
                               onPressed: ClickAddQuestion
                              ),
                             RaisedButton(
                                 textColor: Colors.white,
-                                color: Color(0xFF3D5A80),
+                                color: Color(0xFF0e918c),//Color(0xFF3D5A80),
                                 child: Text("سوالات من"),
                                 onPressed: ClickMyQuestion
                             ),
                             RaisedButton(
                                 textColor: Colors.white,
-                                color: Color(0xFF3D5A80),
+                                color: Color.fromRGBO(238, 108,77 ,1.0),//Color.fromRGBO(28, 160, 160,1.0),//Color(0xFF3D5A80),//Rgb (28,160,160)
                                 child: Text("بانک سوال"),
                                 onPressed: ClickSearchQuestion
                             ),
@@ -1067,12 +1177,16 @@ class CreateExamPageState extends State<CreateExamPage> {
                     ),
                   ),
                 ),
-                RaisedButton(
-                    textColor: Colors.white,
-                    color: Color(0xFF3D5A80),
-                    child: Text("ایجاد آزمون"),
-                    onPressed: CreateExam
-                ),
+                // CountdownTimer(
+                //   endTime: endTime,
+                //
+                // ),
+                // RaisedButton(
+                //     textColor: Colors.white,
+                //     color: Color(0xFF3D5A80),
+                //     child: Text("ایجاد آزمون"),
+                //     onPressed: CreateExam
+                // ),
               ],
             ),
           ),

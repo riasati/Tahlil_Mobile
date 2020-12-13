@@ -1,6 +1,6 @@
 import 'package:samproject/domain/quetionServer.dart';
-import 'file:///E:/Courses/Term7/Tahlil_Mobile/samproject/lib/domain/UserAnswer.dart';
 import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/domain/UserAnswer.dart';
 
 class Question {
   String text;

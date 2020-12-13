@@ -91,14 +91,13 @@ class _HHHState extends State<HHH> {
   }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(height: 50,child: Text("asdfasd"),),
-        Card(
-          child: SingleChildScrollView(child: QuestionViewInTakeExam(question: newQuestion4,)),
-        )
-
-      ],
+    return Center(
+      child: SizedBox(
+        height: 300,
+        child: Card(
+          child: QuestionViewInTakeExam(question: newQuestion4,),
+        ),
+      ),
     );
   }
 }

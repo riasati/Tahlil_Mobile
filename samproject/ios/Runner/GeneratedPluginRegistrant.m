@@ -4,6 +4,18 @@
 
 #import "GeneratedPluginRegistrant.h"
 
+#if __has_include(<flutter_downloader/FlutterDownloaderPlugin.h>)
+#import <flutter_downloader/FlutterDownloaderPlugin.h>
+#else
+@import flutter_downloader;
+#endif
+
+#if __has_include(<flutter_uploader/FlutterUploaderPlugin.h>)
+#import <flutter_uploader/FlutterUploaderPlugin.h>
+#else
+@import flutter_uploader;
+#endif
+
 #if __has_include(<image_picker/FLTImagePickerPlugin.h>)
 #import <image_picker/FLTImagePickerPlugin.h>
 #else
@@ -19,6 +31,8 @@
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
+  [FlutterDownloaderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterDownloaderPlugin"]];
+  [FlutterUploaderPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterUploaderPlugin"]];
   [FLTImagePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTImagePickerPlugin"]];
   [FLTSharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTSharedPreferencesPlugin"]];
 }
