@@ -1,3 +1,6 @@
+import 'package:samproject/domain/question.dart';
+import 'package:shamsi_date/shamsi_date.dart';
+
 class Exam{
   String _examId;
   String _name;
