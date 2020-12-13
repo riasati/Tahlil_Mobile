@@ -6,6 +6,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/domain/question.dart';
+import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -178,7 +180,7 @@ class _ClassExamsState extends State<ClassExams> {
         },
         child: Row(
           children: [
-            InsidClassPage.isAdmin?adminActions(exam):memberActions(),
+            InsidClassPage.isAdmin?adminActions(exam):memberActions(exam),
             Padding(child: AutoSizeText(dateAndTime, textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
             Container(
               child: Padding(
@@ -222,11 +224,13 @@ class _ClassExamsState extends State<ClassExams> {
     );
   }
 
-  Widget memberActions() {
+  Widget memberActions(Exam exam) {
     return Row(
       children: [
         FlatButton(
-          onPressed: (){},
+          onPressed: (){
+            getQuestions(exam);
+          },
           child: Container(
             color: Color.fromRGBO(14, 145, 140, 1),
             child: Padding(
@@ -246,6 +250,70 @@ class _ClassExamsState extends State<ClassExams> {
         ),
       ],
     );
+  }
+
+  void getQuestions(Exam exam) async{
+    Navigator.pop(context);
+    InsidClassPage.isLoading = true;
+    widget?.insidClassPageSetState();
+    print(exam);
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = "http://parham-backend.herokuapp.com/exam/" + exam.examId + "/questions";
+        final response = await get(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        exam.questions = [];
+        if(response.statusCode == 200) {
+          var questionsInfo = json.decode(
+              utf8.decode(response.bodyBytes))["questions"];
+          exam.endDate = DateTime.parse(questionsInfo['user_examEndTime']);
+          for (var questionInfoAndGrad in questionsInfo) {
+            QuestionServer qs = new QuestionServer();
+            qs.grade = questionInfoAndGrad["grade"];
+            var questionInfo = questionInfoAndGrad["question"];
+            qs.question = questionInfo["question"];
+            qs.imageQuestion = questionInfo["imageQuestion"];
+            qs.type = questionInfo["type"];
+            qs.options = questionInfo["options"];
+            Question q = Question.QuestionServerToQuestion(qs,qs.type);
+            exam.questions.add(q);
+            print(q);
+          }
+        }else{
+          print(response.body);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "زمان آزمون فرانرسیده",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+      }
+    }on Exception catch(e){
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.insidClassPageSetState();
   }
 
   Widget adminActions(Exam exam) {

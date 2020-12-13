@@ -47,4 +47,9 @@ class Exam{
   set questions(List<Question> value) {
     _questions = value;
   }
+
+  @override
+  String toString() {
+    return 'Exam{_examId: $_examId, _name: $_name, _startDate: $_startDate, _endDate: $_endDate, _examLength: $_examLength, _questions: $_questions}';
+  }
 }

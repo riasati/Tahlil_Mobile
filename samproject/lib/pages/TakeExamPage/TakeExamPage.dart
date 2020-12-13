@@ -6,6 +6,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/pages/TakeExamPage/BottomNavigator.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,7 +15,7 @@ class TakeExamPage extends StatefulWidget {
   Exam exam;
 
 
-  TakeExamPage(this.exam);
+  //TakeExamPage(this.exam);
 
   @override
   _TakeExamPageState createState() => _TakeExamPageState();
@@ -26,12 +27,17 @@ class _TakeExamPageState extends State<TakeExamPage> {
   @override
   void initState() {
     super.initState();
-    getQuestions();
+    //getQuestions();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        bottomNavigationBar: BottomNavigator(),
+      ),
+    );
   }
 
 

@@ -2,8 +2,7 @@ import 'package:samproject/domain/quetionServer.dart';
 import 'file:///E:/Courses/Term7/Tahlil_Mobile/samproject/lib/domain/UserAnswer.dart';
 import 'package:samproject/pages/homePage.dart';
 
-class Question
-{
+class Question {
   String text;
   String questionImage;
   String answerImage;
@@ -27,8 +26,8 @@ class Question
   UserAnswer userAnswer;
 
   Question();
-  Question CopyQuestion()
-  {
+
+  Question CopyQuestion() {
     Question q = new Question();
     q.text = this.text;
     q.questionImage = this.questionImage;
@@ -52,8 +51,9 @@ class Question
     q.grade = this.grade;
     return q;
   }
-  static Question QuestionServerToQuestion(QuestionServer QS,String ServerKind)
-  {
+
+  static Question QuestionServerToQuestion(
+      QuestionServer QS, String ServerKind) {
     Question Q = new Question();
     Q.id = QS.id;
     Q.text = QS.question;
@@ -66,120 +66,83 @@ class Question
     Q.answerImage = QS.imageAnswer;
     Q.grade = QS.grade;
 
-
-    if (QS.public != null)
-    {
-      if (QS.public == true)
-      {
+    if (QS.public != null) {
+      if (QS.public == true) {
         Q.isPublic = true;
-      }
-      else
-      {
+      } else {
         Q.isPublic = false;
       }
     }
 
-    if (ServerKind == "SHORTANSWER")
-    {
-      if (QS.answer.isEmpty == false)
-      {
+    if (ServerKind == "SHORTANSWER") {
+      if (QS.answer.isEmpty == false) {
         Q.answerString = QS.answer[0]["answer"];
       }
-
-    }
-    else if (ServerKind == "LONGANSWER")
-    {
-      if (QS.answer.isEmpty == false)
-      {
+    } else if (ServerKind == "LONGANSWER") {
+      if (QS.answer.isEmpty == false) {
         Q.answerString = QS.answer[0]["answer"];
       }
-    }
-    else if (ServerKind == "TEST")
-    {
-      for (int i = 0;i<QS.options.length;i++)
-      {
-        if (i==0)
-        {
+    } else if (ServerKind == "TEST") {
+      for (int i = 0; i < QS.options.length; i++) {
+        if (i == 0) {
           Q.optionOne = QS.options[0]["option"];
           Q.optionTwo = "خالی";
           Q.optionThree = "خالی";
           Q.optionFour = "خالی";
-        }
-        else if (i==1)
-        {
+        } else if (i == 1) {
           Q.optionTwo = QS.options[1]["option"];
           Q.optionThree = "خالی";
           Q.optionFour = "خالی";
-        }
-        else if (i==2)
-        {
+        } else if (i == 2) {
           Q.optionThree = QS.options[2]["option"];
           Q.optionFour = "خالی";
-        }
-        else if (i==3)
-        {
+        } else if (i == 3) {
           Q.optionFour = QS.options[3]["option"];
         }
       }
 
       //Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
-     // Q.numberOne = int.parse(QS.answer[0]["answer"]);
-      if (QS.answer[0]["answer"] is !String)
-      {
+      // Q.numberOne = int.parse(QS.answer[0]["answer"]);
+      if (QS.answer[0]["answer"] is! String) {
         Q.numberOne = QS.answer[0]["answer"];
+      } else {
+        Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
       }
-      else
-        {
-          Q.numberOne = int.tryParse(QS.answer[0]["answer"]);
-        }
-    }
-    else if (ServerKind == "MULTICHOISE")
-    {
-      for (int i = 0;i<QS.options.length;i++)
-      {
-        if (i==0)
-        {
+    } else if (ServerKind == "MULTICHOISE") {
+      for (int i = 0; i < QS.options.length; i++) {
+        if (i == 0) {
           Q.optionOne = QS.options[0]["option"];
           Q.optionTwo = "خالی";
           Q.optionThree = "خالی";
           Q.optionFour = "خالی";
-        }
-        else if (i==1)
-        {
+        } else if (i == 1) {
           Q.optionTwo = QS.options[1]["option"];
           Q.optionThree = "خالی";
           Q.optionFour = "خالی";
-        }
-        else if (i==2)
-        {
+        } else if (i == 2) {
           Q.optionThree = QS.options[2]["option"];
           Q.optionFour = "خالی";
-        }
-        else if (i==3)
-        {
+        } else if (i == 3) {
           Q.optionFour = QS.options[3]["option"];
         }
       }
-      for (int i=0;i<QS.answer.length;i++)
-      {
-        if (QS.answer[i]["answer"] == 1)
-        {
+      for (int i = 0; i < QS.answer.length; i++) {
+        if (QS.answer[i]["answer"] == 1) {
           Q.numberOne = 1;
-        }
-        else if (QS.answer[i]["answer"] == 2)
-        {
+        } else if (QS.answer[i]["answer"] == 2) {
           Q.numberTwo = 1;
-        }
-        else if (QS.answer[i]["answer"] == 3)
-        {
+        } else if (QS.answer[i]["answer"] == 3) {
           Q.numberThree = 1;
-        }
-        else if (QS.answer[i]["answer"] == 4)
-        {
+        } else if (QS.answer[i]["answer"] == 4) {
           Q.numberFour = 1;
         }
       }
     }
     return Q;
+  }
+
+  @override
+  String toString() {
+    return 'Question{text: $text, kind: $kind, answerString: $answerString, numberOne: $numberOne, numberTwo: $numberTwo, numberThree: $numberThree, numberFour: $numberFour, optionOne: $optionOne, optionTwo: $optionTwo, optionThree: $optionThree, optionFour: $optionFour, grade: $grade}';
   }
 }
