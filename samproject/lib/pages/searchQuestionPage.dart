@@ -224,66 +224,82 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
  @override
   void initState() {
     super.initState();
-    // payeData.fillStringList(payelist);
-    // bookData.fillStringList(booklist);
-    // chapterData.fillStringList(cahpterlist);
-    // kindData.fillStringList(kindlist);
-    // difficultyData.fillStringList(difficultylist);
-
-    // newQuestion.paye = "دهم";
-    // newQuestion.book = "فیزیک";
-    // newQuestion.chapter = "چهارم";
-    // newQuestion.kind = "تشریحی";
-    // newQuestion.difficulty = "سخت";
-    // newQuestion.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // //newQuestion.image1 = "عکس سوال";
-    // newQuestion.answerString = "منهای شش";
-    // //newQuestion.image2 = "عکس پاسخ";
-    //
-    // newQuestion2.paye = "دهم";
-    // newQuestion2.book = "فیزیک";
-    // newQuestion2.chapter = "چهارم";
-    // newQuestion2.kind = "چند گزینه ای";
-    // newQuestion2.difficulty = "سخت";
-    // newQuestion2.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // newQuestion2.questinImage = "عکس سوال";
-    // newQuestion2.optionOne = "به توان یک";
-    // newQuestion2.optionTwo = "به توان دو";
-    // newQuestion2.optionThree = "به توان سه";
-    // newQuestion2.optionFour = "به توان چهار";
-    // newQuestion2.numberOne = 0;
-    // newQuestion2.numberTwo = 1;
-    // newQuestion2.numberThree = 1;
-    // newQuestion2.numberFour = 0;
-    //
-    // newQuestion3.paye = "دهم";
-    // newQuestion3.book = "فیزیک";
-    // newQuestion3.chapter = "چهارم";
-    // newQuestion3.kind = "تستی";
-    // newQuestion3.difficulty = "سخت";
-    // newQuestion3.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // newQuestion3.questinImage = "عکس سوال";
-    // newQuestion3.optionOne = "به توان یک";
-    // newQuestion3.optionTwo = "به توان دو";
-    // newQuestion3.optionThree = "به توان سه";
-    // newQuestion3.optionFour = "به توان چهار";
-    // newQuestion3.numberOne = 2;
-    //
-    // newQuestion4.paye = "دهم";
-    // newQuestion4.book = "فیزیک";
-    // newQuestion4.chapter = "چهارم";
-    // newQuestion4.kind = "جایخالی";
-    // newQuestion4.difficulty = "سخت";
-    // newQuestion4.text = "هر میکرو معادل با 10 به توان چند است؟";
-    // newQuestion4.questinImage = "عکس سوال";
-    // newQuestion4.answerString = "منهای شش";
-
+    getFirstQuestions();
   }
 
   List<Question> questionList = [];
   int totalpage = 0;
   int thispage = 1;
 
+  void getFirstQuestions() async
+  {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+
+    if (token == null) {return;}
+    String tokenplus = "Bearer" + " " + token;
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': tokenplus,
+      "content-type": "application/json"
+    };
+
+    var params = {
+      'page': '1',
+      'limit': '5',
+    };
+    var query = params.entries.map((p) => '${p.key}=${p.value}').join('&');
+    dynamic data = jsonEncode(<String,dynamic>{
+      "type":[],
+      "base": [],
+      "hardness" : [],
+      "course": [],
+      "chapter" : [],
+    });
+    questionList = [];
+    String url = 'https://parham-backend.herokuapp.com/bank?$query';
+    var response = await http.post(url,
+      headers: headers,
+      body: data,
+    );
+    if (response.statusCode == 200){
+      //print("ok");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      totalpage = responseJson["totalPages"];
+
+      // print(responseJson["questions"].length);
+      for (int i=0;i<responseJson["questions"].length;i++)
+      {
+        QuestionServer qs = new QuestionServer();
+        qs.type = responseJson["questions"][i]["type"];
+        qs.question = responseJson["questions"][i]["question"];
+        qs.base = responseJson["questions"][i]["base"];
+        qs.course = responseJson["questions"][i]["course"];
+        qs.chapter = responseJson["questions"][i]["chapter"];
+        qs.hardness = responseJson["questions"][i]["hardness"];
+        qs.answer = responseJson["questions"][i]["answers"];
+        qs.options = responseJson["questions"][i]["options"];
+        qs.imageQuestion = responseJson["questions"][i]["imageQuestion"];
+        qs.imageAnswer = responseJson["questions"][i]["imageAnswer"];
+        qs.id = responseJson["questions"][i]["qId"];
+
+        Question q = Question.QuestionServerToQuestion(qs,qs.type);
+        questionList.add(q);
+      }
+      setState(() {
+
+      });
+    }
+    else{
+      print("not okey");
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      ShowCorrectnessDialog(false,context);
+    }
+
+  }
   void searchQuestion() async
   {
     final prefs = await SharedPreferences.getInstance();
@@ -381,6 +397,7 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
         backgroundColor: Color(0xFF3D5A80),
         title: Container(
           alignment: Alignment.center,
+          padding: EdgeInsets.only(right: 40),
           child: Text(
             "بانک سوال",
             textDirection: TextDirection.rtl,

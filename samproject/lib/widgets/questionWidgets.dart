@@ -193,7 +193,7 @@ class EditAndAddtoExamButton extends StatelessWidget {
         //     onPressed: onEditPressed),
         RaisedButton(
             textColor: Colors.white,
-            color: Color(0xFF3D5A80),
+            color: Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
             child: Text("اضافه کردن به آزمون"),
             onPressed: onAddtoExamPressed),
       ],
@@ -209,7 +209,7 @@ class EditAndAddtoExamButton extends StatelessWidget {
                 onPressed: onEditPressed),
             RaisedButton(
                 textColor: Colors.white,
-                color: Color(0xFF3D5A80),
+                color: Color(0xFF0e918c),//Color(0xFF3D5A80),
                 child: Text("انصراف"),
                 onPressed: onCancelPressed)
           ],
@@ -1217,7 +1217,39 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
   bool allOrNothingInChapter = false;
   bool allOrNothingInKind = false;
   bool allOrNothingInDifficulty = false;
-
+  String fillStrings(Map<String,bool> map,String str)
+  {
+    int numberSelected = 0;
+    String returnValue;
+    for (bool boolian in map.values)
+    {
+      if (boolian == true)
+      {
+        numberSelected += 1;
+      }
+    }
+    if (numberSelected == 0)
+    {
+      returnValue = str;
+    }
+    map.forEach((key, value)
+    {
+      if (value == true)
+      {
+        if (numberSelected == 1)
+        {
+          returnValue = key;
+        }
+        else
+        {
+          returnValue = key + "...";
+        }
+      }
+    }
+    );
+    return returnValue;
+  }
+ 
   @override
   void initState() {
     super.initState();
@@ -1250,7 +1282,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
             children: [
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
                   child: PopupMenuButton(
-                    child: Text("پایه تحصیلی",textDirection: TextDirection.rtl),
+                    child: Text(fillStrings(payeMap,"پابه تحصیلی"),textDirection: TextDirection.rtl),
                     onSelected: onSelectedPayeMenu,
                     itemBuilder: (_) {
                       payeList = [];
@@ -1273,7 +1305,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
                   child:PopupMenuButton(
-                    child: Text("درس",textDirection: TextDirection.rtl),
+                    child: Text(fillStrings(bookMap,"درس"),textDirection: TextDirection.rtl),
                     onSelected: onSelectedBookMenu,
                     itemBuilder: (_)
                     {
@@ -1298,7 +1330,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
                   child: PopupMenuButton(
-                    child: Text("فصل",textDirection: TextDirection.rtl),
+                    child: Text(fillStrings(chapterMap,"فصل"),textDirection: TextDirection.rtl),
                     onSelected: onSelectedChapterMenu,
                     itemBuilder: (_)
                     {
@@ -1331,7 +1363,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
             children: [
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
                   child: PopupMenuButton(
-                    child: Text("نوع سوال",textDirection: TextDirection.rtl),
+                    child: Text(fillStrings(kindMap,"نوع سوال"),textDirection: TextDirection.rtl),
                     onSelected: onSelectedKindMenu,
                     itemBuilder: (_)
                     {
@@ -1356,7 +1388,7 @@ class _SearchFilterWidgetState extends State<SearchFilterWidget> {
               SizedBox(height: 20,width: 1,child: Container(color: Color(0xFF0e918c),),),
               Expanded(flex: 1,child: Container(alignment: Alignment.center,
                   child: PopupMenuButton(
-                    child: Text("دشواری سوال",textDirection: TextDirection.rtl),
+                    child: Text(fillStrings(difficultyMap,"دشواری سوال"),textDirection: TextDirection.rtl),
                     onSelected: onSelectedDifficultyMenu,
                     itemBuilder: (_)
                     {

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
+import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/popupMenuData.dart';
 import 'package:samproject/domain/question.dart';
@@ -168,7 +170,8 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
         print("Question changed ");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
-
+        EditExamPage.questionList.insert(EditExamPage.questionList.indexOf(widget.question), changedQuestion.CopyQuestion());
+        EditExamPage.questionList.removeAt(EditExamPage.questionList.indexOf(widget.question));
         widget.question = changedQuestion.CopyQuestion();
 
       }
@@ -179,7 +182,7 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
         print(responseJson.toString());
 
       }
-
+      EditExamPageState.calculateTotalGrade(widget.parent);
       setState(() {
         IsEdit = false;
       });
@@ -270,12 +273,33 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
                 child: Row(
                   textDirection: TextDirection.rtl,
                   children: [
-                    (widget.index != EditExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
+                    //(widget.index != EditExamPage.questionList.length-1)? Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,)):Container(width: 0,height: 0,),
                     Flexible(flex: 9,child:(question.grade == null) ? Text("بارم : 0.0",textDirection: TextDirection.rtl):Text("بارم : "+ question.grade.toString(),textDirection: TextDirection.rtl)),
                   ],
                 ),
               ),
-              EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
+              //EditAndAddtoExamButton(onEditPressed: onEditButton,IsAddtoExamEnable: false)
+              (widget.index != EditExamPage.questionList.length-1) ?
+              Row(
+                textDirection: TextDirection.rtl,
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,tooltip: "جه به جایی با سوال پایین",)),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 70),
+                    child: RaisedButton(
+                        textColor: Colors.white,
+                        color: Color(0xFF3D5A80),
+                        child: Text("ويرايش"),
+                        onPressed: onEditButton),
+                  )
+                ],
+              ):
+              RaisedButton(
+                  textColor: Colors.white,
+                  color: Color(0xFF3D5A80),
+                  child: Text("ويرايش"),
+                  onPressed: onEditButton),
             ],
           )
       ),
@@ -303,6 +327,7 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
   {
     EditExamPage.questionList.remove(widget.question);
     widget.parent.setState(() {
+      EditExamPageState.calculateTotalGrade(widget.parent);
     });
   }
   @override
@@ -352,6 +377,7 @@ class EditExamPage extends StatefulWidget {
   static List<Question> questionList = [];
   String classId;
   String examId;
+  static double totalGrade = 0;
   EditExamPage({Key key,this.classId,this.examId}) : super(key: key);
   @override
   EditExamPageState createState() => EditExamPageState();
@@ -372,6 +398,57 @@ class EditExamPageState extends State<EditExamPage> {
   popupMenuData chapterData = new popupMenuData("فصل");
   popupMenuData kindData = new popupMenuData("نوع سوال");
   popupMenuData difficultyData = new popupMenuData("دشواری سوال");
+  void  _showDatePicker() {
+    showDialog(
+      context: context,
+      builder: (BuildContext _) {
+        return  PersianDateTimePicker(
+          type: 'date',
+          onSelect: (date) {
+            print(date);
+            examDate.text = date;
+          },
+        );
+      },
+    );
+  }
+  void  _showTimePicker(bool IsStart) {
+    showDialog(
+      context: context,
+      builder: (BuildContext _) {
+        return  PersianDateTimePicker(
+          type: 'time',
+          onSelect: (time) {
+            print(time);
+            if (IsStart)
+            {
+              examStartTime.text = time;
+            }
+            else
+            {
+              examFinishTime.text = time;
+            }
+
+          },
+        );
+      },
+    );
+  }
+
+  static void calculateTotalGrade(EditExamPageState state)
+  {
+    EditExamPage.totalGrade = 0;
+    for (int i=0;i<EditExamPage.questionList.length;i++)
+    {
+      if (EditExamPage.questionList[i].grade != null)
+      {
+        EditExamPage.totalGrade += EditExamPage.questionList[i].grade;
+      }
+    }
+    state.setState(() {
+
+    });
+  }
   void GetExamSpecification() async
   {
     final prefs = await SharedPreferences.getInstance();
@@ -392,20 +469,15 @@ class EditExamPageState extends State<EditExamPage> {
     {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
+
       examTopic.text = responseJson["exam"]["name"];
       examDurationTime.text = responseJson["exam"]["examLength"].toString();
-      List<String> dateAndTime =  responseJson["exam"]["startDate"].toString().split("T");
-      print(dateAndTime.toString());
-      List<String> dates = dateAndTime[0].split("-");
-      print(dates.toString());
-      Gregorian g = new Gregorian(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
-      Jalali j = g.toJalali();
-      examDate.text = j.year.toString() + "/" + j.month.toString() + "/" + j.day.toString();
-      List<String> startExamTime = dateAndTime[1].split(":");
-      examStartTime.text = startExamTime[0] + ":" + startExamTime[1];
-      List<String> finishExamTime = responseJson["exam"]["endDate"].toString().split("T")[1].split(":");
-      examFinishTime.text = finishExamTime[0] + ":" + finishExamTime[1];
-      // totalpage = responseJson["totalPages"];
+      Exam editExam = new Exam(responseJson["exam"]["_id"],responseJson["exam"]["name"],DateTime.parse(responseJson["exam"]["startDate"]),DateTime.parse(responseJson["exam"]["endDate"]),responseJson["exam"]["examLength"]);
+      String jalaliDateTimeStart = editExam.GetJalaliOfServerGregorian(editExam.startDate);
+      String jalaliDateTimeFinish = editExam.GetJalaliOfServerGregorian(editExam.endDate);
+      examDate.text = jalaliDateTimeStart.split(" ")[0];
+      examStartTime.text = jalaliDateTimeStart.split(" ")[1];
+      examFinishTime.text = jalaliDateTimeFinish.split(" ")[1];
       for (int i=0;i<responseJson["exam"]["questions"].length;i++)
       {
         QuestionServer qs = new QuestionServer();
@@ -429,6 +501,7 @@ class EditExamPageState extends State<EditExamPage> {
         Question q = Question.QuestionServerToQuestion(qs,qs.type);
         EditExamPage.questionList.add(q);
       }
+      calculateTotalGrade(this);
       setState(() {
 
       });
@@ -584,6 +657,7 @@ class EditExamPageState extends State<EditExamPage> {
 
     Question addQuestion = newQuestion.CopyQuestion();
     EditExamPage.questionList.add(addQuestion);
+    calculateTotalGrade(this);
     newQuestion = new Question();
     controller = new Controllers();
     setState(() {
@@ -633,41 +707,56 @@ class EditExamPageState extends State<EditExamPage> {
       ShowCorrectnessDialog(false, context);
       return;
     }
-    List<String> dates = examDate.text.split("/");
-    List<String> startTimes = examStartTime.text.split(":");
-    List<String> finishTimes = examFinishTime.text.split(":");
-    Jalali j = new Jalali(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
-    Gregorian g = j.toGregorian();
-    print(g.year.toString() + "-" + g.month.toString() + "-" + g.day.toString() + " " + examStartTime.text);
-    DateTime startExamDatetime;
-    DateTime endExamDatetime;
-    if (startTimes.length == 1)
-    {
-      startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),);
-    }
-    else
-    {
-      startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),int.tryParse(startTimes[1]));
-    }
-    if(finishTimes.length == 1)
-    {
-      endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]));
-    }
-    else
-    {
-      endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]),int.tryParse(finishTimes[1]));
-    }
-    //print(startExamDatetime.toIso8601String());
-    //print(endExamDatetime.toIso8601String());
+    Exam newExam = new Exam(null,examTopic.text,null,null,int.tryParse(examDurationTime.text));
+    DateTime startExamDatetime = newExam.CreateDateTimeFromJalali(examDate.text, examStartTime.text);
+    DateTime endExamDatetime = newExam.CreateDateTimeFromJalali(examDate.text, examFinishTime.text);
+    newExam.startDate = startExamDatetime;
+    newExam.endDate = endExamDatetime;
     data = jsonEncode(<String, dynamic>{
       "examId":widget.examId,
-      "name": examTopic.text,
-      "startDate": startExamDatetime.toIso8601String(),
-      "endDate": endExamDatetime.toIso8601String(),
-      "examLength": int.tryParse(examDurationTime.text),
+      "name": newExam.name,//examTopic.text,
+      "startDate": newExam.startDate.toIso8601String(),
+      "endDate": newExam.endDate.toIso8601String(),
+      "examLength": newExam.examLength,
       "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
-      "useInClass": widget.classId,//"kuTwxu"//
+      "useInClass": widget.classId,
     });
+
+    // List<String> dates = examDate.text.split("/");
+    // List<String> startTimes = examStartTime.text.split(":");
+    // List<String> finishTimes = examFinishTime.text.split(":");
+    // Jalali j = new Jalali(int.tryParse(dates[0]),int.tryParse(dates[1]),int.tryParse(dates[2]));
+    // Gregorian g = j.toGregorian();
+    // print(g.year.toString() + "-" + g.month.toString() + "-" + g.day.toString() + " " + examStartTime.text);
+    // DateTime startExamDatetime;
+    // DateTime endExamDatetime;
+    // if (startTimes.length == 1)
+    // {
+    //   startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),);
+    // }
+    // else
+    // {
+    //   startExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(startTimes[0]),int.tryParse(startTimes[1]));
+    // }
+    // if(finishTimes.length == 1)
+    // {
+    //   endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]));
+    // }
+    // else
+    // {
+    //   endExamDatetime = new DateTime(g.year,g.month,g.day,int.tryParse(finishTimes[0]),int.tryParse(finishTimes[1]));
+    // }
+    //print(startExamDatetime.toIso8601String());
+    //print(endExamDatetime.toIso8601String());
+    // data = jsonEncode(<String, dynamic>{
+    //   "examId":widget.examId,
+    //   "name": examTopic.text,
+    //   "startDate": startExamDatetime.toIso8601String(),
+    //   "endDate": endExamDatetime.toIso8601String(),
+    //   "examLength": int.tryParse(examDurationTime.text),
+    //   "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
+    //   "useInClass": widget.classId,//"kuTwxu"//
+    // });
     //print(data);
     final response = await http.put(url,
         headers: {
@@ -682,6 +771,7 @@ class EditExamPageState extends State<EditExamPage> {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       EditExamPage.questionList.clear();
+      EditExamPage.totalGrade = 0;
     }
     else
     {
@@ -702,6 +792,7 @@ class EditExamPageState extends State<EditExamPage> {
         backgroundColor: Color(0xFF3D5A80),
         title: Container(
           alignment: Alignment.center,
+          padding: EdgeInsets.only(right: 40),
           child: Text(
             "ویرایش آزمون",
             textDirection: TextDirection.rtl,
@@ -772,7 +863,8 @@ class EditExamPageState extends State<EditExamPage> {
                                               textDirection: TextDirection.rtl,
                                               controller: examDate,
                                               textAlign: TextAlign.right,
-                                              keyboardType: TextInputType.datetime,
+                                              onTap: _showDatePicker,
+                                              //keyboardType: TextInputType.datetime,
                                               decoration: InputDecoration(
                                                 labelText: "تاریخ آزمون",
                                                 hintText: "1399/9/2",
@@ -837,7 +929,8 @@ class EditExamPageState extends State<EditExamPage> {
                                             child: TextFormField(
                                               textDirection: TextDirection.rtl,
                                               controller: examStartTime,
-                                              keyboardType: TextInputType.number,
+                                              onTap: (){_showTimePicker(true);},
+                                              //keyboardType: TextInputType.number,
                                               textAlign: TextAlign.right,
                                               decoration: InputDecoration(
                                                 labelText: "شروع آزمون",
@@ -866,7 +959,8 @@ class EditExamPageState extends State<EditExamPage> {
                                               textDirection: TextDirection.rtl,
                                               controller: examFinishTime,
                                               textAlign: TextAlign.right,
-                                              keyboardType: TextInputType.number,
+                                              onTap: (){_showTimePicker(false);},
+                                              //keyboardType: TextInputType.number,
                                               decoration: InputDecoration(
                                                 labelText: "اتمام آزمون",
                                                 hintText: "18:00",
@@ -880,6 +974,22 @@ class EditExamPageState extends State<EditExamPage> {
                                         )
                                       ],
                                     ))
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: Row(
+                              textDirection: TextDirection.rtl,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text( "جمع نمرات : "+EditExamPage.totalGrade.toString() ,textDirection: TextDirection.rtl,),
+                                RaisedButton(
+                                    textColor: Colors.white,
+                                    color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
+                                    child: Text("ویرایش آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                    onPressed: CreateExam
+                                ),
                               ],
                             ),
                           )
@@ -918,13 +1028,13 @@ class EditExamPageState extends State<EditExamPage> {
                               ),
                               RaisedButton(
                                   textColor: Colors.white,
-                                  color: Color(0xFF3D5A80),
+                                  color: Color(0xFF0e918c),
                                   child: Text("سوالات من"),
                                   onPressed: ClickMyQuestion
                               ),
                               RaisedButton(
                                   textColor: Colors.white,
-                                  color: Color(0xFF3D5A80),
+                                  color: Color.fromRGBO(238, 108,77 ,1.0),
                                   child: Text("بانک سوال"),
                                   onPressed: ClickSearchQuestion
                               ),
@@ -954,12 +1064,12 @@ class EditExamPageState extends State<EditExamPage> {
                       ),
                     ),
                   ),
-                  RaisedButton(
-                      textColor: Colors.white,
-                      color: Color(0xFF3D5A80),
-                      child: Text("ایجاد آزمون"),
-                      onPressed: CreateExam
-                  ),
+                  // RaisedButton(
+                  //     textColor: Colors.white,
+                  //     color: Color(0xFF3D5A80),
+                  //     child: Text("ایجاد آزمون"),
+                  //     onPressed: CreateExam
+                  // ),
                 ],
               ),
             ),
