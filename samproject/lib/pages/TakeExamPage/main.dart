@@ -14,27 +14,27 @@ import 'BottomNavigator.dart';
 //TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 30,EndExam: DateTime.now().add(Duration(minutes: 20)),EndTimerFunction: (){print("hello");},),
 //TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 1,EndExam: DateTime.now().add(Duration(minutes: 2)),EndTimerFunction: (){print("hello");},),
 
-void main() {
-  runApp(
-      TakeExamPage()
-  //     MaterialApp(
-  //   debugShowCheckedModeBanner: false,
-  //   home: Scaffold(
-  //     // body: Column(
-  //     //   children: [
-  //     //     Container(height: 50,child: Text("asdfads"),),
-  //     //     TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 30,EndExam: DateTime.now().add(Duration(minutes: 40)),EndTimerFunction: (){print("hello");},),
-  //     //     TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 30,EndExam: DateTime.now().add(Duration(minutes: 20)),EndTimerFunction: (){print("hello");},),
-  //     //     TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 1,EndExam: DateTime.now().add(Duration(minutes: 2)),EndTimerFunction: (){print("hello");},),
-  //     //   ],
-  //     // ),
-  //     body: HHH(),
-  //     bottomNavigationBar: BottomNavigator(),
-  //   ),
-  // )
-
-  );
-}
+// void main() {
+//   runApp(
+//       // TakeExamPage()
+//   //     MaterialApp(
+//   //   debugShowCheckedModeBanner: false,
+//   //   home: Scaffold(
+//   //     // body: Column(
+//   //     //   children: [
+//   //     //     Container(height: 50,child: Text("asdfads"),),
+//   //     //     TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 30,EndExam: DateTime.now().add(Duration(minutes: 40)),EndTimerFunction: (){print("hello");},),
+//   //     //     TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 30,EndExam: DateTime.now().add(Duration(minutes: 20)),EndTimerFunction: (){print("hello");},),
+//   //     //     TimerWidget(StartUserExam: new DateTime.now(),ExamLenght: 1,EndExam: DateTime.now().add(Duration(minutes: 2)),EndTimerFunction: (){print("hello");},),
+//   //     //   ],
+//   //     // ),
+//   //     body: HHH(),
+//   //     bottomNavigationBar: BottomNavigator(),
+//   //   ),
+//   // )
+//
+//   );
+// }
 class HHH extends StatefulWidget {
   @override
   _HHHState createState() => _HHHState();

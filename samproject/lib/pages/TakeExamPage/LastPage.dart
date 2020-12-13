@@ -1,12 +1,31 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LastPage extends StatefulWidget {
+  String examId;
+
+
+  LastPage(this.examId);
+
   @override
   _LastPageState createState() => _LastPageState();
 }
 
 class _LastPageState extends State<LastPage> {
+  List<DataRow> statuses = [];
+  bool lastPageLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getExamStatus();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,25 +54,28 @@ class _LastPageState extends State<LastPage> {
               ],
             ),
           ),
-          body: ListView(children: <Widget>[
-            DataTable(
-              columns: [
-                DataColumn(
-                    label: Center(
-                      child: Text('شماره سوال',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                    )),
-                DataColumn(
-                    label: Center(
-                      child: Text('پاسخ داده اید',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                    )),
-              ],
-              rows: dataRows(),
-            ),
-          ])),
+          body: LoadingOverlay(
+            child: ListView(children: <Widget>[
+              DataTable(
+                columns: [
+                  DataColumn(
+                      label: Center(
+                        child: Text('شماره سوال',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                      )),
+                  DataColumn(
+                      label: Center(
+                        child: Text('پاسخ داده اید',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                      )),
+                ],
+                rows: statuses,
+              ),
+            ]),
+            isLoading: lastPageLoading,
+          )),
     );
   }
 
@@ -70,7 +92,9 @@ class _LastPageState extends State<LastPage> {
           "بازگشت",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pop(context);
+        },
       ),
     );
   }
@@ -88,18 +112,65 @@ class _LastPageState extends State<LastPage> {
           "پایان",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
       ),
     );
   }
 
-  List<DataRow> dataRows(){
-    List<DataRow> rows = [];
-      for(int i = 1; i < 25 ; i++){
-        rows.add(dataRow(i, true));
-        rows.add(dataRow(25+i, false));
+  void getExamStatus() async{
+    lastPageLoading = true;
+    print(widget.examId);
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = "http://parham-backend.herokuapp.com/exam/" + widget.examId + "/questions/status";
+        final response = await get(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        if(response.statusCode == 200) {
+          var statusesInfo = json.decode(
+              utf8.decode(response.bodyBytes))["status"];
+          for (var statusInfo in statusesInfo) {
+            statuses.add(dataRow(statusInfo["questionIndex"],
+                statusInfo["hasAnswerText"]));
+          }
+          setState(() {
+
+          });
+        }else{
+          print(response.body);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "زمان آزمون فرانرسیده",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
       }
-      return rows;
+    }on Exception catch(e){
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
+    }
+    lastPageLoading = false;
   }
 
   DataRow dataRow(int index, bool isAnswered) {

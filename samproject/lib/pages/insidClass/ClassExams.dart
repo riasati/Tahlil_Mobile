@@ -8,6 +8,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/quetionServer.dart';
+import 'package:samproject/pages/TakeExamPage/TakeExamPage.dart';
 import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -256,9 +257,8 @@ class _ClassExamsState extends State<ClassExams> {
     Navigator.pop(context);
     InsidClassPage.isLoading = true;
     widget?.insidClassPageSetState();
-    print(exam);
+    print(exam.examId);
     final prefs = await SharedPreferences.getInstance();
-    print(prefs.getString("token"));
     String token = prefs.getString("token");
     try {
       if (token != null) {
@@ -274,19 +274,26 @@ class _ClassExamsState extends State<ClassExams> {
         if(response.statusCode == 200) {
           var questionsInfo = json.decode(
               utf8.decode(response.bodyBytes))["questions"];
-          exam.endDate = DateTime.parse(questionsInfo['user_examEndTime']);
+          exam.endDate = DateTime.parse(json.decode(
+              utf8.decode(response.bodyBytes))['user_examEndTime']);
           for (var questionInfoAndGrad in questionsInfo) {
-            QuestionServer qs = new QuestionServer();
-            qs.grade = questionInfoAndGrad["grade"];
+            Question question = new Question();
+            question.grade = questionInfoAndGrad["grade"].toDouble();
+            question.answerString = questionInfoAndGrad["answerText"];
+            //question.answerFile = questionInfoAndGrad["answerText"];
             var questionInfo = questionInfoAndGrad["question"];
-            qs.question = questionInfo["question"];
-            qs.imageQuestion = questionInfo["imageQuestion"];
-            qs.type = questionInfo["type"];
-            qs.options = questionInfo["options"];
-            Question q = Question.QuestionServerToQuestion(qs,qs.type);
-            exam.questions.add(q);
-            print(q);
+            question.text = questionInfo["question"];
+            question.questionImage = questionInfo["imageQuestion"];
+            question.kind = questionInfo["type"];
+            if(question.kind == "MULTICHOISE" || question.kind == "TEST") {
+              question.optionOne = questionInfo["options"][0]["option"];
+              question.optionTwo = questionInfo["options"][1]["option"];
+              question.optionThree = questionInfo["options"][2]["option"];
+              question.optionFour = questionInfo["options"][3]["option"];
+            }
+            exam.questions.add(question);
           }
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TakeExamPage(exam)));
         }else{
           print(response.body);
           setState(() {
