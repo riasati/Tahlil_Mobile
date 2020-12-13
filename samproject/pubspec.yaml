@@ -31,10 +31,11 @@ dependencies:
   loading_overlay: ^0.2.1
   rounded_loading_button: ^1.0.0
   auto_size_text: 2.1.0
-  shamsi_date: ^0.9.1
+  shamsi_date: ^0.8.1
   marquee: 1.6.1
-  scroll_snap_list: 0.5.1
+  persian_datetime_picker: ^1.0.7
   flutter_countdown_timer: ^1.5.0
+  scroll_snap_list: 0.5.1
   flutter_uploader: ^1.2.0
   flutter_downloader: ^1.5.2
   # The following adds the Cupertino Icons font to your application.
