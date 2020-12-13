@@ -26,10 +26,12 @@ class Exam{
     {
       returnDateTime = new DateTime(g.year,g.month,g.day,int.tryParse(Times[0]),int.tryParse(Times[1]));
     }
+    returnDateTime = returnDateTime.subtract(Duration(hours: 3,minutes: 30));
     return returnDateTime;
   }
   String GetJalaliOfServerGregorian(DateTime serverDateTime)
   {
+    serverDateTime = serverDateTime.add(Duration(hours: 3,minutes: 30));
     Gregorian g = new Gregorian(serverDateTime.year,serverDateTime.month,serverDateTime.day);
     Jalali j = g.toJalali();
     String jalaliDate = j.year.toString() + "/" + j.month.toString() + "/" + j.day.toString();
