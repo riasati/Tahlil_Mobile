@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
@@ -8,6 +9,7 @@ import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/pages/TakeExamPage/BottomNavigator.dart';
 import 'package:samproject/pages/TakeExamPage/LastPage.dart';
+import 'package:samproject/pages/TakeExamPage/QuestionView.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,11 +27,24 @@ class _TakeExamPageState extends State<TakeExamPage> {
   //Exam exam = new Exam("", "", new DateTime(2020) , new DateTime(2020), 0);
   int _currentQuestion = 0;
   GlobalKey<ScrollSnapListState> questionRouterKey = GlobalKey();
+  DateTime user_examEndTime;
+  int endTime;
 
+  void endTimerFunction()
+  {
+
+  }
+  void getQuestions()
+  {
+    // fill this exam.question
+    // fill user_examEndTime
+  }
   @override
   void initState() {
     super.initState();
-    //getQuestions();
+    getQuestions();
+    user_examEndTime = DateTime.now().add(Duration(hours: 1));
+    endTime = user_examEndTime.millisecondsSinceEpoch;
   }
 
   @override
@@ -38,12 +53,27 @@ class _TakeExamPageState extends State<TakeExamPage> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         bottomNavigationBar: buildBottomNavigator(context),
-        body: Center(
-          child: Container(
-            child: Text(
-              widget.exam.questions[_currentQuestion].kind
+        body: Column(
+          children: [
+            Row(
+              textDirection: TextDirection.rtl,
+              children: [
+                Text(widget.exam.name,textDirection: TextDirection.rtl,),
+                Expanded(child: Container()),
+                CountdownTimer(endTime: endTime,onEnd: endTimerFunction,)
+              ],
             ),
-          ),
+            Center(
+              child: Card(
+                child: QuestionViewInTakeExam(question: widget.exam.questions[_currentQuestion],ExamId: widget.exam.examId,questionIndex: _currentQuestion,),
+              )
+              // Container(
+              //   child: Text(
+              //     widget.exam.questions[_currentQuestion].kind
+              //   ),
+              // ),
+            ),
+          ],
         ),
       ),
     );
