@@ -9,4 +9,9 @@ class UserAnswerMultipleChoice extends UserAnswer{
   set userChoices(List<int> value) {
     _userChoices = value;
   }
+
+  @override
+  String toString() {
+    return 'UserAnswerMultipleChoice{_userChoices: $_userChoices}';
+  }
 }

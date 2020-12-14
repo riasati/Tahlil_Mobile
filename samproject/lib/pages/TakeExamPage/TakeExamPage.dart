@@ -31,7 +31,7 @@ class _TakeExamPageState extends State<TakeExamPage> {
 
   void endTimerFunction()
   {
-
+    Navigator.push(context, MaterialPageRoute(builder: (context) => LastPage(widget.exam.examId, true)));
   }
 
   PageController controller=PageController();
@@ -165,7 +165,7 @@ class _TakeExamPageState extends State<TakeExamPage> {
         onPressed: (){
           setState(() {
             if(_currentQuestion == widget.exam.questions.length - 1)
-              Navigator.push(context, MaterialPageRoute(builder: (context) => LastPage(widget.exam.examId)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => LastPage(widget.exam.examId, false)));
             else
               _currentQuestion++;
             controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);

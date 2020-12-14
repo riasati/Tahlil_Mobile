@@ -3,6 +3,7 @@ import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/domain/UserAnswer.dart';
 
 class Question {
+  int index;
   String text;
   String questionImage;
   String answerImage;

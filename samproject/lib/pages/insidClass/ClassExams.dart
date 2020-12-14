@@ -6,6 +6,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/domain/UserAnswer.dart';
+import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
+import 'package:samproject/domain/UserAnswerShort.dart';
+import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/domain/quetionServer.dart';
 import 'package:samproject/pages/TakeExamPage/TakeExamPage.dart';
@@ -276,12 +280,11 @@ class _ClassExamsState extends State<ClassExams> {
               utf8.decode(response.bodyBytes))["questions"];
           exam.endDate = DateTime.parse(json.decode(
               utf8.decode(response.bodyBytes))['user_examEndTime']);
-          for (var questionInfoAndGrad in questionsInfo) {
+          //print(response.body);
+          for (var questionGradeAnswerInfo in questionsInfo) {
             Question question = new Question();
-            question.grade = questionInfoAndGrad["grade"].toDouble();
-            question.answerString = questionInfoAndGrad["answerText"];
-            //question.answerFile = questionInfoAndGrad["answerText"];
-            var questionInfo = questionInfoAndGrad["question"];
+            var questionInfo = questionGradeAnswerInfo["question"];
+            question.index = questionInfo["index"];
             question.text = questionInfo["question"];
             question.questionImage = questionInfo["imageQuestion"];
             question.kind = questionInfo["type"];
@@ -291,6 +294,30 @@ class _ClassExamsState extends State<ClassExams> {
               question.optionThree = questionInfo["options"][2]["option"];
               question.optionFour = questionInfo["options"][3]["option"];
             }
+            if(questionGradeAnswerInfo["answerText"] != null) {
+              if (question.kind == "TEST") {
+                UserAnswerTest userAnswerTest = new UserAnswerTest();
+                userAnswerTest.userChoice =
+                    int.parse(questionGradeAnswerInfo["answerText"]);
+                question.userAnswer = userAnswerTest;
+              }
+              else if (question.kind == "MULTICHOISE") {
+                UserAnswerMultipleChoice userAnswerMultipleChoice = new UserAnswerMultipleChoice();
+                String answerText = questionGradeAnswerInfo["answerText"];
+                userAnswerMultipleChoice.userChoices =
+                    answerText.split(",").map(int.parse).toList();
+                question.userAnswer = userAnswerMultipleChoice;
+              }
+              else if(question.kind == "SHORTANSWER"){
+                UserAnswerShort userAnswerShort = new UserAnswerShort();
+                userAnswerShort.answerText = questionGradeAnswerInfo["answerText"];
+                question.userAnswer = userAnswerShort;
+              }
+              //TODO USER ANSWER LONG
+            }
+            question.grade = questionGradeAnswerInfo["grade"].toDouble();
+            question.answerString = questionGradeAnswerInfo["answerText"];
+            //question.answerFile = questionInfoAndGrad["answerText"];
             exam.questions.add(question);
           }
           Navigator.push(context, MaterialPageRoute(builder: (context) => TakeExamPage(exam)));

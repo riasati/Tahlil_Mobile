@@ -9,4 +9,9 @@ class UserAnswerShort extends UserAnswer{
   set answerText(String value) {
     _answerText = value;
   }
+
+  @override
+  String toString() {
+    return 'UserAnswerShort{_answerText: $_answerText}';
+  }
 }

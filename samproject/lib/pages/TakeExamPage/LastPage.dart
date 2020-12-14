@@ -9,9 +9,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LastPage extends StatefulWidget {
   String examId;
+  bool finish;
 
 
-  LastPage(this.examId);
+  LastPage(this.examId, this.finish);
 
   @override
   _LastPageState createState() => _LastPageState();
@@ -41,11 +42,11 @@ class _LastPageState extends State<LastPage> {
                 ),
             height: 70,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: widget.finish?MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
               children: [
                 Container(
-                  child: previousButton(),
-                  width: 100,
+                  child: widget.finish?Text(""):previousButton(),
+                  width: widget.finish?1:100,
                 ),
                 Container(
                   child: finishButton(),

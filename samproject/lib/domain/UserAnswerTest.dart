@@ -8,4 +8,9 @@ class UserAnswerTest extends UserAnswer{
   set userChoice(int value) {
     _userChoice = value;
   }
+
+  @override
+  String toString() {
+    return 'UserAnswerTest{_userChoice: $_userChoice}';
+  }
 }
