@@ -36,15 +36,27 @@ class _TakeExamPageState extends State<TakeExamPage> {
   }
   void getQuestions()
   {
-    // fill this exam.question
+    // fill this exam.question and call fillPageList
     // fill user_examEndTime
   }
+
+  PageController controller=PageController();
+  List<Widget> _list=<Widget>[];
+  void fillPageList()
+  {
+    for(int i = 0;i<widget.exam.questions.length;i++)
+    {
+      _list.add(QuestionViewInTakeExam(question: widget.exam.questions[i],ExamId: widget.exam.examId,questionIndex: i+1,));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getQuestions();
     user_examEndTime = DateTime.now().add(Duration(hours: 1));
     endTime = user_examEndTime.millisecondsSinceEpoch;
+
   }
 
   @override
@@ -64,8 +76,16 @@ class _TakeExamPageState extends State<TakeExamPage> {
               ],
             ),
             Center(
-              child: Card(
-                child: QuestionViewInTakeExam(question: widget.exam.questions[_currentQuestion],ExamId: widget.exam.examId,questionIndex: _currentQuestion,),
+              child: PageView(
+                controller: controller,
+                scrollDirection: Axis.horizontal,
+                children: _list,
+                onPageChanged: (num)
+                {
+                  setState(() {
+                    _currentQuestion = num;
+                  });
+                },
               )
               // Container(
               //   child: Text(

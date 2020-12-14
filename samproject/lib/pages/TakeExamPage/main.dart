@@ -94,9 +94,7 @@ class _HHHState extends State<HHH> {
     return Center(
       child: SizedBox(
         height: 300,
-        child: Card(
-          child: QuestionViewInTakeExam(question: newQuestion4,ExamId: "5fd71095c27be4001719c8d7",questionIndex: 2,),
-        ),
+        child: QuestionViewInTakeExam(question: newQuestion4,ExamId: "5fd71095c27be4001719c8d7",questionIndex: 2,),
       ),
     );
   }

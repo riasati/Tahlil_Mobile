@@ -259,75 +259,77 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   // }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      textDirection: TextDirection.rtl,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: [
-                  Text("بارم",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
-                  Text(widget.question.grade.toString(),textDirection: TextDirection.rtl,textAlign: TextAlign.center),
-                ],
+    return Card(
+      child: Column(
+        textDirection: TextDirection.rtl,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: Column(
+                  children: [
+                    Text("بارم",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                    Text(widget.question.grade.toString(),textDirection: TextDirection.rtl,textAlign: TextAlign.center),
+                  ],
+                ),
               ),
-            ),
-            Expanded(flex: 10,child: NotEditingQuestionText(question: widget.question,)),
-          ],
-        ),
-        //NotEditingQuestionSpecification(question: widget.question,),
-       // NotEditingQuestionText(question: widget.question,),
-        if (widget.question.kind == "چند گزینه ای"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: UserAnswerQuestion,isNull: false,)
-        else if (widget.question.kind == "تست"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: UserAnswerQuestion,isNull: false,)
-        else if (widget.question.kind == "پاسخ کوتاه"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: UserAnswerQuestion,controllers: controllers,)
-          else if (widget.question.kind == "تشریحی"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: UserAnswerQuestion,controllers: controllers,showChooseImage: false,),
-        //RaisedButton(onPressed: filePicker,child: Text("انتخاب فایل"),)
-        //IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
-        // (_AnswerFile != null) ? Image.file(_AnswerFile) : Container(),
-        (_AnswerFile != null) ? Row(
-          children: [
-            IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
-            Expanded(child: Container()),
-            Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
-          ],
-        ) : Container(),
-        if (registeredAnswer == false && widget.question.kind != "تشریحی") Row(
-          textDirection: TextDirection.rtl,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
-          ],
-        )
-        else if (registeredAnswer == true && widget.question.kind != "تشریحی") Row(
-          textDirection: TextDirection.rtl,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color : Color(0xFF0e918c),textColor: Colors.white,),
-            RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
-          ],
-        )
-        else if (registeredAnswer == false && widget.question.kind == "تشریحی") Row(
+              Expanded(flex: 10,child: NotEditingQuestionText(question: widget.question,)),
+            ],
+          ),
+          //NotEditingQuestionSpecification(question: widget.question,),
+         // NotEditingQuestionText(question: widget.question,),
+          if (widget.question.kind == "چند گزینه ای"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: UserAnswerQuestion,isNull: false,)
+          else if (widget.question.kind == "تست"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: UserAnswerQuestion,isNull: false,)
+          else if (widget.question.kind == "پاسخ کوتاه"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: UserAnswerQuestion,controllers: controllers,)
+            else if (widget.question.kind == "تشریحی"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: UserAnswerQuestion,controllers: controllers,showChooseImage: false,),
+          //RaisedButton(onPressed: filePicker,child: Text("انتخاب فایل"),)
+          //IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
+          // (_AnswerFile != null) ? Image.file(_AnswerFile) : Container(),
+          (_AnswerFile != null) ? Row(
+            children: [
+              IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
+              Expanded(child: Container()),
+              Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
+            ],
+          ) : Container(),
+          if (registeredAnswer == false && widget.question.kind != "تشریحی") Row(
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
-              RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+              RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
             ],
-        )
-        else if (registeredAnswer == true && widget.question.kind == "تشریحی") Row(
+          )
+          else if (registeredAnswer == true && widget.question.kind != "تشریحی") Row(
+            textDirection: TextDirection.rtl,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color : Color(0xFF0e918c),textColor: Colors.white,),
+              RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+            ],
+          )
+          else if (registeredAnswer == false && widget.question.kind == "تشریحی") Row(
               textDirection: TextDirection.rtl,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
-                RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
-                RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+                RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
               ],
-        ),
-        // (widget.question.kind == "تشریحی") ? RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل"),) : Container(),
-        // RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ")),
-      ],
+          )
+          else if (registeredAnswer == true && widget.question.kind == "تشریحی") Row(
+                textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+                  RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+                  RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+                ],
+          ),
+          // (widget.question.kind == "تشریحی") ? RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل"),) : Container(),
+          // RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ")),
+        ],
+      ),
     );
   }
 }
