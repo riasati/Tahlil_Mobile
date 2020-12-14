@@ -133,6 +133,17 @@ class _NotEditingMultiChoiceOptionState extends State<NotEditingMultiChoiceOptio
     }
   }
   @override
+  void initState() {
+    super.initState();
+    if (widget.isNull == false)
+    {
+      (widget.question.numberOne == 1) ? optionOne = true: optionOne = false;
+      (widget.question.numberTwo == 1) ? optionTwo = true: optionTwo = false;
+      (widget.question.numberThree == 1) ? optionThree = true: optionThree = false;
+      (widget.question.numberFour == 1) ? optionFour = true: optionFour = false;
+    }
+  }
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(4.0),
@@ -754,10 +765,10 @@ class _NotEditingTestState extends State<NotEditingTest> {
   @override
   void initState() {
     super.initState();
-    if (widget.isNull)
-    {
+  //  if (widget.isNull)
+  //  {
       _radioGroupValue = widget.question.numberOne;
-    }
+  //  }
 
   }
   @override

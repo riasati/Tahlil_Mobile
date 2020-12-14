@@ -3,9 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
 //import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
@@ -28,16 +30,7 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   Question UserAnswerQuestion = new Question();
   File _AnswerFile;
   bool registeredAnswer = false;
-  // final picker = ImagePicker();
-  // void getAnswerImage() async {
-  //   final pickedFile = await picker.getImage(source: ImageSource.gallery);
-  //   setState(() {
-  //     if (pickedFile != null ) {
-  //       _AnswerImage = File(pickedFile.path);
-  //      // widget.question.answerImage = base64Encode(_AnswerImage.readAsBytesSync());
-  //     }
-  //   });
-  // }
+
   void chooseFile() async
   {
     final picker = ImagePicker();
@@ -47,29 +40,25 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
         _AnswerFile = File(pickedFile.path);
       }
     });
-    // _AnswerFile = File("/sdcard/Download/Feasibility Study Phase.pdf");
-    // setState(() {
-    //
-    // });
   }
   void sendAnswer() async
   {
      final prefs = await SharedPreferences.getInstance();
      String token = prefs.getString("token");
      //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
-     //if (token == null) {ShowCorrectnessDialog(false, context);return;}
+    // if (token == null) {ShowCorrectnessDialog(false, context);return;}
      String tokenplus = "Bearer" + " " + token;
      String answer = "";
      if (widget.question.kind == "TEST")
      {
-       answer = UserAnswerQuestion.numberOne.toString();
+       answer = widget.question.numberOne.toString();
      }
      else if (widget.question.kind == "MULTICHOISE")
      {
-       (UserAnswerQuestion.numberOne == 1) ? answer += "1," : null;
-       (UserAnswerQuestion.numberTwo == 1) ? answer += "2," : null;
-       (UserAnswerQuestion.numberThree == 1) ? answer += "3," : null;
-       (UserAnswerQuestion.numberFour == 1) ? answer += "4," : null;
+       (widget.question.numberOne == 1) ? answer += "1," : null;
+       (widget.question.numberTwo == 1) ? answer += "2," : null;
+       (widget.question.numberThree == 1) ? answer += "3," : null;
+       (widget.question.numberFour == 1) ? answer += "4," : null;
        if (answer.endsWith(","))
        {
          String answerPlus = "";
@@ -223,6 +212,10 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
       setState(() {
         registeredAnswer = false;
         _AnswerFile = null;
+        widget.question.numberOne = null;
+        widget.question.numberTwo = null;
+        widget.question.numberThree = null;
+        widget.question.numberFour = null;
       });
       
     }
@@ -236,17 +229,20 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   @override
   void initState() {
     super.initState();
-    //UserAnswerQuestion = new Question();
-   // UserAnswerQuestion = widget.question.CopyQuestion();
-    UserAnswerQuestion.text = widget.question.text;
-    UserAnswerQuestion.optionOne = widget.question.optionOne;
-    UserAnswerQuestion.optionTwo = widget.question.optionTwo;
-    UserAnswerQuestion.optionThree = widget.question.optionThree;
-    UserAnswerQuestion.optionFour = widget.question.optionFour;
-
-    print(UserAnswerQuestion);
-
-    //basename(_AnswerFile.path);
+    if (widget.question.kind == "TEST")
+    {
+      if (widget.question.numberOne != null)
+      {
+        registeredAnswer = true;
+      }
+    }
+    if (widget.question.kind == "MULTICHOISE")
+    {
+      if (widget.question.numberOne != null || widget.question.numberTwo != null || widget.question.numberThree != null || widget.question.numberFour != null)
+      {
+        registeredAnswer = true;
+      }
+    }
   }
   // void filePicker()async
   // {
@@ -260,11 +256,8 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   // }
   @override
   Widget build(BuildContext context) {
-    //UserAnswerQuestion = widget.question.CopyQuestion();
-    // UserAnswerQuestion.numberOne = 0;
-    // UserAnswerQuestion.numberTwo = 0;
-    // UserAnswerQuestion.numberThree = 0;
-    // UserAnswerQuestion.numberFour = 0;
+    print(widget.question);
+    print(registeredAnswer);
     return Card(
       child: Column(
         textDirection: TextDirection.rtl,
@@ -286,13 +279,10 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
           ),
           //NotEditingQuestionSpecification(question: widget.question,),
          // NotEditingQuestionText(question: widget.question,),
-          if (widget.question.kind == "MULTICHOISE"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: UserAnswerQuestion,isNull: false,)
-          else if (widget.question.kind == "TEST"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: UserAnswerQuestion,isNull: false,)
-          else if (widget.question.kind == "SHORTANSWER"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: UserAnswerQuestion,controllers: controllers,)
-            else if (widget.question.kind == "LONGANSWER"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: UserAnswerQuestion,controllers: controllers,showChooseImage: false,),
-          //RaisedButton(onPressed: filePicker,child: Text("انتخاب فایل"),)
-          //IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
-          // (_AnswerFile != null) ? Image.file(_AnswerFile) : Container(),
+          if (widget.question.kind == "MULTICHOISE"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: widget.question,isNull: false,)
+          else if (widget.question.kind == "TEST"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: widget.question,isNull: false,)
+          else if (widget.question.kind == "SHORTANSWER"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: widget.question,controllers: controllers,)
+            else if (widget.question.kind == "LONGANSWER"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: widget.question,controllers: controllers,showChooseImage: false,),
           (_AnswerFile != null) ? Row(
             children: [
               IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
@@ -332,8 +322,6 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
                   RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
                 ],
           ),
-          // (widget.question.kind == "تشریحی") ? RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل"),) : Container(),
-          // RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ")),
         ],
       ),
     );
