@@ -1,3 +1,4 @@
+import 'package:samproject/domain/question.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 class Exam{
@@ -6,6 +7,7 @@ class Exam{
   DateTime _startDate;
   DateTime _endDate;
   int _examLength;
+  List<Question> _questions = [];
 
 
   Exam(this._examId, this._name, this._startDate, this._endDate, this._examLength);
@@ -66,5 +68,16 @@ class Exam{
 
   set startDate(DateTime value) {
     _startDate = value;
+  }
+
+  List<Question> get questions => _questions;
+
+  set questions(List<Question> value) {
+    _questions = value;
+  }
+
+  @override
+  String toString() {
+    return 'Exam{_examId: $_examId, _name: $_name, _startDate: $_startDate, _endDate: $_endDate, _examLength: $_examLength, _questions: $_questions}';
   }
 }

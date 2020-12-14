@@ -6,6 +6,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/domain/UserAnswer.dart';
+import 'package:samproject/domain/question.dart';
+import 'package:samproject/pages/ReviewExamPage/ReviewExamPage.dart';
 import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -178,7 +181,7 @@ class _ClassExamsState extends State<ClassExams> {
         },
         child: Row(
           children: [
-            InsidClassPage.isAdmin?adminActions(exam):memberActions(),
+            InsidClassPage.isAdmin?adminActions(exam):memberActions(exam),
             Padding(child: AutoSizeText(dateAndTime, textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
             Container(
               child: Padding(
@@ -222,11 +225,13 @@ class _ClassExamsState extends State<ClassExams> {
     );
   }
 
-  Widget memberActions() {
+  Widget memberActions(Exam exam) {
     return Row(
       children: [
         FlatButton(
-          onPressed: (){},
+          onPressed: (){
+            getQuestionAndAnswerForReview(exam);
+          },
           child: Container(
             color: Color.fromRGBO(14, 145, 140, 1),
             child: Padding(
@@ -308,6 +313,82 @@ class _ClassExamsState extends State<ClassExams> {
           ]
       ).show();
     });
+  }
+
+  void getQuestionAndAnswerForReview(Exam exam) async{
+    Navigator.pop(context);
+    InsidClassPage.isLoading = true;
+    widget?.insidClassPageSetState();
+    print(exam.examId);
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = "http://parham-backend.herokuapp.com/exam/" + exam.examId + "/questions/review";
+        final response = await get(url,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            });
+        exam.questions = [];
+        if(response.statusCode == 200) {
+          var questionsInfo = json.decode(
+              utf8.decode(response.bodyBytes))["questions"];
+          exam.endDate = DateTime.parse(json.decode(
+              utf8.decode(response.bodyBytes))['user_examEndTime']);
+          for (var questionInfoAndGrad in questionsInfo) {
+            Question question = new Question();
+            UserAnswer userAnswer;
+            var questionInfo = questionInfoAndGrad["question"];
+            question.text = questionInfo["question"];
+            question.questionImage = questionInfo["imageQuestion"];
+            question.kind = questionInfo["type"];
+            question.grade = questionInfoAndGrad["grade"].toDouble();
+            if(question.kind == "MULTICHOISE" || question.kind == "TEST") {
+              question.optionOne = questionInfo["options"][0]["option"];
+              question.numberOne = questionInfo["answers"][0]["answer"];
+              question.optionTwo = questionInfo["options"][1]["option"];
+              question.numberTwo = questionInfo["answers"][1]["answer"];
+              question.optionThree = questionInfo["options"][2]["option"];
+              question.numberThree = questionInfo["answers"][2]["answer"];
+              question.optionFour = questionInfo["options"][3]["option"];
+              question.numberFour = questionInfo["answers"][3]["answer"];
+            }
+
+            question.answerString = questionInfoAndGrad["answerText"];
+            //question.answerFile = questionInfoAndGrad["answerText"];
+            exam.questions.add(question);
+          }
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewExamPage(exam)));
+        }else{
+          print(response.body);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "زمان آزمون فرانرسیده",
+              buttons: [
+              ],
+            ).show();
+          });
+        }
+      }
+    }on Exception catch(e){
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [
+          ],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.insidClassPageSetState();
   }
 
   void _pressRemoveExam(Exam exam) async {
