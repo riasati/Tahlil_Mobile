@@ -27,17 +27,11 @@ class _TakeExamPageState extends State<TakeExamPage> {
   //Exam exam = new Exam("", "", new DateTime(2020) , new DateTime(2020), 0);
   int _currentQuestion = 0;
   GlobalKey<ScrollSnapListState> questionRouterKey = GlobalKey();
-  DateTime user_examEndTime;
   int endTime;
 
   void endTimerFunction()
   {
 
-  }
-  void getQuestions()
-  {
-    // fill this exam.question and call fillPageList
-    // fill user_examEndTime
   }
 
   PageController controller=PageController();
@@ -53,10 +47,9 @@ class _TakeExamPageState extends State<TakeExamPage> {
   @override
   void initState() {
     super.initState();
-    getQuestions();
-    user_examEndTime = DateTime.now().add(Duration(hours: 1));
-    endTime = user_examEndTime.millisecondsSinceEpoch;
-
+    endTime = widget.exam.endDate.millisecondsSinceEpoch;
+    fillPageList();
+    //print(widget.exam.questions[0].kind);
   }
 
   @override
@@ -66,33 +59,43 @@ class _TakeExamPageState extends State<TakeExamPage> {
       home: Scaffold(
         bottomNavigationBar: buildBottomNavigator(context),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Row(
-              textDirection: TextDirection.rtl,
-              children: [
-                Text(widget.exam.name,textDirection: TextDirection.rtl,),
-                Expanded(child: Container()),
-                CountdownTimer(endTime: endTime,onEnd: endTimerFunction,)
-              ],
+            //Container(height: 50,child: Text("asdfads"),),
+            Flexible(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Row(
+                  textDirection: TextDirection.rtl,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(widget.exam.name,textDirection: TextDirection.rtl,),
+                 //   Expanded(child: Container()),
+                    CountdownTimer(endTime: endTime,onEnd: endTimerFunction,)
+                  ],
+                ),
+              ),
             ),
-            Center(
+            Flexible(
+              flex: 10,
               child: PageView(
                 controller: controller,
                 scrollDirection: Axis.horizontal,
                 children: _list,
                 onPageChanged: (num)
                 {
+                  _currentQuestion = num;
+                  questionRouterKey.currentState.focusToItem(_currentQuestion);
                   setState(() {
-                    _currentQuestion = num;
+
                   });
                 },
-              )
-              // Container(
-              //   child: Text(
-              //     widget.exam.questions[_currentQuestion].kind
-              //   ),
-              // ),
+              ),
             ),
+            // Center(
+            //   child: QuestionViewInTakeExam(question: widget.exam.questions[_currentQuestion],ExamId: widget.exam.examId,questionIndex: _currentQuestion,),
+            // ),
           ],
         ),
       ),
@@ -137,6 +140,7 @@ class _TakeExamPageState extends State<TakeExamPage> {
             setState(() {
               if(_currentQuestion > 0)
                 _currentQuestion--;
+              controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
                 questionRouterKey.currentState.focusToItem(_currentQuestion);
             });
           },
@@ -164,6 +168,7 @@ class _TakeExamPageState extends State<TakeExamPage> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => LastPage(widget.exam.examId)));
             else
               _currentQuestion++;
+            controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
               questionRouterKey.currentState.focusToItem(_currentQuestion);
           });
         },
@@ -202,6 +207,7 @@ class _TakeExamPageState extends State<TakeExamPage> {
         onPressed: () {
           setState(() {
             _currentQuestion = index;
+            controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
             questionRouterKey.currentState.focusToItem(_currentQuestion);
           });
         },

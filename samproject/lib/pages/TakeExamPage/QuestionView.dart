@@ -25,7 +25,7 @@ class QuestionViewInTakeExam extends StatefulWidget {
 
 class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   Controllers controllers = new Controllers();
-  Question UserAnswerQuestion;
+  Question UserAnswerQuestion = new Question();
   File _AnswerFile;
   bool registeredAnswer = false;
   // final picker = ImagePicker();
@@ -54,17 +54,17 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   }
   void sendAnswer() async
   {
-     //final prefs = await SharedPreferences.getInstance();
-     //String token = prefs.getString("token");
-     String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
+     final prefs = await SharedPreferences.getInstance();
+     String token = prefs.getString("token");
+     //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
      //if (token == null) {ShowCorrectnessDialog(false, context);return;}
      String tokenplus = "Bearer" + " " + token;
      String answer = "";
-     if (widget.question.kind == "تست")
+     if (widget.question.kind == "TEST")
      {
        answer = UserAnswerQuestion.numberOne.toString();
      }
-     else if (widget.question.kind == "چند گزینه ای")
+     else if (widget.question.kind == "MULTICHOISE")
      {
        (UserAnswerQuestion.numberOne == 1) ? answer += "1," : null;
        (UserAnswerQuestion.numberTwo == 1) ? answer += "2," : null;
@@ -80,11 +80,11 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
          answer = answerPlus;
        }
      }
-     else if (widget.question.kind == "پاسخ کوتاه")
+     else if (widget.question.kind == "SHORTANSWER")
      {
        answer = controllers.BlankTextController.text;
      }
-     else if (widget.question.kind == "تشریحی")
+     else if (widget.question.kind == "LONGANSWER")
      {
        answer = controllers.TashrihiTextController.text;
        print(answer);
@@ -190,9 +190,9 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   }
   void deleteAnswer(bool IsCompleteDelete) async
   {
-    //final prefs = await SharedPreferences.getInstance();
-    //String token = prefs.getString("token");
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
     //if (token == null) {ShowCorrectnessDialog(false, context);return;}
     String tokenplus = "Bearer" + " " + token;
     var headers = {
@@ -236,14 +236,15 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   @override
   void initState() {
     super.initState();
-    UserAnswerQuestion = widget.question.CopyQuestion();
-    // UserAnswerQuestion.answerImage = null;
-    // UserAnswerQuestion.answerString = null;
-    // UserAnswerQuestion.isPublic = null;
-    UserAnswerQuestion.numberOne = 0;
-    UserAnswerQuestion.numberTwo = 0;
-    UserAnswerQuestion.numberThree = 0;
-    UserAnswerQuestion.numberFour = 0;
+    //UserAnswerQuestion = new Question();
+   // UserAnswerQuestion = widget.question.CopyQuestion();
+    UserAnswerQuestion.text = widget.question.text;
+    UserAnswerQuestion.optionOne = widget.question.optionOne;
+    UserAnswerQuestion.optionTwo = widget.question.optionTwo;
+    UserAnswerQuestion.optionThree = widget.question.optionThree;
+    UserAnswerQuestion.optionFour = widget.question.optionFour;
+
+    print(UserAnswerQuestion);
 
     //basename(_AnswerFile.path);
   }
@@ -259,6 +260,11 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   // }
   @override
   Widget build(BuildContext context) {
+    //UserAnswerQuestion = widget.question.CopyQuestion();
+    // UserAnswerQuestion.numberOne = 0;
+    // UserAnswerQuestion.numberTwo = 0;
+    // UserAnswerQuestion.numberThree = 0;
+    // UserAnswerQuestion.numberFour = 0;
     return Card(
       child: Column(
         textDirection: TextDirection.rtl,
@@ -280,10 +286,10 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
           ),
           //NotEditingQuestionSpecification(question: widget.question,),
          // NotEditingQuestionText(question: widget.question,),
-          if (widget.question.kind == "چند گزینه ای"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: UserAnswerQuestion,isNull: false,)
-          else if (widget.question.kind == "تست"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: UserAnswerQuestion,isNull: false,)
-          else if (widget.question.kind == "پاسخ کوتاه"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: UserAnswerQuestion,controllers: controllers,)
-            else if (widget.question.kind == "تشریحی"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: UserAnswerQuestion,controllers: controllers,showChooseImage: false,),
+          if (widget.question.kind == "MULTICHOISE"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: UserAnswerQuestion,isNull: false,)
+          else if (widget.question.kind == "TEST"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: UserAnswerQuestion,isNull: false,)
+          else if (widget.question.kind == "SHORTANSWER"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: UserAnswerQuestion,controllers: controllers,)
+            else if (widget.question.kind == "LONGANSWER"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: UserAnswerQuestion,controllers: controllers,showChooseImage: false,),
           //RaisedButton(onPressed: filePicker,child: Text("انتخاب فایل"),)
           //IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
           // (_AnswerFile != null) ? Image.file(_AnswerFile) : Container(),
@@ -294,14 +300,14 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
               Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
             ],
           ) : Container(),
-          if (registeredAnswer == false && widget.question.kind != "تشریحی") Row(
+          if (registeredAnswer == false && widget.question.kind != "LONGANSWER") Row(
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
             ],
           )
-          else if (registeredAnswer == true && widget.question.kind != "تشریحی") Row(
+          else if (registeredAnswer == true && widget.question.kind != "LONGANSWER") Row(
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -309,7 +315,7 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
               RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
             ],
           )
-          else if (registeredAnswer == false && widget.question.kind == "تشریحی") Row(
+          else if (registeredAnswer == false && widget.question.kind == "LONGANSWER") Row(
               textDirection: TextDirection.rtl,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -317,7 +323,7 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
                 RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
               ],
           )
-          else if (registeredAnswer == true && widget.question.kind == "تشریحی") Row(
+          else if (registeredAnswer == true && widget.question.kind == "LONGANSWER") Row(
                 textDirection: TextDirection.rtl,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
