@@ -1,6 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/domain/question.dart';
+import 'package:samproject/pages/ReviewExamPage/typeofanswer/MultipleChoiceQuestion.dart';
+import 'package:samproject/pages/ReviewExamPage/typeofanswer/ShortAnswerQuestion.dart';
+import 'package:samproject/pages/ReviewExamPage/typeofanswer/TestQuestion.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 
 
@@ -20,9 +24,30 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         bottomNavigationBar: buildBottomNavigator(context),
-        body: Container(),
+        body: Container(
+          child: questionView(widget.exam.questions[_currentQuestion]),
+        ),
       ),
     );
+  }
+
+
+  Widget questionView(Question question){
+    var answerView;
+    if(question.kind == "TEST")
+      answerView = TestQuestion(question);
+    else if(question.kind == "MULTICHOISE")
+      answerView = MultipleChoiceQuestion(question);
+    else if(question.kind == "SHORTANSWER")
+      answerView = ShortAnswerQuestion(question);
+    else
+      answerView = Container(child: Text("LONG ANSWER"),);
+    return Column(
+      children: [
+        answerView,//answer
+      ],
+    );
+
   }
 
   Widget buildBottomNavigator(BuildContext context) {

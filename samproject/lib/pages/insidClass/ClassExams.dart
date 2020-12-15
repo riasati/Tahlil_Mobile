@@ -7,6 +7,10 @@ import 'package:http/http.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/UserAnswer.dart';
+import 'package:samproject/domain/UserAnswerLong.dart';
+import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
+import 'package:samproject/domain/UserAnswerShort.dart';
+import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/ReviewExamPage/ReviewExamPage.dart';
 import 'package:samproject/pages/editExamPage.dart';
@@ -19,7 +23,7 @@ class ClassExams extends StatefulWidget {
 
   final insidClassPageSetState;
 
-  ClassExams( {@required void toggleCoinCallback() }):
+  ClassExams({@required void toggleCoinCallback() }) :
         insidClassPageSetState = toggleCoinCallback;
 
   @override
@@ -86,7 +90,8 @@ class _ClassExamsState extends State<ClassExams> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = _getExamsOfClassInfoURL  + InsidClassPage.currentClass.classId + "/exams";
+        var url = _getExamsOfClassInfoURL +
+            InsidClassPage.currentClass.classId + "/exams";
         final response = await get(url,
             headers: {
               'accept': 'application/json',
@@ -94,12 +99,13 @@ class _ClassExamsState extends State<ClassExams> {
               'Content-Type': 'application/json',
             });
         classExams = [];
-        if(response.statusCode == 200) {
+        if (response.statusCode == 200) {
           var examsInfo = json.decode(
               utf8.decode(response.bodyBytes))["exams"];
           for (var examInfo in examsInfo) {
             Exam exam = Exam(examInfo["_id"], examInfo["name"],
-                DateTime.parse(examInfo["startDate"]), DateTime.parse(examInfo["endDate"]), examInfo['examLength']);
+                DateTime.parse(examInfo["startDate"]),
+                DateTime.parse(examInfo["endDate"]), examInfo['examLength']);
             classExams.add(exam);
             DateTime d = DateTime.parse(examInfo["startDate"]);
             Jalali j = Jalali.fromDateTime(d);
@@ -107,7 +113,7 @@ class _ClassExamsState extends State<ClassExams> {
           classExams.sort((t1, t2) => t1.startDate.compareTo(t2.startDate));
           classExams = classExams.reversed.toList();
           examsListBottomSheet();
-        }else{
+        } else {
           setState(() {
             Alert(
               context: context,
@@ -119,7 +125,7 @@ class _ClassExamsState extends State<ClassExams> {
           });
         }
       }
-    }on Exception catch(e){
+    } on Exception catch (e) {
       print(e.toString());
       setState(() {
         Alert(
@@ -135,32 +141,35 @@ class _ClassExamsState extends State<ClassExams> {
     widget?.insidClassPageSetState();
   }
 
-  void examsListBottomSheet() => showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          )
-      ),
-      barrierColor: Colors.black45.withOpacity(0.8),
-      builder: (context) => Column(
-        //mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            child: Icon(FontAwesomeIcons.gripLines),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
-              ),
-            ),
+  void examsListBottomSheet() =>
+      showModalBottomSheet(
+          context: context,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              )
           ),
-          Expanded(child: examsList()),
-        ],
-      ));
+          barrierColor: Colors.black45.withOpacity(0.8),
+          builder: (context) =>
+              Column(
+                //mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    child: Icon(FontAwesomeIcons.gripLines),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                            width: 1.0, color: Color(0xFFFF000000)),
+                      ),
+                    ),
+                  ),
+                  Expanded(child: examsList()),
+                ],
+              ));
 
-  Widget examsList(){
+  Widget examsList() {
     return ListView.builder(
         itemCount: classExams.length,
         itemBuilder: (BuildContext context, int index) {
@@ -169,7 +178,7 @@ class _ClassExamsState extends State<ClassExams> {
     );
   }
 
-  Widget eachExamCard(Exam exam){
+  Widget eachExamCard(Exam exam) {
     String date = convertDateToJalaliString(exam.startDate);
     String dateAndTime = addTimeToDate(date, exam.startDate);
     return Card(
@@ -181,13 +190,16 @@ class _ClassExamsState extends State<ClassExams> {
         },
         child: Row(
           children: [
-            InsidClassPage.isAdmin?adminActions(exam):memberActions(exam),
-            Padding(child: AutoSizeText(dateAndTime, textAlign: TextAlign.right,), padding: EdgeInsets.only(left: 10),),
+            InsidClassPage.isAdmin ? adminActions(exam) : memberActions(exam),
+            Padding(
+              child: AutoSizeText(dateAndTime, textAlign: TextAlign.right,),
+              padding: EdgeInsets.only(left: 10),),
             Container(
               child: Padding(
                 child: FittedBox(
-                  child: Text(exam.name , textAlign: TextAlign.right, style: TextStyle(fontSize: 5),),
-                  fit:BoxFit.fitWidth, ),
+                  child: Text(exam.name, textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: 5),),
+                  fit: BoxFit.fitWidth,),
                 padding: EdgeInsets.only(right: 10),),
               width: 70,
 
@@ -214,9 +226,18 @@ class _ClassExamsState extends State<ClassExams> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                AutoSizeText(startDateAndTime + " :شروع آزمون", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
-                AutoSizeText(endDateAndTime + " :پایان آزمون", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
-                AutoSizeText( exam.examLength.toString() +  " :مدت زمان", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
+                AutoSizeText(
+                  startDateAndTime + " :شروع آزمون", style: TextStyle(),
+                  textAlign: TextAlign.right,
+                  maxLines: 1,),
+                AutoSizeText(
+                  endDateAndTime + " :پایان آزمون", style: TextStyle(),
+                  textAlign: TextAlign.right,
+                  maxLines: 1,),
+                AutoSizeText(
+                  exam.examLength.toString() + " :مدت زمان", style: TextStyle(),
+                  textAlign: TextAlign.right,
+                  maxLines: 1,),
               ],
             ),
           ),
@@ -229,7 +250,7 @@ class _ClassExamsState extends State<ClassExams> {
     return Row(
       children: [
         FlatButton(
-          onPressed: (){
+          onPressed: () {
             getQuestionAndAnswerForReview(exam);
           },
           child: Container(
@@ -237,16 +258,16 @@ class _ClassExamsState extends State<ClassExams> {
             child: Padding(
               child: Center(
                 child: AutoSizeText(
-                "شرکت در آزمون",
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white,
+                  "شرکت در آزمون",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
                 ),
-          ),
               ),
               padding: EdgeInsets.only(left: 2, right: 7, top: 2, bottom: 2),
             ),
-        ),
+          ),
           padding: EdgeInsets.all(0),
         ),
       ],
@@ -255,17 +276,18 @@ class _ClassExamsState extends State<ClassExams> {
 
   Widget adminActions(Exam exam) {
     return PopupMenuButton<String>(
-      onSelected: (String value) {
-      },
+      onSelected: (String value) {},
       child: Icon(
         Icons.more_vert,
         size: 35,
         color: Colors.red,
       ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+      itemBuilder: (BuildContext context) =>
+      <PopupMenuEntry<String>>[
         PopupMenuItem<String>(
           child: FlatButton(
-            child: Center(child: Text('حذف ازمون', style: TextStyle(color: Colors.red),)),
+            child: Center(
+                child: Text('حذف ازمون', style: TextStyle(color: Colors.red),)),
             padding: EdgeInsets.all(0),
             onPressed: () {
               _checkRemoveExam(exam);
@@ -274,12 +296,14 @@ class _ClassExamsState extends State<ClassExams> {
         ),
         PopupMenuItem<String>(
           child: FlatButton(
-            child: Center(child: Text('ویرایش آزمون', style: TextStyle(color: Colors.red),)),
+            child: Center(child: Text(
+              'ویرایش آزمون', style: TextStyle(color: Colors.red),)),
             padding: EdgeInsets.all(0),
             onPressed: () {
               print(exam.examId);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => EditExamPage(classId: InsidClassPage.currentClass.classId,examId: exam.examId,)));
-
+              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                  EditExamPage(classId: InsidClassPage.currentClass.classId,
+                    examId: exam.examId,)));
             },
           ),
         ),
@@ -287,7 +311,7 @@ class _ClassExamsState extends State<ClassExams> {
     );
   }
 
-  void _checkRemoveExam( Exam exam){
+  void _checkRemoveExam(Exam exam) {
     setState(() {
       Alert(
           context: context,
@@ -302,7 +326,7 @@ class _ClassExamsState extends State<ClassExams> {
           buttons: [
             DialogButton(
               child: Text("بله"),
-              onPressed: (){
+              onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
                 _pressRemoveExam(exam);
               },
@@ -315,9 +339,9 @@ class _ClassExamsState extends State<ClassExams> {
     });
   }
 
-  void getQuestionAndAnswerForReview(Exam exam) async{
+  void getQuestionAndAnswerForReview(Exam exam) async {
     Navigator.pop(context);
-    InsidClassPage.isLoading = true;
+    //InsidClassPage.isLoading = true;
     widget?.insidClassPageSetState();
     print(exam.examId);
     final prefs = await SharedPreferences.getInstance();
@@ -325,7 +349,8 @@ class _ClassExamsState extends State<ClassExams> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = "http://parham-backend.herokuapp.com/exam/" + exam.examId + "/questions/review";
+        var url = "http://parham-backend.herokuapp.com/exam/" + exam.examId +
+            "/questions/review";
         final response = await get(url,
             headers: {
               'accept': 'application/json',
@@ -333,36 +358,90 @@ class _ClassExamsState extends State<ClassExams> {
               'Content-Type': 'application/json',
             });
         exam.questions = [];
-        if(response.statusCode == 200) {
+        if (response.statusCode == 200) {
           var questionsInfo = json.decode(
               utf8.decode(response.bodyBytes))["questions"];
-          exam.endDate = DateTime.parse(json.decode(
-              utf8.decode(response.bodyBytes))['user_examEndTime']);
-          for (var questionInfoAndGrad in questionsInfo) {
+          for (var questionGradeAnswerInfo in questionsInfo) {
             Question question = new Question();
-            UserAnswer userAnswer;
-            var questionInfo = questionInfoAndGrad["question"];
+            var questionInfo = questionGradeAnswerInfo["question"];
             question.text = questionInfo["question"];
             question.questionImage = questionInfo["imageQuestion"];
             question.kind = questionInfo["type"];
-            question.grade = questionInfoAndGrad["grade"].toDouble();
-            if(question.kind == "MULTICHOISE" || question.kind == "TEST") {
+            question.grade = questionGradeAnswerInfo["grade"].toDouble();
+            if (question.kind == "MULTICHOISE") {
+              question.optionOne = questionInfo["options"][0]["option"];
+              question.numberOne = 0;
+              question.optionTwo = questionInfo["options"][1]["option"];
+              question.numberTwo = 0;
+              question.optionThree = questionInfo["options"][2]["option"];
+              question.numberThree = 0;
+              question.optionFour = questionInfo["options"][3]["option"];
+              question.numberFour = 0;
+              for(var answer in questionInfo["answers"]){
+                if(answer['answer'] == 1)
+                  question.numberOne = 1;
+                else if(answer['answer'] == 2)
+                  question.numberTwo = 1;
+                else if(answer['answer'] == 3)
+                  question.numberThree = 1;
+                else if(answer['answer'] == 4)
+                  question.numberFour = 1;
+              }
+              UserAnswerMultipleChoice userAnswerMultipleChoice = new UserAnswerMultipleChoice();
+              if (questionGradeAnswerInfo["answerText"] != null) {
+                String answerText = questionGradeAnswerInfo["answerText"];
+                userAnswerMultipleChoice.userChoices =
+                    answerText.split(",").map(int.parse).toList();
+              }
+              else
+                userAnswerMultipleChoice.userChoices = [];
+              question.userAnswer = userAnswerMultipleChoice;
+            }
+            else if (question.kind == "TEST") {
               question.optionOne = questionInfo["options"][0]["option"];
               question.numberOne = questionInfo["answers"][0]["answer"];
               question.optionTwo = questionInfo["options"][1]["option"];
-              question.numberTwo = questionInfo["answers"][1]["answer"];
               question.optionThree = questionInfo["options"][2]["option"];
-              question.numberThree = questionInfo["answers"][2]["answer"];
               question.optionFour = questionInfo["options"][3]["option"];
-              question.numberFour = questionInfo["answers"][3]["answer"];
+              UserAnswerTest userAnswerTest = new UserAnswerTest();
+              if (questionGradeAnswerInfo["answerText"] != null)
+                userAnswerTest.userChoice =
+                    int.parse(questionGradeAnswerInfo["answerText"]);
+              else
+                userAnswerTest.userChoice = -1;
+              question.userAnswer = userAnswerTest;
             }
-
-            question.answerString = questionInfoAndGrad["answerText"];
-            //question.answerFile = questionInfoAndGrad["answerText"];
+            else if (question.kind == "SHORTANSWER") {
+              question.answerString = questionInfo['answers'][0]['answer'];
+              UserAnswerShort userAnswerShort = new UserAnswerShort();
+              if (questionGradeAnswerInfo["answerText"] != null)
+                userAnswerShort.answerText =
+                questionGradeAnswerInfo["answerText"];
+              else
+                userAnswerShort.answerText = "";
+              question.userAnswer = userAnswerShort;
+            }
+            else{
+              question.answerString = questionInfo['answers'][0]['answer'];
+              UserAnswerLong userAnswerLong = new UserAnswerLong();
+              if (questionGradeAnswerInfo["answerText"] != null)
+                userAnswerLong.answerText =
+                questionGradeAnswerInfo["answerText"];
+              else
+                userAnswerLong.answerText = "";
+              if (questionGradeAnswerInfo["answerFile"] != null)
+                userAnswerLong.answerFile =
+                questionGradeAnswerInfo["answerFile"];
+              else
+                userAnswerLong.answerFile = "";
+              question.userAnswer = userAnswerLong;
+            }
+            print(question);
             exam.questions.add(question);
           }
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewExamPage(exam)));
-        }else{
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ReviewExamPage(exam)));
+        } else {
           print(response.body);
           setState(() {
             Alert(
@@ -375,7 +454,7 @@ class _ClassExamsState extends State<ClassExams> {
           });
         }
       }
-    }on Exception catch(e){
+    } on Exception catch (e) {
       print(e.toString());
       setState(() {
         Alert(
@@ -402,7 +481,7 @@ class _ClassExamsState extends State<ClassExams> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = _removeExamURL  + exam.examId;
+        var url = _removeExamURL + exam.examId;
         print(url);
         final response = await delete(url,
             headers: {
@@ -410,7 +489,7 @@ class _ClassExamsState extends State<ClassExams> {
               'Authorization': token,
               'Content-Type': 'application/json',
             });
-        if(response.statusCode == 200){
+        if (response.statusCode == 200) {
           setState(() {
             Alert(
               context: context,
@@ -421,7 +500,7 @@ class _ClassExamsState extends State<ClassExams> {
             ).show();
           });
         }
-        else{
+        else {
           setState(() {
             Alert(
               context: context,
@@ -433,7 +512,7 @@ class _ClassExamsState extends State<ClassExams> {
           });
         }
       }
-    }on Exception catch(e){
+    } on Exception catch (e) {
       print(e.toString());
       setState(() {
         Alert(
@@ -449,7 +528,7 @@ class _ClassExamsState extends State<ClassExams> {
     widget?.insidClassPageSetState();
   }
 
-  String convertDateToJalaliString(DateTime time){
+  String convertDateToJalaliString(DateTime time) {
     Jalali jalaliTime = Jalali.fromDateTime(time);
     int sal = jalaliTime.year;
     int mah = jalaliTime.month;
@@ -457,10 +536,10 @@ class _ClassExamsState extends State<ClassExams> {
     return "$sal/$mah/$rooz";
   }
 
-  String addTimeToDate(String date, DateTime inputTime){
+  String addTimeToDate(String date, DateTime inputTime) {
     int hour = inputTime.hour;
     String minute = inputTime.minute.toString();
-    if(inputTime.minute < 10)
+    if (inputTime.minute < 10)
       minute = "0" + minute;
     String time = " $hour:$minute";
     return date + time;
