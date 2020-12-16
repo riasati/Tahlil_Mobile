@@ -490,13 +490,18 @@ class EditExamPageState extends State<EditExamPage> {
         qs.answer = responseJson["exam"]["questions"][i]["question"]["answers"];
         qs.options = responseJson["exam"]["questions"][i]["question"]["options"];
         qs.public = responseJson["exam"]["questions"][i]["question"]["public"];
-        qs.id = responseJson["exam"]["questions"][i]["question"]["_id"];
+        qs.id = responseJson["exam"]["questions"][i]["_id"];
         qs.imageQuestion = responseJson["exam"]["questions"][i]["question"]["imageQuestion"];
         qs.imageAnswer = responseJson["exam"]["questions"][i]["question"]["imageAnswer"];
-        if (responseJson["exam"]["questions"][i]["grade"] != null)
+        if (responseJson["exam"]["questions"][i]["grade"] == 0)
         {
-          //TODO FIX THIS CODE
-          qs.grade = double.tryParse(responseJson["exam"]["questions"][i]["grade"]);
+          qs.grade = 0;
+        }
+        else if (responseJson["exam"]["questions"][i]["grade"] != null)
+        {
+          // print(qs.id);
+          // print(responseJson["exam"]["questions"][i]["grade"]);
+          qs.grade = responseJson["exam"]["questions"][i]["grade"];
         }
 
         Question q = Question.QuestionServerToQuestion(qs,qs.type);
@@ -701,7 +706,7 @@ class EditExamPageState extends State<EditExamPage> {
       print(EditExamPage.questionList[i].id);
       double grade = EditExamPage.questionList[i].grade;
       questionObjects.add({"question" : id , "grade" : grade});
-      //print(CreateExamPage.questionList[i].id);
+      //print(EditExamPage.questionList[i].id);
     }
     if (examDate.text.isEmpty || examStartTime.text.isEmpty || examFinishTime.text.isEmpty || examDurationTime.text.isEmpty)
     {
@@ -771,8 +776,8 @@ class EditExamPageState extends State<EditExamPage> {
       ShowCorrectnessDialog(true, context);
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-      EditExamPage.questionList.clear();
-      EditExamPage.totalGrade = 0;
+      // EditExamPage.questionList.clear();
+      // EditExamPage.totalGrade = 0;
     }
     else
     {
@@ -784,7 +789,8 @@ class EditExamPageState extends State<EditExamPage> {
   @override
   void initState() {
     super.initState();
-    //EditExamPage.questionList = [];
+    EditExamPage.questionList = [];
+    EditExamPage.totalGrade = 0;
     GetExamSpecification();
   }
   @override
