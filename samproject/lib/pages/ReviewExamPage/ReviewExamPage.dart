@@ -31,42 +31,42 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
       home: Scaffold(
         bottomNavigationBar: buildBottomNavigator(context),
         body: Container(
-          child: questionView(widget.exam.questions[_currentQuestion]),
+          child: Center(child: QuestionViewInReviewExam(question:widget.exam.questions[_currentQuestion])),
         ),
       ),
     );
   }
 
 
-  Widget questionView(Question question){
-    var answerView;
-    if(question.kind == "TEST")
-      answerView = Expanded(child: TestQuestion(question), flex: 2,);
-    else if(question.kind == "MULTICHOISE")
-      answerView = Expanded(child: MultipleChoiceQuestion(question), flex: 2,);
-    else if(question.kind == "SHORTANSWER")
-      answerView = Expanded(child: ShortAnswerQuestion(question), flex: 1,);
-    else{
-      UserAnswerLong userAnswerLong = question.userAnswer;
-      userAnswerLong.answerFile = "slkflskjdf";
-      userAnswerLong.answerText = "ljsdlfj";
-      answerView = Expanded(child: LongAnswerQuestion(question), flex: 2,);
-    }
-    // return Column(
-    //   children: [
-    //     Expanded(
-    //       flex: 1,
-    //       child: Center(
-    //         child: QuestionViewInReviewExam(question: question, userAnswer:question.userAnswer),
-    //       ),
-    //     ),
-    //     answerView,//answer
-    //   ],
-    // );
-
-    return QuestionViewInReviewExam(question: question, userAnswer:question.userAnswer);
-
-  }
+  // Widget questionView(Question question){
+  //   // var answerView;
+  //   // if(question.kind == "TEST")
+  //   //   answerView = Expanded(child: TestQuestion(question), flex: 2,);
+  //   // else if(question.kind == "MULTICHOISE")
+  //   //   answerView = Expanded(child: MultipleChoiceQuestion(question), flex: 2,);
+  //   // else if(question.kind == "SHORTANSWER")
+  //   //   answerView = Expanded(child: ShortAnswerQuestion(question), flex: 1,);
+  //   // else{
+  //   //   UserAnswerLong userAnswerLong = question.userAnswer;
+  //   //   userAnswerLong.answerFile = "slkflskjdf";
+  //   //   userAnswerLong.answerText = "ljsdlfj";
+  //   //   answerView = Expanded(child: LongAnswerQuestion(question), flex: 2,);
+  //   // }
+  //   // return Column(
+  //   //   children: [
+  //   //     Expanded(
+  //   //       flex: 1,
+  //   //       child: Center(
+  //   //         child: QuestionViewInReviewExam(question: question, userAnswer:question.userAnswer),
+  //   //       ),
+  //   //     ),
+  //   //     answerView,//answer
+  //   //   ],
+  //   // );
+  //
+  //   return QuestionViewInReviewExam2(question: question);
+  //
+  // }
 
   Widget buildBottomNavigator(BuildContext context) {
     return Container(

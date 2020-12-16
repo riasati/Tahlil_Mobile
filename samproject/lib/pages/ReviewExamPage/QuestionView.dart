@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/UserAnswer.dart';
+import 'package:samproject/domain/UserAnswerLong.dart';
 import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
 import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
@@ -12,9 +13,8 @@ import 'package:samproject/widgets/questionWidgets.dart';
 
 class QuestionViewInReviewExam extends StatefulWidget {
   Question question;
-  UserAnswer userAnswer;
 
-  QuestionViewInReviewExam({Key key, this.question, this.userAnswer})
+  QuestionViewInReviewExam({Key key, this.question})
       : super(key: key);
 
   @override
@@ -24,23 +24,17 @@ class QuestionViewInReviewExam extends StatefulWidget {
 
 class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
   @override
-  void initState() {
-    super.initState();
-    widget.question.userAnswer = widget.userAnswer;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Card(
-        child: Padding(
-          child: ListView(
-
-            //textDirection: TextDirection.rtl,
-            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Flexible(
-                child: Row(
+      child: SingleChildScrollView(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(4.0),
+            child: Column(
+              //textDirection: TextDirection.rtl,
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Row(
                   children: [
                     Expanded(
                       flex: 1,
@@ -58,44 +52,45 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                       ),
                     ),
                     Expanded(
+                      flex: 8,
                       child: NotEditingQuestionText(
                         question: widget.question,
-                      ), flex: 8,),
-                    //Expanded(flex: 10,child: NotEditingQuestionSpecification(question: widget.question,)),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              // if (widget.question.kind == "چند گزینه ای"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) MultipleChoiceQuestion(widget.question)
-              // else if (widget.question.kind == "تست"/*HomePage.maps.SKindMap["TEST"]*/) TestQuestion(widget.question)
-              // else if (widget.question.kind == "پاسخ کوتاه"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) ShortAnswerQuestion(widget.question)
-              //   else if (widget.question.kind == "تشریحی"/*HomePage.maps.SKindMap["LONGANSWER"]*/) ShortAnswerQuestion(widget.question),
+                // if (widget.question.kind == "چند گزینه ای"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) MultipleChoiceQuestion(widget.question)
+                // else if (widget.question.kind == "تست"/*HomePage.maps.SKindMap["TEST"]*/) TestQuestion(widget.question)
+                // else if (widget.question.kind == "پاسخ کوتاه"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) ShortAnswerQuestion(widget.question)
+                //   else if (widget.question.kind == "تشریحی"/*HomePage.maps.SKindMap["LONGANSWER"]*/) ShortAnswerQuestion(widget.question),
 
-              if (widget.question.kind ==
-                  "MULTICHOISE" /*HomePage.maps.SKindMap["MULTICHOISE"]*/)
-                Padding(child: MultipleChoiceQuestion(widget.question,), padding: EdgeInsets.only(top: 50),)
-              else if (widget.question.kind ==
-                  "TEST" /*HomePage.maps.SKindMap["TEST"]*/)
-                Padding(
-                  padding: const EdgeInsets.only(top: 50),
-                  child: TestQuestion(widget.question,),
-                )
-              else if (widget.question.kind ==
-                  "SHORTANSWER" /*HomePage.maps.SKindMap["SHORTANSWER"]*/)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50),
-                    child: ShortAnswerQuestion(widget.question),
-                  )
-              else
-                  Flexible(child: LongAnswerQuestion(widget.question), flex: 4,),
+                if (widget.question.kind ==
+                    "MULTICHOISE")
+                  MultipleChoiceQuestion(widget.question)
+                else if (widget.question.kind ==
+                    "TEST" )
+                  TestQuestion(widget.question,)
+                else if (widget.question.kind ==
+                      "SHORTANSWER" )
+                    ShortAnswerQuestion(widget.question)
+                  else
+                    LongAnswerWidgetInReivuew(question: widget.question,),
 
-              //RaisedButton(onPressed: filePicker,child: Text("انتخاب فایل"),)
-              //IconButton(icon: Icon(Icons.camera),onPressed: getAnswerImage,tooltip: "می توان فقط عکس هم فرستاد",),
-              // (_AnswerFile != null) ? Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,) : Container(),
-              // (widget.question.kind == "تشریحی") ? RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل"),) : Container(),
-              // RaisedButton(onPressed: sendFile,child: Text("ثبت پاسخ")),
-            ],
+                if (widget.question.kind ==
+                    "MULTICHOISE")
+                  MultiChoiceWidgetInReview(question: widget.question,userAnswerMultipleChoice: widget.question.userAnswer,)
+                else if (widget.question.kind ==
+                    "TEST")
+                  TestWidgetInReview(question: widget.question,userAnswerTest: widget.question.userAnswer,)
+                else if (widget.question.kind ==
+                      "SHORTANSWER")
+                    ShortAnswerQuestion(widget.question)
+                  else
+                    LongAnswerWidgetInReivuew(question: widget.question,),
+
+              ],
+            ),
           ),
-          padding: EdgeInsets.all(4),
         ),
       ),
     );
@@ -271,12 +266,12 @@ class _MultiChoiceWidgetInReviewState extends State<MultiChoiceWidgetInReview> {
                 ),
               Checkbox(
                   value:
-                      (widget.userAnswerMultipleChoice.userChoices.contains(3))
+                      (widget.userAnswerMultipleChoice.userChoices.contains(4))
                           ? true
                           : false,
                   onChanged: null),
               Expanded(
-                  child: Text(widget.question.optionThree,
+                  child: Text(widget.question.optionFour,
                       textDirection: TextDirection.rtl))
             ],
           ),
@@ -514,6 +509,161 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
                       textDirection: TextDirection.rtl))
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class LongAnswerWidgetInReivuew extends StatefulWidget {
+  Question question;
+  LongAnswerWidgetInReivuew({Key key, this.question}) : super(key: key);
+  @override
+  _LongAnswerWidgetInReivuewState createState() => _LongAnswerWidgetInReivuewState();
+}
+
+class _LongAnswerWidgetInReivuewState extends State<LongAnswerWidgetInReivuew> {
+  bool userAnswer = false;
+  final PageController pageController = PageController(
+    initialPage: 1,
+  );
+  Widget questionAnswerView() {
+    return Text(
+      widget.question.answerString,
+      style: TextStyle(
+        fontSize: 16.0,
+        color: Colors.black,
+      ),
+      textAlign: TextAlign.right,
+    );
+  }
+  Widget userAnswerView() {
+    UserAnswerLong userAnswerLong = widget.question.userAnswer;
+    if(userAnswerLong.answerFile != null && userAnswerLong.answerFile.isNotEmpty)
+      return Padding(
+        padding: EdgeInsets.all(4.0),//EdgeInsets.only(bottom: 70),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              userAnswerLong.answerText,
+              style: TextStyle(
+                fontSize: 16.0,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.right,
+            ),
+            Container(
+              child: FlatButton(
+                onPressed: () {},
+                child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+                color: Color(0xFF3D5A80),
+              ),
+              width: 150,
+            )
+          ],
+        ),
+      );
+    else
+      return Text(
+        userAnswerLong.answerText,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.black,
+        ),
+        textAlign: TextAlign.right,
+      );
+  }
+  Widget buttonBar() {
+    return ButtonBar(
+      children: [
+        Container(
+          child: FlatButton(
+            onPressed: () {
+              setState(() {
+                userAnswer = true;
+                pageController.animateToPage(0,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.decelerate);
+              });
+            },
+            child: Text(
+              "پاسخ شما",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: userAnswer ? Colors.white : Colors.black),
+            ),
+          ),
+          width: 120,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30), bottomLeft: Radius.circular(30)),
+            color: userAnswer ? Colors.black : Colors.black26,
+          ),
+        ),
+        Container(
+          child: FlatButton(
+              onPressed: () {
+                setState(() {
+                  userAnswer = false;
+                  pageController.animateToPage(1,
+                      duration: Duration(milliseconds: 500),
+                      curve: Curves.decelerate);
+                });
+              },
+              child: Text(
+                "پاسخ سوال",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: userAnswer ? Colors.black : Colors.white),
+              )),
+          width: 120,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(30),
+                bottomRight: Radius.circular(30)),
+            color: userAnswer ? Colors.black26 : Colors.black,
+          ),
+        ),
+      ],
+      buttonPadding: EdgeInsets.all(0),
+      alignment: MainAxisAlignment.center,
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10),
+      child: Column(
+       // mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 10, right: 10, left: 10),
+            child: //userAnswerView(),
+            Container(
+              height: 250,
+              child: PageView(
+                //physics:NeverScrollableScrollPhysics(),
+                physics: ScrollPhysics(),
+                onPageChanged: (index) {
+                  setState(() {
+                    userAnswer = (index == 0);
+                  });
+                },
+                controller: pageController,
+                children: [
+                  userAnswerView(),
+                  questionAnswerView(),
+                ],
+              ),
+            ),
+          ),
+          buttonBar()
         ],
       ),
     );

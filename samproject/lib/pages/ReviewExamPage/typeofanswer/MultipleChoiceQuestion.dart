@@ -20,7 +20,7 @@ class _MultipleChoiceQuestionState extends State<MultipleChoiceQuestion> {
       children: showAnswer(),
     ),
     width: double.infinity,
-      height: 500,
+     // height: 500,
     );
   }
 

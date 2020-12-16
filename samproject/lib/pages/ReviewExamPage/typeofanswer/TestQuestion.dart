@@ -24,7 +24,7 @@ class _TestQuestionState extends State<TestQuestion> {
       children: showAnswer(),
     ),
     width: double.infinity,
-      height: 500,
+    //  height: 500,
     );
   }
 
