@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/question.dart';
+import 'package:samproject/pages/ReviewExamPage/typeofanswer/LongAnswer.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/MultipleChoiceQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/ShortAnswerQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/TestQuestion.dart';
@@ -35,15 +36,21 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   Widget questionView(Question question){
     var answerView;
     if(question.kind == "TEST")
-      answerView = TestQuestion(question);
+      answerView = Expanded(child: TestQuestion(question), flex: 2,);
     else if(question.kind == "MULTICHOISE")
-      answerView = MultipleChoiceQuestion(question);
+      answerView = Expanded(child: MultipleChoiceQuestion(question), flex: 2,);
     else if(question.kind == "SHORTANSWER")
-      answerView = ShortAnswerQuestion(question);
+      answerView = Expanded(child: ShortAnswerQuestion(question), flex: 1,);
     else
-      answerView = Container(child: Text("LONG ANSWER"),);
+      answerView = Expanded(child: LongAnswerQuestion(question), flex: 2,);
     return Column(
       children: [
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: Text("qustion="),
+          ),
+        ),
         answerView,//answer
       ],
     );
@@ -72,28 +79,27 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   }
 
   Widget previousButton() {
-    return Opacity(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          color: Color(0xFF3D5A80),
-        ),
-        margin: EdgeInsets.only(left: 3),
-        child: MaterialButton(
-          child: Text(
-            "قبلی",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          onPressed: (){
-            setState(() {
-              if(_currentQuestion > 0)
-                _currentQuestion--;
-              questionRouterKey.currentState.focusToItem(_currentQuestion);
-            });
-          },
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+        color: Color(0xFF3D5A80),
       ),
-      opacity: _currentQuestion == 0?0.0:1.0,
+      margin: EdgeInsets.only(left: 3),
+      child: MaterialButton(
+        child: Text(
+          "قبلی",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        onPressed: (){
+          setState(() {
+            if(_currentQuestion > 0)
+              _currentQuestion--;
+            else
+              Navigator.pop(context);
+            questionRouterKey.currentState.focusToItem(_currentQuestion);
+          });
+        },
+      ),
     );
   }
 

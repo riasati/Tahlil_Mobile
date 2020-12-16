@@ -18,10 +18,10 @@ class _ShortAnswerQuestionState extends State<ShortAnswerQuestion> {
     UserAnswerShort userAnswerShort = widget.question.userAnswer;
     return Container(
       width: double.infinity,
-      height: 200,
+      // height: 200,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text("پاسخ سوال: " + widget.question.answerString , style: TextStyle(fontWeight: FontWeight.bold),),
           Text("پاسخ شما: " + userAnswerShort.answerText, style: TextStyle(fontWeight: FontWeight.bold)),

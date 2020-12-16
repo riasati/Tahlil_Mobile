@@ -4,6 +4,7 @@ import 'package:samproject/domain/UserAnswerShort.dart';
 import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/ReviewExamPage/QuestionView.dart';
+import 'package:samproject/pages/ReviewExamPage/typeofanswer/LongAnswer.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/MultipleChoiceQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/ShortAnswerQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/TestQuestion.dart';
@@ -129,7 +130,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: "Starter Template",
       home: Scaffold(
-        body: Center(child: SizedBox(height: 350,child: Card(child: QuestionViewInReviewExam(question: newQuestion3,userAnswer: userAnswerShort,)))),
+        body: Center(child: LongAnswerQuestion(question)),
       )
     );
   }
