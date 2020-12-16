@@ -16,16 +16,19 @@ class _ShortAnswerQuestionState extends State<ShortAnswerQuestion> {
   @override
   Widget build(BuildContext context) {
     UserAnswerShort userAnswerShort = widget.question.userAnswer;
-    return Container(
-      width: double.infinity,
-      // height: 200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text("پاسخ سوال: " + widget.question.answerString , style: TextStyle(fontWeight: FontWeight.bold),),
-          Text("پاسخ شما: " + userAnswerShort.answerText, style: TextStyle(fontWeight: FontWeight.bold)),
-        ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Container(
+        width: double.infinity,
+        // height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text("پاسخ سوال: " + widget.question.answerString , style: TextStyle(fontWeight: FontWeight.bold),textDirection: TextDirection.rtl),
+            Text("پاسخ شما: " + userAnswerShort.answerText, style: TextStyle(fontWeight: FontWeight.bold), textDirection: TextDirection.rtl,),
+          ],
+        ),
       ),
     );
   }

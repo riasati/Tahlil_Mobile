@@ -1,12 +1,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/domain/UserAnswerLong.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/LongAnswer.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/MultipleChoiceQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/ShortAnswerQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/TestQuestion.dart';
+import 'package:samproject/pages/homePage.dart';
+import 'package:samproject/pages/searchQuestionPage.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
+
+import 'QuestionView.dart';
 
 
 class ReviewExamPage extends StatefulWidget {
@@ -41,19 +46,25 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
       answerView = Expanded(child: MultipleChoiceQuestion(question), flex: 2,);
     else if(question.kind == "SHORTANSWER")
       answerView = Expanded(child: ShortAnswerQuestion(question), flex: 1,);
-    else
+    else{
+      UserAnswerLong userAnswerLong = question.userAnswer;
+      userAnswerLong.answerFile = "slkflskjdf";
+      userAnswerLong.answerText = "ljsdlfj";
       answerView = Expanded(child: LongAnswerQuestion(question), flex: 2,);
-    return Column(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Center(
-            child: Text("qustion="),
-          ),
-        ),
-        answerView,//answer
-      ],
-    );
+    }
+    // return Column(
+    //   children: [
+    //     Expanded(
+    //       flex: 1,
+    //       child: Center(
+    //         child: QuestionViewInReviewExam(question: question, userAnswer:question.userAnswer),
+    //       ),
+    //     ),
+    //     answerView,//answer
+    //   ],
+    // );
+
+    return QuestionViewInReviewExam(question: question, userAnswer:question.userAnswer);
 
   }
 

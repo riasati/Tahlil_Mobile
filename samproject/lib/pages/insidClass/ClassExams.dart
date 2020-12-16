@@ -529,6 +529,7 @@ class _ClassExamsState extends State<ClassExams> {
   }
 
   String convertDateToJalaliString(DateTime time) {
+    time = time.add(Duration(hours: 3,minutes: 30));
     Jalali jalaliTime = Jalali.fromDateTime(time);
     int sal = jalaliTime.year;
     int mah = jalaliTime.month;
@@ -537,6 +538,7 @@ class _ClassExamsState extends State<ClassExams> {
   }
 
   String addTimeToDate(String date, DateTime inputTime) {
+    inputTime = inputTime.add(Duration(hours: 3,minutes: 30));
     int hour = inputTime.hour;
     String minute = inputTime.minute.toString();
     if (inputTime.minute < 10)

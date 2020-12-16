@@ -12,7 +12,6 @@ import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/pages/searchQuestionPage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
-import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 class QuestionViewInEditExam extends StatefulWidget {
@@ -496,7 +495,8 @@ class EditExamPageState extends State<EditExamPage> {
         qs.imageAnswer = responseJson["exam"]["questions"][i]["question"]["imageAnswer"];
         if (responseJson["exam"]["questions"][i]["grade"] != null)
         {
-          qs.grade = responseJson["exam"]["questions"][i]["grade"];
+          //TODO FIX THIS CODE
+          qs.grade = double.tryParse(responseJson["exam"]["questions"][i]["grade"]);
         }
 
         Question q = Question.QuestionServerToQuestion(qs,qs.type);
@@ -784,6 +784,7 @@ class EditExamPageState extends State<EditExamPage> {
   @override
   void initState() {
     super.initState();
+    //EditExamPage.questionList = [];
     GetExamSpecification();
   }
   @override
