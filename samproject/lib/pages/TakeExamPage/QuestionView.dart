@@ -12,8 +12,6 @@ import 'package:samproject/widgets/questionWidgets.dart';
 //import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_uploader/flutter_uploader.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path/path.dart';
 import 'package:http_parser/http_parser.dart';
 class QuestionViewInTakeExam extends StatefulWidget {
@@ -45,7 +43,6 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   {
      final prefs = await SharedPreferences.getInstance();
      String token = prefs.getString("token");
-     //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
     // if (token == null) {ShowCorrectnessDialog(false, context);return;}
      String tokenplus = "Bearer" + " " + token;
      String answer = "";
@@ -91,27 +88,6 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
    //     openFileFromNotification: true, // click on notification to open downloaded file (for Android)
    //   );
 
-    //upload from package
-    //  final uploader = FlutterUploader();
-    // final taskId = await uploader.enqueue(
-    //     url: "https://parham-backend.herokuapp.com/user/avatar", //required: url to upload to
-    //     files: [FileItem(filename: basename(_AnswerImage.path) , savedDir: _AnswerImage.parent.path, /*fieldname:"file"*/)], // required: list of files that you want to upload
-    //     method: UploadMethod.PUT, // HTTP method  (POST or PUT or PATCH)
-    //     headers: {"Authorization": tokenplus,},
-    //     //data: {"name": "john"}, // any data you want to send in upload request
-    //     showNotification: true, // send local notification (android only) for upload status
-    //   //  tag: "upload 1", // unique tag for upload task
-    // );
-    //
-    //  final subscription = uploader.result.listen((result) {
-    //    print(result.statusCode);
-    //  }, onError: (ex, stacktrace) {
-    //    // ... code to handle error
-    //  });
-    //  print(subscription);
-
-    //upload from http
-
      var params = {
        'answer': answer,
      };
@@ -123,12 +99,12 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
     if (_AnswerFile != null)
     {
       String extenstion = _AnswerFile.path.split('.').last;
-      print(_AnswerFile.path);
+      //print(_AnswerFile.path);
       var file;
       if (extenstion == 'jpg')
       {
         file = await http.MultipartFile.fromPath("answer", _AnswerFile.path,contentType: MediaType('image', 'jpg'));
-        print("in jpg");
+        //print("in jpg");
       }
       else if (extenstion == 'jpeg')
       {
@@ -138,7 +114,7 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
       else if (extenstion == 'png')
       {
         file = await http.MultipartFile.fromPath("answer", _AnswerFile.path,contentType: MediaType('image', 'png'));
-        print("in png");
+        //print("in png");
       }
       else if (extenstion == 'pdf')
       {
@@ -173,6 +149,10 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
         // print(responseJson.toString());
         var responseData = await response.stream.toBytes();
         var responseString = String.fromCharCodes(responseData);
+        widget.question.numberOne = null;
+        widget.question.numberTwo = null;
+        widget.question.numberThree = null;
+        widget.question.numberFour = null;
         print(responseString);
 
       }
@@ -181,7 +161,6 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   {
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
-    //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmMxMjAwNTZlMTdmMDAwMTcwYzA1NDMiLCJpYXQiOjE2MDc5MjU1NDV9.jFuqcw14ftz2FIBXro1LA7dshwCZzFIxZv9Q4uAKuuk";
     //if (token == null) {ShowCorrectnessDialog(false, context);return;}
     String tokenplus = "Bearer" + " " + token;
     var headers = {
@@ -209,8 +188,13 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
     var res = await http.delete(url, headers: headers);
     if (res.statusCode == 200)
     {
+      final responseJson = jsonDecode(res.body);
+      print(responseJson.toString());
       setState(() {
-        registeredAnswer = false;
+        if (IsCompleteDelete)
+        {
+          registeredAnswer = false;
+        }
         _AnswerFile = null;
         widget.question.numberOne = null;
         widget.question.numberTwo = null;
@@ -219,10 +203,10 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
       });
       
     }
-    else
-      {
-        //ShowCorrectnessDialog(false, context)
-      }
+    // else
+    //   {
+    //     //ShowCorrectnessDialog(false, context)
+    //   }
 
   }
 
@@ -256,73 +240,125 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   // }
   @override
   Widget build(BuildContext context) {
-    print(widget.question);
-    print(registeredAnswer);
-    return Card(
-      child: Column(
-        textDirection: TextDirection.rtl,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: Column(
+    // print(widget.question);
+    // print(registeredAnswer);
+    var questionKind;
+    var answerRow;
+
+    if (widget.question.kind == "MULTICHOISE") questionKind = NotEditingMultiChoiceOption(question: widget.question,isNull: false,);
+    else if (widget.question.kind == "TEST") questionKind = NotEditingTest(question: widget.question,isNull: false,);
+    else if (widget.question.kind == "SHORTANSWER") questionKind = EditingShortAnswer(question: widget.question,controllers: controllers,);
+    else if (widget.question.kind == "LONGANSWER") questionKind = EditingLongAnswer(question: widget.question,controllers: controllers,showChooseImage: false,);
+
+    if (registeredAnswer == false && widget.question.kind != "LONGANSWER") answerRow = Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+      ],
+    );
+    else if (registeredAnswer == true && widget.question.kind != "LONGANSWER") answerRow = Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color : Color(0xFF0e918c),textColor: Colors.white,),
+        RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+      ],
+    );
+    else if (registeredAnswer == false && widget.question.kind == "LONGANSWER") answerRow = Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+        RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+      ],
+    );
+    else if (registeredAnswer == true && widget.question.kind == "LONGANSWER") answerRow = Row(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+        RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+        RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+      ],
+    );
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
+          children: [
+            Column(
+              textDirection: TextDirection.rtl,
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Row(
                   children: [
-                    Text("بارم",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
-                    Text(widget.question.grade.toString(),textDirection: TextDirection.rtl,textAlign: TextAlign.center),
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          Text("بارم",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                          Text(widget.question.grade.toString(),textDirection: TextDirection.rtl,textAlign: TextAlign.center),
+                        ],
+                      ),
+                    ),
+                    Expanded(flex: 10,child: NotEditingQuestionText(question: widget.question,)),
                   ],
                 ),
-              ),
-              Expanded(flex: 10,child: NotEditingQuestionText(question: widget.question,)),
-            ],
-          ),
-          //NotEditingQuestionSpecification(question: widget.question,),
-         // NotEditingQuestionText(question: widget.question,),
-          if (widget.question.kind == "MULTICHOISE"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) NotEditingMultiChoiceOption(question: widget.question,isNull: false,)
-          else if (widget.question.kind == "TEST"/*HomePage.maps.SKindMap["TEST"]*/) NotEditingTest(question: widget.question,isNull: false,)
-          else if (widget.question.kind == "SHORTANSWER"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) EditingShortAnswer(question: widget.question,controllers: controllers,)
-            else if (widget.question.kind == "LONGANSWER"/*HomePage.maps.SKindMap["LONGANSWER"]*/) EditingLongAnswer(question: widget.question,controllers: controllers,showChooseImage: false,),
-          (_AnswerFile != null) ? Row(
-            children: [
-              IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
-              Expanded(child: Container()),
-              Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
-            ],
-          ) : Container(),
-          if (registeredAnswer == false && widget.question.kind != "LONGANSWER") Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
-            ],
-          )
-          else if (registeredAnswer == true && widget.question.kind != "LONGANSWER") Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color : Color(0xFF0e918c),textColor: Colors.white,),
-              RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
-            ],
-          )
-          else if (registeredAnswer == false && widget.question.kind == "LONGANSWER") Row(
-              textDirection: TextDirection.rtl,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
-                RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+                // if (widget.question.kind == "MULTICHOISE") NotEditingMultiChoiceOption(question: widget.question,isNull: false,)
+                // else if (widget.question.kind == "TEST") NotEditingTest(question: widget.question,isNull: false,)
+                // else if (widget.question.kind == "SHORTANSWER") EditingShortAnswer(question: widget.question,controllers: controllers,)
+                //   else if (widget.question.kind == "LONGANSWER") EditingLongAnswer(question: widget.question,controllers: controllers,showChooseImage: false,),
+                //Container(child:questionKind ,height: 500,),
+                questionKind,
+                (_AnswerFile != null) ? Row(
+                  children: [
+                    IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
+                    Expanded(child: Container()),
+                    Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
+                  ],
+                ) : Container(),
+                //Expanded(child: Container(height: 30,),),
+
+                // if (registeredAnswer == false && widget.question.kind != "LONGANSWER") Row(
+                //   textDirection: TextDirection.rtl,
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+                //   ],
+                // )
+                // else if (registeredAnswer == true && widget.question.kind != "LONGANSWER") Row(
+                //   textDirection: TextDirection.rtl,
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color : Color(0xFF0e918c),textColor: Colors.white,),
+                //     RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+                //   ],
+                // )
+                // else if (registeredAnswer == false && widget.question.kind == "LONGANSWER") Row(
+                //     textDirection: TextDirection.rtl,
+                //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+                //       RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+                //     ],
+                // )
+                // else if (registeredAnswer == true && widget.question.kind == "LONGANSWER") Row(
+                //       textDirection: TextDirection.rtl,
+                //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //       children: [
+                //         RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
+                //         RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
+                //         RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
+                //       ],
+                // ),
               ],
-          )
-          else if (registeredAnswer == true && widget.question.kind == "LONGANSWER") Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  RaisedButton(onPressed: chooseFile,child: Text("انتخاب فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF3D5A80),textColor: Colors.white,),
-                  RaisedButton(onPressed: sendAnswer,child: Text("ثبت پاسخ جدید",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color(0xFF0e918c),textColor: Colors.white,),
-                  RaisedButton(onPressed: () => deleteAnswer(true),child: Text("حذف پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),color: Color.fromRGBO(238, 108,77 ,1.0),textColor: Colors.white,),
-                ],
-          ),
-        ],
+            ),
+            Expanded(child: Container()),
+            answerRow,
+          ],
+        ),
       ),
     );
   }

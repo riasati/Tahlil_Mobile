@@ -13,6 +13,7 @@ import 'package:samproject/pages/TakeExamPage/QuestionView.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 
 class TakeExamPage extends StatefulWidget {
@@ -43,13 +44,34 @@ class _TakeExamPageState extends State<TakeExamPage> {
       _list.add(QuestionViewInTakeExam(question: widget.exam.questions[i],ExamId: widget.exam.examId,questionIndex: i+1,));
     }
   }
+  void setTimer() async
+  {
+    DateTime serverDate;
+    var headers = {
+      'accept': 'application/json',
+    };
+    var response = await http.get('https://parham-backend.herokuapp.com/public/time', headers: headers);
+    if (response.statusCode == 200)
+    {
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      serverDate = DateTime.parse(responseJson["date"]);
+    }
+    else
+      {
+        return;
+      }
+    endTime = DateTime.now().millisecondsSinceEpoch + (widget.exam.endDate.millisecondsSinceEpoch - serverDate.millisecondsSinceEpoch);
+    setState(() {
 
+    });
+  }
   @override
   void initState() {
+    setTimer();
     super.initState();
-    endTime = widget.exam.endDate.millisecondsSinceEpoch;
     fillPageList();
-    //print(widget.exam.questions[0].kind);
+    print(widget.exam);
   }
 
   @override
@@ -58,45 +80,36 @@ class _TakeExamPageState extends State<TakeExamPage> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         bottomNavigationBar: buildBottomNavigator(context),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            //Container(height: 50,child: Text("asdfads"),),
-            Flexible(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Row(
-                  textDirection: TextDirection.rtl,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(widget.exam.name,textDirection: TextDirection.rtl,),
-                 //   Expanded(child: Container()),
-                    CountdownTimer(endTime: endTime,onEnd: endTimerFunction,)
-                  ],
-                ),
-              ),
+        appBar: AppBar(
+          backgroundColor: Color(0xFF3D5A80),
+          title: Container(
+            //   padding: EdgeInsets.only(right: 40),
+            alignment: Alignment.center,
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(widget.exam.name,textDirection: TextDirection.rtl,style: TextStyle(color: Colors.white,fontSize: 20.0),textAlign: TextAlign.center,),
+                //   Expanded(child: Container()),
+                CountdownTimer(endTime: endTime,onEnd: endTimerFunction,textStyle: TextStyle(color: Colors.white,fontSize: 20.0),)
+              ],
             ),
-            Flexible(
-              flex: 10,
-              child: PageView(
-                controller: controller,
-                scrollDirection: Axis.horizontal,
-                children: _list,
-                onPageChanged: (num)
-                {
-                  _currentQuestion = num;
-                  questionRouterKey.currentState.focusToItem(_currentQuestion);
-                  setState(() {
+          ),
+        ),
+        body: Card(
+          child: PageView(
+            controller: controller,
+            scrollDirection: Axis.horizontal,
+            children: _list,
+            onPageChanged: (num)
+            {
+              _currentQuestion = num;
+              questionRouterKey.currentState.focusToItem(_currentQuestion);
+              setState(() {
 
-                  });
-                },
-              ),
-            ),
-            // Center(
-            //   child: QuestionViewInTakeExam(question: widget.exam.questions[_currentQuestion],ExamId: widget.exam.examId,questionIndex: _currentQuestion,),
-            // ),
-          ],
+              });
+            },
+          ),
         ),
       ),
     );

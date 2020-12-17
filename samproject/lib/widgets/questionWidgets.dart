@@ -910,7 +910,7 @@ class _EditingLongAnswerState extends State<EditingLongAnswer> {
                     textDirection: TextDirection.rtl,
                     controller: widget.controllers.TashrihiTextController,
                     keyboardType: TextInputType.multiline,
-                    maxLines: 3,
+                    maxLines: (widget.showChooseImage) ? 3 :6,
                     decoration: InputDecoration(border: OutlineInputBorder()),
                   )
 
