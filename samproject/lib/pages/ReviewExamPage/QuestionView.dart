@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:samproject/domain/UserAnswer.dart';
@@ -11,6 +12,8 @@ import 'package:samproject/pages/ReviewExamPage/typeofanswer/MultipleChoiceQuest
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/ShortAnswerQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/TestQuestion.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 
 class QuestionViewInReviewExam extends StatefulWidget {
   Question question;
@@ -322,7 +325,7 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
                 Icon(
                   Icons.check,
                   size: 30,
-                  color: Colors.red,
+                  color: Colors.green,
                 )
               else if (widget.question.numberOne != 1 &&
                   widget.userAnswerTest.userChoice == 1)
@@ -371,7 +374,7 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
                 Icon(
                   Icons.check,
                   size: 30,
-                  color: Colors.red,
+                  color: Colors.green,
                 )
               else if (widget.question.numberOne != 2 &&
                   widget.userAnswerTest.userChoice == 2)
@@ -420,7 +423,7 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
                 Icon(
                   Icons.check,
                   size: 30,
-                  color: Colors.red,
+                  color: Colors.green,
                 )
               else if (widget.question.numberOne != 3 &&
                   widget.userAnswerTest.userChoice == 3)
@@ -469,7 +472,7 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
                 Icon(
                   Icons.check,
                   size: 30,
-                  color: Colors.red,
+                  color: Colors.green,
                 )
               else if (widget.question.numberOne != 4 &&
                   widget.userAnswerTest.userChoice == 4)
@@ -510,6 +513,29 @@ class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
   final PageController pageController = PageController(
     initialPage: 1,
   );
+  void initializeDownloader() async
+  {
+    WidgetsFlutterBinding.ensureInitialized();
+    await FlutterDownloader.initialize(
+        debug: true // optional: set false to disable printing logs to console
+    );
+  }
+  @override
+  void initState() {
+    super.initState();
+    initializeDownloader();
+  }
+  void downloaFile() async
+  {
+    UserAnswerLong userAnswerLong = widget.question.userAnswer;
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    final taskId = await FlutterDownloader.enqueue(
+      url: userAnswerLong.answerFile,
+      savedDir: appDocDir.path,
+      showNotification: true, // show download progress in status bar (for Android)
+      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+    );
+  }
   Widget questionAnswerView() {
     return Text(
       "پاسخ سوال : "  + widget.question.answerString,
@@ -550,7 +576,7 @@ class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
               flex: 1,
               child: Container(
                 child: FlatButton(
-                  onPressed: () {},
+                  onPressed: downloaFile,
                   child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
                 ),
                 decoration: BoxDecoration(
