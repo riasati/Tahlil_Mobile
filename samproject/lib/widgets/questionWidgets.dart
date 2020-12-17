@@ -199,19 +199,40 @@ class VisitAnswerAndAddtoExamButton extends StatelessWidget {
         RaisedButton(
             textColor: Colors.white,
             color: Color(0xFF3D5A80),
-            child: Text("دیدن پاسخ"),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("دیدن پاسخ",style: TextStyle(color: Colors.white),),
+                Icon(Icons.question_answer_outlined,color: Colors.white,),
+              ],
+            ),
             onPressed: onVisitAnswerPressed),
         RaisedButton(
             textColor: Colors.white,
             color: Color.fromRGBO(238, 108,77 ,1.0),
-            child: Text("اضافه کردن به آزمون"),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('اضافه کردن به آزمون',style: TextStyle(color: Colors.white),),
+                Icon(Icons.add,color: Colors.white,),
+              ],
+            ),
             onPressed: onAddtoExamPressed),
       ],
     ) :
     RaisedButton(
         textColor: Colors.white,
         color: Color(0xFF3D5A80),
-        child: Text("دیدن پاسخ"),
+        child: Row(
+          textDirection: TextDirection.rtl,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("دیدن پاسخ",style: TextStyle(color: Colors.white),),
+            Icon(Icons.question_answer_outlined,color: Colors.white,),
+          ],
+        ),
         onPressed: onVisitAnswerPressed);
   }
 }
@@ -237,7 +258,14 @@ class EditAndAddtoExamButton extends StatelessWidget {
         RaisedButton(
             textColor: Colors.white,
             color: Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
-            child: Text("اضافه کردن به آزمون"),
+            child: Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('اضافه کردن به آزمون',style: TextStyle(color: Colors.white),),
+                Icon(Icons.add,color: Colors.white,),
+              ],
+            ),
             onPressed: onAddtoExamPressed),
       ],
     ) :(IsEditing) ?
@@ -248,18 +276,42 @@ class EditAndAddtoExamButton extends StatelessWidget {
             RaisedButton(
                 textColor: Colors.white,
                 color: Color(0xFF3D5A80),
-                child: Text("ويرايش"),
+                child: Row(
+                  textDirection: TextDirection.rtl,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('ويرايش',style: TextStyle(color: Colors.white),),
+                    Icon(Icons.edit,color: Colors.white,),
+                  ],
+                ),//Text("ويرايش"),
                 onPressed: onEditPressed),
             RaisedButton(
                 textColor: Colors.white,
                 color: Color(0xFF0e918c),//Color(0xFF3D5A80),
-                child: Text("انصراف"),
+                child: Row(
+                  textDirection: TextDirection.rtl,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('اانصراف',style: TextStyle(color: Colors.white),),
+                    Icon(Icons.cancel,color: Colors.white,),
+                  ],
+                ),
                 onPressed: onCancelPressed)
           ],
         ): RaisedButton(
             textColor: Colors.white,
             color: Color(0xFF3D5A80),
-            child: Text("ويرايش"),
+            child: Container(
+              width: 70,
+              child: Row(
+                textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('ويرايش',style: TextStyle(color: Colors.white),),
+                  Icon(Icons.edit,color: Colors.white,),
+                ],
+              ),
+            ),
               onPressed: onEditPressed);
   }
 }

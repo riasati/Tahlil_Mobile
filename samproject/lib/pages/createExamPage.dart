@@ -304,11 +304,21 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
                 children: [
                   Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,tooltip: "جه به جایی با سوال پایین",)),
                     Padding(
-                      padding: const EdgeInsets.only(right: 70),
+                      padding: const EdgeInsets.only(right: 60),
                       child: RaisedButton(
                   textColor: Colors.white,
                   color: Color(0xFF3D5A80),
-                      child: Text("ويرايش"),
+                      child: Container(
+                        width: 70,
+                        child: Row(
+                          textDirection: TextDirection.rtl,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('ويرايش',style: TextStyle(color: Colors.white),),
+                            Icon(Icons.edit,color: Colors.white,),
+                          ],
+                        ),
+                      ),
                   onPressed: onEditButton),
                     )
                 ],
@@ -316,7 +326,17 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
               RaisedButton(
                   textColor: Colors.white,
                   color: Color(0xFF3D5A80),
-                  child: Text("ويرايش"),
+                  child: Container(
+                    width: 70,
+                    child: Row(
+                      textDirection: TextDirection.rtl,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('ويرايش',style: TextStyle(color: Colors.white),),
+                        Icon(Icons.edit,color: Colors.white,),
+                      ],
+                    ),
+                  ),
                   onPressed: onEditButton),
             ],
           )
@@ -1096,11 +1116,18 @@ class CreateExamPageState extends State<CreateExamPage> {
                             textDirection: TextDirection.rtl,
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text( "جمع نمرات : "+CreateExamPage.totalGrade.toString() ,textDirection: TextDirection.rtl,),
+                              Text( "جمع نمرات : "+CreateExamPage.totalGrade.toStringAsPrecision(3) ,textDirection: TextDirection.rtl,),
                               RaisedButton(
                                   textColor: Colors.white,
                                   color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
-                                  child: Text("ایجاد آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                  child: Row(
+                                    textDirection: TextDirection.rtl,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('ایجاد آزمون',style: TextStyle(color: Colors.white),textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                      Icon(Icons.add,color: Colors.white,),
+                                    ],
+                                  ),//Text("ایجاد آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
                                   onPressed: CreateExam
                               ),
                             ],
@@ -1168,7 +1195,17 @@ class CreateExamPageState extends State<CreateExamPage> {
                             RaisedButton(
                               textColor: Colors.white,
                               color: Color(0xFF3D5A80),
-                              child: Text("ایجاد سوال"),
+                              child:Container(
+                                width: 100,
+                                child: Row(
+                                  textDirection: TextDirection.rtl,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('ایجاد سوال', style: TextStyle(color: Colors.white),),
+                                    Icon(Icons.create,color: Colors.white,),
+                                  ],
+                                ),
+                              ),
                               onPressed: onCreateQuestion,
                             ),
                           ],

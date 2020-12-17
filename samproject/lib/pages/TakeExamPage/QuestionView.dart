@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:samproject/domain/UserAnswerLong.dart';
+import 'package:samproject/domain/UserAnswerShort.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/homePage.dart';
@@ -25,9 +27,11 @@ class QuestionViewInTakeExam extends StatefulWidget {
 
 class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   Controllers controllers = new Controllers();
-  Question UserAnswerQuestion = new Question();
+//  Question UserAnswerQuestion = new Question();
   File _AnswerFile;
   bool registeredAnswer = false;
+  bool hasAnsweFile;
+  String fileName;
 
   void chooseFile() async
   {
@@ -36,6 +40,8 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
     setState(() {
       if (pickedFile != null ) {
         _AnswerFile = File(pickedFile.path);
+        hasAnsweFile = true;
+        fileName = basename(_AnswerFile.path);
       }
     });
   }
@@ -196,6 +202,8 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
           registeredAnswer = false;
         }
         _AnswerFile = null;
+        hasAnsweFile = false;
+        fileName = null;
         widget.question.numberOne = null;
         widget.question.numberTwo = null;
         widget.question.numberThree = null;
@@ -224,6 +232,29 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
     {
       if (widget.question.numberOne != null || widget.question.numberTwo != null || widget.question.numberThree != null || widget.question.numberFour != null)
       {
+        registeredAnswer = true;
+      }
+    }
+    if (widget.question.kind == "LONGANSWER")
+    {
+      UserAnswerLong userAnswerLong = widget.question.userAnswer;  
+      if (userAnswerLong.answerText != null)
+      {
+        controllers.TashrihiTextController.text = userAnswerLong.answerText;
+        registeredAnswer = true;
+        if (userAnswerLong.answerFile != null)
+        {
+          hasAnsweFile = true;
+          fileName = userAnswerLong.answerFile.split('/').last;
+        }
+      }
+    }
+    if (widget.question.kind == "SHORTANSWER")
+    {
+      UserAnswerShort userAnswerShort = widget.question.userAnswer;
+      if (userAnswerShort.answerText != null)
+      {
+        controllers.BlankTextController.text = userAnswerShort.answerText;
         registeredAnswer = true;
       }
     }
@@ -312,11 +343,11 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
                 //   else if (widget.question.kind == "LONGANSWER") EditingLongAnswer(question: widget.question,controllers: controllers,showChooseImage: false,),
                 //Container(child:questionKind ,height: 500,),
                 questionKind,
-                (_AnswerFile != null) ? Row(
+                (hasAnsweFile) ? Row(
                   children: [
                     IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
                     Expanded(child: Container()),
-                    Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
+                    Text(fileName,textDirection: TextDirection.rtl,),
                   ],
                 ) : Container(),
                 //Expanded(child: Container(height: 30,),),

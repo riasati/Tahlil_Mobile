@@ -299,7 +299,15 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 FractionallySizedBox(
                   widthFactor: 1,
                   child: RoundedLoadingButton(
-                    child: Text('تغییرات',style: TextStyle(color: Colors.white),),
+                    height: 40,
+                    child: Row(
+                      textDirection: TextDirection.rtl,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('تغییر',style: TextStyle(color: Colors.white),),
+                        Icon(Icons.build,color: Colors.white,),
+                      ],
+                    ),//Text('تغییرات',style: TextStyle(color: Colors.white),),
                     //borderRadius: 0,
                     controller: _btnController,
                     color: Color(0xFF3D5A80),

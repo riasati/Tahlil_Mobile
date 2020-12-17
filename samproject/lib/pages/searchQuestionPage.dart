@@ -429,7 +429,14 @@ class _SearchQuestionPageState extends State<SearchQuestionPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: RoundedLoadingButton(
                               height: 30,
-                              child: Text('جستجو',style: TextStyle(color: Colors.white),),
+                              child: Row(
+                                textDirection: TextDirection.rtl,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('جستجو',style: TextStyle(color: Colors.white),),
+                                  Icon(Icons.search,color: Colors.white,),
+                                ],
+                              ),
                               controller: _btnController,
                               color: Color.fromRGBO(238, 108,77 ,1.0), //Color.(0xFF3D5A80),
                               onPressed: () => searchQuestion(),

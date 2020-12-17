@@ -286,11 +286,21 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
                 children: [
                   Flexible(flex: 1,child: IconButton(icon: Icon(Icons.arrow_downward),onPressed: onDownwardArrowClick,tooltip: "جه به جایی با سوال پایین",)),
                   Padding(
-                    padding: const EdgeInsets.only(right: 70),
+                    padding: const EdgeInsets.only(right: 60),
                     child: RaisedButton(
                         textColor: Colors.white,
                         color: Color(0xFF3D5A80),
-                        child: Text("ويرايش"),
+                        child: Container(
+                          width: 70,
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('ويرايش',style: TextStyle(color: Colors.white),),
+                              Icon(Icons.edit,color: Colors.white,),
+                            ],
+                          ),
+                        ),
                         onPressed: onEditButton),
                   )
                 ],
@@ -298,7 +308,17 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
               RaisedButton(
                   textColor: Colors.white,
                   color: Color(0xFF3D5A80),
-                  child: Text("ويرايش"),
+                  child: Container(
+                    width: 70,
+                    child: Row(
+                      textDirection: TextDirection.rtl,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('ويرايش',style: TextStyle(color: Colors.white),),
+                        Icon(Icons.edit,color: Colors.white,),
+                      ],
+                    ),
+                  ),
                   onPressed: onEditButton),
             ],
           )
@@ -490,7 +510,7 @@ class EditExamPageState extends State<EditExamPage> {
         qs.answer = responseJson["exam"]["questions"][i]["question"]["answers"];
         qs.options = responseJson["exam"]["questions"][i]["question"]["options"];
         qs.public = responseJson["exam"]["questions"][i]["question"]["public"];
-        qs.id = responseJson["exam"]["questions"][i]["_id"];
+        qs.id = responseJson["exam"]["questions"][i]["question"]["_id"];
         qs.imageQuestion = responseJson["exam"]["questions"][i]["question"]["imageQuestion"];
         qs.imageAnswer = responseJson["exam"]["questions"][i]["question"]["imageAnswer"];
         if (responseJson["exam"]["questions"][i]["grade"] == 0)
@@ -991,11 +1011,18 @@ class EditExamPageState extends State<EditExamPage> {
                               textDirection: TextDirection.rtl,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text( "جمع نمرات : "+EditExamPage.totalGrade.toString() ,textDirection: TextDirection.rtl,),
+                                Text( "جمع نمرات : "+EditExamPage.totalGrade.toStringAsPrecision(3) ,textDirection: TextDirection.rtl,),
                                 RaisedButton(
                                     textColor: Colors.white,
                                     color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
-                                    child: Text("ویرایش آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                    child: Row(
+                                      textDirection: TextDirection.rtl,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text('ویرایش آزمون',style: TextStyle(color: Colors.white),textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                        Icon(Icons.edit,color: Colors.white,),
+                                      ],
+                                    ),//Text("ویرایش آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
                                     onPressed: CreateExam
                                 ),
                               ],
@@ -1063,7 +1090,17 @@ class EditExamPageState extends State<EditExamPage> {
                               RaisedButton(
                                 textColor: Colors.white,
                                 color: Color(0xFF3D5A80),
-                                child: Text("ایجاد سوال"),
+                                child: Container(
+                                  width: 100,
+                                  child: Row(
+                                    textDirection: TextDirection.rtl,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('ایجاد سوال', style: TextStyle(color: Colors.white),),
+                                      Icon(Icons.create,color: Colors.white,),
+                                    ],
+                                  ),
+                                ),
                                 onPressed: onCreateQuestion,
                               ),
                             ],

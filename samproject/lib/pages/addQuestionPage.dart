@@ -1012,10 +1012,14 @@ class _AddQuestionPageState extends State<AddQuestionPage> {
                     child:
                         RoundedLoadingButton(
                           height: 40,
-                          child: Text(
-                        'اضافه کردن',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                          child: Row(
+                            textDirection: TextDirection.rtl,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('ایجاد سوال', style: TextStyle(color: Colors.white),),
+                              Icon(Icons.create,color: Colors.white,),
+                            ],
+                          ),
                       controller: _btnController,
                       color: Color(0xFF3D5A80),
                       onPressed: () => submit(),
