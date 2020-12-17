@@ -544,7 +544,8 @@ class _ClassExamsState extends State<ClassExams> {
             Alert(
               context: context,
               type: AlertType.error,
-              title: "زمان آزمون فرانرسیده",
+              title: json.decode(
+                  utf8.decode(response.bodyBytes))["error"],
               buttons: [
               ],
             ).show();
