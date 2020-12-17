@@ -203,7 +203,7 @@ class VisitAnswerAndAddtoExamButton extends StatelessWidget {
             onPressed: onVisitAnswerPressed),
         RaisedButton(
             textColor: Colors.white,
-            color: Color(0xFF3D5A80),
+            color: Color.fromRGBO(238, 108,77 ,1.0),
             child: Text("اضافه کردن به آزمون"),
             onPressed: onAddtoExamPressed),
       ],

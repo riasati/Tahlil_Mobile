@@ -144,6 +144,6 @@ class Question {
 
   @override
   String toString() {
-    return 'Question{text: $text, kind: $kind, answerString: $answerString, numberOne: $numberOne, numberTwo: $numberTwo, numberThree: $numberThree, numberFour: $numberFour, optionOne: $optionOne, optionTwo: $optionTwo, optionThree: $optionThree, optionFour: $optionFour, grade: $grade}';
+    return 'Question{text: $text, kind: $kind, answerString: $answerString, numberOne: $numberOne, numberTwo: $numberTwo, numberThree: $numberThree, numberFour: $numberFour, optionOne: $optionOne, optionTwo: $optionTwo, optionThree: $optionThree, optionFour: $optionFour, grade: $grade, userAnswer: $userAnswer}';
   }
 }

@@ -12,7 +12,6 @@ import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/pages/searchQuestionPage.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
-import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 class QuestionViewInEditExam extends StatefulWidget {
@@ -180,6 +179,7 @@ class QuestionViewInEditExamState extends State<QuestionViewInEditExam> {
         print("Question failed");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
+        widget.question.grade = changedQuestion.grade;
 
       }
       EditExamPageState.calculateTotalGrade(widget.parent);
@@ -490,11 +490,17 @@ class EditExamPageState extends State<EditExamPage> {
         qs.answer = responseJson["exam"]["questions"][i]["question"]["answers"];
         qs.options = responseJson["exam"]["questions"][i]["question"]["options"];
         qs.public = responseJson["exam"]["questions"][i]["question"]["public"];
-        qs.id = responseJson["exam"]["questions"][i]["question"]["_id"];
+        qs.id = responseJson["exam"]["questions"][i]["_id"];
         qs.imageQuestion = responseJson["exam"]["questions"][i]["question"]["imageQuestion"];
         qs.imageAnswer = responseJson["exam"]["questions"][i]["question"]["imageAnswer"];
-        if (responseJson["exam"]["questions"][i]["grade"] != null)
+        if (responseJson["exam"]["questions"][i]["grade"] == 0)
         {
+          qs.grade = 0;
+        }
+        else if (responseJson["exam"]["questions"][i]["grade"] != null)
+        {
+          // print(qs.id);
+          // print(responseJson["exam"]["questions"][i]["grade"]);
           qs.grade = responseJson["exam"]["questions"][i]["grade"];
         }
 
@@ -700,7 +706,7 @@ class EditExamPageState extends State<EditExamPage> {
       print(EditExamPage.questionList[i].id);
       double grade = EditExamPage.questionList[i].grade;
       questionObjects.add({"question" : id , "grade" : grade});
-      //print(CreateExamPage.questionList[i].id);
+      //print(EditExamPage.questionList[i].id);
     }
     if (examDate.text.isEmpty || examStartTime.text.isEmpty || examFinishTime.text.isEmpty || examDurationTime.text.isEmpty)
     {
@@ -770,8 +776,8 @@ class EditExamPageState extends State<EditExamPage> {
       ShowCorrectnessDialog(true, context);
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
-      EditExamPage.questionList.clear();
-      EditExamPage.totalGrade = 0;
+      // EditExamPage.questionList.clear();
+      // EditExamPage.totalGrade = 0;
     }
     else
     {
@@ -783,6 +789,8 @@ class EditExamPageState extends State<EditExamPage> {
   @override
   void initState() {
     super.initState();
+    EditExamPage.questionList = [];
+    EditExamPage.totalGrade = 0;
     GetExamSpecification();
   }
   @override

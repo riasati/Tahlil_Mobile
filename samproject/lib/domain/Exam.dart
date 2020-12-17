@@ -33,7 +33,7 @@ class Exam{
   }
   String GetJalaliOfServerGregorian(DateTime serverDateTime)
   {
-    //serverDateTime = serverDateTime.add(Duration(hours: 3,minutes: 30));
+    serverDateTime = serverDateTime.add(Duration(hours: 3,minutes: 30));
     Gregorian g = new Gregorian(serverDateTime.year,serverDateTime.month,serverDateTime.day);
     Jalali j = g.toJalali();
     String jalaliDate = j.year.toString() + "/" + j.month.toString() + "/" + j.day.toString();

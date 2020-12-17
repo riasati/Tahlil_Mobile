@@ -184,7 +184,7 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
         print("Question failed");
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
-
+        widget.question.grade = changedQuestion.grade;
       }
       CreateExamPageState.calculateTotalGrade(widget.parent);
       setState(() {
