@@ -24,49 +24,62 @@ class ReviewExamPage extends StatefulWidget {
 class _ReviewExamPageState extends State<ReviewExamPage> {
   int _currentQuestion = 0;
   GlobalKey<ScrollSnapListState> questionRouterKey = GlobalKey();
+  PageController controller=PageController();
+  List<Widget> _list=<Widget>[];
+  void fillPageList()
+  {
+    for(int i = 0;i<widget.exam.questions.length;i++)
+    {
+      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i]));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fillPageList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         bottomNavigationBar: buildBottomNavigator(context),
-        body: Container(
-          child: Center(child: QuestionViewInReviewExam(question:widget.exam.questions[_currentQuestion])),
+        appBar: AppBar(
+          backgroundColor: Color(0xFF3D5A80),
+          title: Container(
+         //   padding: EdgeInsets.only(right: 40),
+            alignment: Alignment.center,
+            child: Text(//widget.exam.name
+              "مرور"  + widget.exam.name,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
+        body: Card(
+          child: PageView(
+            controller: controller,
+            scrollDirection: Axis.horizontal,
+            children: _list,
+            onPageChanged: (num)
+            {
+              _currentQuestion = num;
+              questionRouterKey.currentState.focusToItem(_currentQuestion);
+              setState(() {
+
+              });
+            },
+          ),
+        ),//QuestionViewInReviewExam(question:widget.exam.questions[_currentQuestion]),
       ),
     );
   }
-
-
-  // Widget questionView(Question question){
-  //   // var answerView;
-  //   // if(question.kind == "TEST")
-  //   //   answerView = Expanded(child: TestQuestion(question), flex: 2,);
-  //   // else if(question.kind == "MULTICHOISE")
-  //   //   answerView = Expanded(child: MultipleChoiceQuestion(question), flex: 2,);
-  //   // else if(question.kind == "SHORTANSWER")
-  //   //   answerView = Expanded(child: ShortAnswerQuestion(question), flex: 1,);
-  //   // else{
-  //   //   UserAnswerLong userAnswerLong = question.userAnswer;
-  //   //   userAnswerLong.answerFile = "slkflskjdf";
-  //   //   userAnswerLong.answerText = "ljsdlfj";
-  //   //   answerView = Expanded(child: LongAnswerQuestion(question), flex: 2,);
-  //   // }
-  //   // return Column(
-  //   //   children: [
-  //   //     Expanded(
-  //   //       flex: 1,
-  //   //       child: Center(
-  //   //         child: QuestionViewInReviewExam(question: question, userAnswer:question.userAnswer),
-  //   //       ),
-  //   //     ),
-  //   //     answerView,//answer
-  //   //   ],
-  //   // );
-  //
-  //   return QuestionViewInReviewExam2(question: question);
-  //
-  // }
 
   Widget buildBottomNavigator(BuildContext context) {
     return Container(
@@ -107,6 +120,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
               _currentQuestion--;
             else
               Navigator.pop(context);
+            controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
             questionRouterKey.currentState.focusToItem(_currentQuestion);
           });
         },
@@ -133,6 +147,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
                 print("finish");
               else
                 _currentQuestion++;
+              controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
               questionRouterKey.currentState.focusToItem(_currentQuestion);
             });
           },
@@ -173,6 +188,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
         onPressed: () {
           setState(() {
             _currentQuestion = index;
+            controller.animateToPage(_currentQuestion, duration: Duration(milliseconds: 500), curve: Curves.decelerate);
             questionRouterKey.currentState.focusToItem(_currentQuestion);
           });
         },

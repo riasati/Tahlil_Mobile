@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:samproject/domain/UserAnswer.dart';
 import 'package:samproject/domain/UserAnswerLong.dart';
 import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
+import 'package:samproject/domain/UserAnswerShort.dart';
 import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/LongAnswer.dart';
@@ -27,69 +28,51 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(4.0),
-            child: Column(
-              //textDirection: TextDirection.rtl,
-              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        children: [
-                          Text(
-                            "بارم",
+        child: Padding(
+          padding: EdgeInsets.all(4.0),
+          child: Column(
+            //textDirection: TextDirection.rtl,
+            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        Text(
+                          "بارم",
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(widget.question.grade.toString(),
                             textDirection: TextDirection.rtl,
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(widget.question.grade.toString(),
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.center),
-                        ],
-                      ),
+                            textAlign: TextAlign.center),
+                      ],
                     ),
-                    Expanded(
-                      flex: 8,
-                      child: NotEditingQuestionText(
-                        question: widget.question,
-                      ),
+                  ),
+                  Expanded(
+                    flex: 7,
+                    child: NotEditingQuestionText(
+                      question: widget.question,
                     ),
-                  ],
-                ),
-                // if (widget.question.kind == "چند گزینه ای"/*HomePage.maps.SKindMap["MULTICHOISE"]*/) MultipleChoiceQuestion(widget.question)
-                // else if (widget.question.kind == "تست"/*HomePage.maps.SKindMap["TEST"]*/) TestQuestion(widget.question)
-                // else if (widget.question.kind == "پاسخ کوتاه"/*HomePage.maps.SKindMap["SHORTANSWER"]*/) ShortAnswerQuestion(widget.question)
-                //   else if (widget.question.kind == "تشریحی"/*HomePage.maps.SKindMap["LONGANSWER"]*/) ShortAnswerQuestion(widget.question),
+                  ),
+                ],
+              ),
 
-                if (widget.question.kind ==
-                    "MULTICHOISE")
-                  MultipleChoiceQuestion(widget.question)
-                else if (widget.question.kind ==
-                    "TEST" )
-                  TestQuestion(widget.question,)
-                else if (widget.question.kind ==
-                      "SHORTANSWER" )
-                    ShortAnswerQuestion(widget.question)
-                  else
-                    LongAnswerWidgetInReivuew(question: widget.question,),
+              if (widget.question.kind ==
+                  "MULTICHOISE")
+                MultiChoiceWidgetInReview(question: widget.question,userAnswerMultipleChoice: widget.question.userAnswer,)
+              else if (widget.question.kind ==
+                  "TEST")
+                TestWidgetInReview(question: widget.question,userAnswerTest: widget.question.userAnswer,)
+              else if (widget.question.kind ==
+                    "SHORTANSWER")
+                  ShortAnswerWidgetInReview(question: widget.question,)
+                else
+                  LongAnswerWidgetInReview(question: widget.question,),
 
-                if (widget.question.kind ==
-                    "MULTICHOISE")
-                  MultiChoiceWidgetInReview(question: widget.question,userAnswerMultipleChoice: widget.question.userAnswer,)
-                else if (widget.question.kind ==
-                    "TEST")
-                  TestWidgetInReview(question: widget.question,userAnswerTest: widget.question.userAnswer,)
-                else if (widget.question.kind ==
-                      "SHORTANSWER")
-                    ShortAnswerQuestion(widget.question)
-                  else
-                    LongAnswerWidgetInReivuew(question: widget.question,),
-
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -515,23 +498,24 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
   }
 }
 
-class LongAnswerWidgetInReivuew extends StatefulWidget {
+class LongAnswerWidgetInReview extends StatefulWidget {
   Question question;
-  LongAnswerWidgetInReivuew({Key key, this.question}) : super(key: key);
+  LongAnswerWidgetInReview({Key key, this.question}) : super(key: key);
   @override
-  _LongAnswerWidgetInReivuewState createState() => _LongAnswerWidgetInReivuewState();
+  _LongAnswerWidgetInReviewState createState() => _LongAnswerWidgetInReviewState();
 }
 
-class _LongAnswerWidgetInReivuewState extends State<LongAnswerWidgetInReivuew> {
+class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
   bool userAnswer = false;
   final PageController pageController = PageController(
     initialPage: 1,
   );
   Widget questionAnswerView() {
     return Text(
-      widget.question.answerString,
+      "پاسخ سوال : "  + widget.question.answerString,
+      textDirection: TextDirection.rtl,
       style: TextStyle(
-        fontSize: 16.0,
+     //   fontSize: 16.0,
         color: Colors.black,
       ),
       textAlign: TextAlign.right,
@@ -543,35 +527,48 @@ class _LongAnswerWidgetInReivuewState extends State<LongAnswerWidgetInReivuew> {
       return Padding(
         padding: EdgeInsets.all(4.0),//EdgeInsets.only(bottom: 70),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          //mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              userAnswerLong.answerText,
-              style: TextStyle(
-                fontSize: 16.0,
-                color: Colors.black,
+            Expanded(
+              flex: 1,
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Text(
+                    "پاسخ شما : "  + userAnswerLong.answerText,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                   //   fontSize: 16.0,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ],
               ),
-              textAlign: TextAlign.right,
             ),
-            Container(
-              child: FlatButton(
-                onPressed: () {},
-                child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+            Flexible(
+              flex: 1,
+              child: Container(
+                child: FlatButton(
+                  onPressed: () {},
+                  child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                  color: Color(0xFF3D5A80),
+                ),
+                width: 150,
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-                color: Color(0xFF3D5A80),
-              ),
-              width: 150,
             )
           ],
         ),
       );
     else
       return Text(
-        userAnswerLong.answerText,
+        "پاسخ شما : "  + userAnswerLong.answerText,
+        textDirection: TextDirection.rtl,
         style: TextStyle(
-          fontSize: 16.0,
+        //  fontSize: 16.0,
           color: Colors.black,
         ),
         textAlign: TextAlign.right,
@@ -646,7 +643,7 @@ class _LongAnswerWidgetInReivuewState extends State<LongAnswerWidgetInReivuew> {
             padding: EdgeInsets.only(bottom: 10, right: 10, left: 10),
             child: //userAnswerView(),
             Container(
-              height: 250,
+              height: 300,
               child: PageView(
                 //physics:NeverScrollableScrollPhysics(),
                 physics: ScrollPhysics(),
@@ -669,3 +666,28 @@ class _LongAnswerWidgetInReivuewState extends State<LongAnswerWidgetInReivuew> {
     );
   }
 }
+
+class ShortAnswerWidgetInReview extends StatelessWidget {
+  Question question;
+  ShortAnswerWidgetInReview({Key key, this.question}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    UserAnswerShort userAnswerShort = question.userAnswer;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Container(
+        width: double.infinity,
+        // height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text("پاسخ سوال: " + question.answerString , style: TextStyle(fontWeight: FontWeight.bold),textDirection: TextDirection.rtl),
+            Text("پاسخ شما: " + userAnswerShort.answerText, style: TextStyle(fontWeight: FontWeight.bold), textDirection: TextDirection.rtl,),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
