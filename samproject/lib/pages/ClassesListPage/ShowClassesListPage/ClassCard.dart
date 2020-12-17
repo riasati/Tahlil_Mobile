@@ -24,7 +24,7 @@ class _ClassCardState extends State<ClassCard> {
   Widget build(BuildContext context) {
     var customIcon;
     var classOwnerName;
-    if(classCard.className.contains("ریاضی"))
+    if (classCard.className.contains("ریاضی"))
       customIcon = Padding(
         child: Icon(
           FontAwesomeIcons.infinity,
@@ -33,13 +33,13 @@ class _ClassCardState extends State<ClassCard> {
         ),
         padding: EdgeInsets.only(right: 10),
       );
-    else if(classCard.className.contains("فیزیک"))
+    else if (classCard.className.contains("فیزیک"))
       customIcon = Icon(
         FontAwesomeIcons.atom,
         size: 50,
         color: Color(0xFF3D5A80),
       );
-    else if(classCard.className.contains("شیمی"))
+    else if (classCard.className.contains("شیمی"))
       customIcon = Icon(
         FontAwesomeIcons.flask,
         size: 50,
@@ -55,59 +55,21 @@ class _ClassCardState extends State<ClassCard> {
         padding: EdgeInsets.only(right: 10),
       );
 
-    if(!(classCard.ownerFullName == null || classCard.ownerFullName == "**** ****"))
-      classOwnerName = Padding(
-        padding: EdgeInsets.only(top: 8),
-        child: AutoSizeText(
-          "استاد:" + classCard.ownerFullName,
-          maxLines: 1,
-          textAlign: TextAlign.right,
-          style: TextStyle(
-            color: Colors.black,
-            //fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
-    else
-      classOwnerName = Container();
-
-    var classIcon;
+    var adminIcon;
     if(classCard.isOwner)
-      classIcon = Padding(
-        padding: EdgeInsets.only(left: 27),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              child: customIcon,
+      adminIcon = Row(
+        children: [
+          Container(
+            child: Icon(
+              FontAwesomeIcons.userGraduate,
+              color: Colors.red,
+              size: 17,
             ),
-            Padding(
-              padding: EdgeInsets.only(left: 0, bottom: 30),
-              child: Container(
-                child: Icon(FontAwesomeIcons.medal, color: Colors.yellow,),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     else
-      classIcon = Padding(
-        padding: EdgeInsets.only(left: 0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              child: customIcon,
-            ),
-            // Padding(
-            //   padding: EdgeInsets.only(left: 0, bottom: 30),
-            //   child: Container(
-            //     child: Icon(FontAwesomeIcons.medal, color: Colors.yellow,),
-            //   ),
-            // ),
-          ],
-        ),
-      );
+      adminIcon = Container(child: Text(""),);
     return Card(
       elevation: 20,
       shape: RoundedRectangleBorder(
@@ -115,14 +77,18 @@ class _ClassCardState extends State<ClassCard> {
       //color: Colors.black45,
       child: FlatButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => InsidClassPage(classCard.classId)));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => InsidClassPage(classCard.classId)));
         },
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              classIcon,
+              adminIcon,
+              customIcon,
               Container(
                 child: Padding(
                   padding: EdgeInsets.only(top: 5),
@@ -132,12 +98,24 @@ class _ClassCardState extends State<ClassCard> {
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w900,
-                      ),),
-                    fit:BoxFit.fitWidth,
+                      ),
+                    ),
+                    fit: BoxFit.fitWidth,
                   ),
                 ),
               ),
-              classOwnerName,
+              Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: AutoSizeText(
+                  "استاد:" + classCard.ownerFullName,
+                  maxLines: 1,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: Colors.black,
+                    //fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
