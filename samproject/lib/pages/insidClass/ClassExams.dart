@@ -252,15 +252,17 @@ class _ClassExamsState extends State<ClassExams> {
       children: [
         FlatButton(
           onPressed: () {
-            //getQuestionAndAnswerForReview(exam);
-            getQuestions(exam);
+            if(endTimeIsAfter(exam))
+              getQuestions(exam);
+            else
+              getQuestionAndAnswerForReview(exam);
           },
           child: Container(
             color: Color.fromRGBO(14, 145, 140, 1),
             child: Padding(
               child: Center(
                 child: AutoSizeText(
-                  "شرکت در آزمون",
+                  endTimeIsAfter(exam)?"شرکت در آزمون":"مرور آزمون",
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.white,
@@ -621,6 +623,10 @@ class _ClassExamsState extends State<ClassExams> {
     }
     InsidClassPage.isLoading = false;
     widget?.insidClassPageSetState();
+  }
+
+  bool endTimeIsAfter(Exam exam){
+    return exam.endDate.isAfter(DateTime.now());
   }
 
   String convertDateToJalaliString(DateTime time) {
