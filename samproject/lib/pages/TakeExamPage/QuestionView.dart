@@ -236,29 +236,29 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
         registeredAnswer = true;
       }
     }
-    // if (widget.question.kind == "LONGANSWER")
-    // {
-    //   UserAnswerLong userAnswerLong = widget.question.userAnswer;
-    //   if (userAnswerLong.answerText != null)
-    //   {
-    //     controllers.TashrihiTextController.text = userAnswerLong.answerText;
-    //     registeredAnswer = true;
-    //     if (userAnswerLong.answerFile != null)
-    //     {
-    //       //hasAnsweFile = true;
-    //       //fileName = userAnswerLong.answerFile.split('/').last;
-    //     }
-    //   }
-    // }
-    // if (widget.question.kind == "SHORTANSWER")
-    // {
-    //   UserAnswerShort userAnswerShort = widget.question.userAnswer;
-    //   if (userAnswerShort.answerText != null)
-    //   {
-    //     controllers.BlankTextController.text = userAnswerShort.answerText;
-    //     registeredAnswer = true;
-    //   }
-    // }
+    if (widget.question.kind == "LONGANSWER")
+    {
+      UserAnswerLong userAnswerLong = widget.question.userAnswer;
+      if (userAnswerLong.answerText != null)
+      {
+        controllers.TashrihiTextController.text = userAnswerLong.answerText;
+        registeredAnswer = true;
+        if (userAnswerLong.answerFile != null)
+        {
+          //hasAnsweFile = true;
+          //fileName = userAnswerLong.answerFile.split('/').last;
+        }
+      }
+    }
+    if (widget.question.kind == "SHORTANSWER")
+    {
+      UserAnswerShort userAnswerShort = widget.question.userAnswer;
+      if (userAnswerShort.answerText != null)
+      {
+        controllers.BlankTextController.text = userAnswerShort.answerText;
+        registeredAnswer = true;
+      }
+    }
   }
   // void filePicker()async
   // {

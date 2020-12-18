@@ -225,13 +225,16 @@ class VisitAnswerAndAddtoExamButton extends StatelessWidget {
     RaisedButton(
         textColor: Colors.white,
         color: Color(0xFF3D5A80),
-        child: Row(
-          textDirection: TextDirection.rtl,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("دیدن پاسخ",style: TextStyle(color: Colors.white),),
-            Icon(Icons.question_answer_outlined,color: Colors.white,),
-          ],
+        child: Container(
+          width: 100,
+          child: Row(
+            textDirection: TextDirection.rtl,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("دیدن پاسخ",style: TextStyle(color: Colors.white),),
+              Icon(Icons.question_answer_outlined,color: Colors.white,),
+            ],
+          ),
         ),
         onPressed: onVisitAnswerPressed);
   }
