@@ -320,6 +320,7 @@ class _ClassExamsState extends State<ClassExams> {
                 UserAnswerTest userAnswerTest = new UserAnswerTest();
                 userAnswerTest.userChoice =
                     int.parse(questionGradeAnswerInfo["answerText"]);
+                question.numberOne = userAnswerTest.userChoice;
                 question.userAnswer = userAnswerTest;
               }
               else if (question.kind == "MULTICHOISE") {
@@ -327,6 +328,18 @@ class _ClassExamsState extends State<ClassExams> {
                 String answerText = questionGradeAnswerInfo["answerText"];
                 userAnswerMultipleChoice.userChoices =
                     answerText.split(",").map(int.parse).toList();
+                question.numberOne = 0;
+                question.numberTwo = 0;
+                question.numberThree = 0;
+                question.numberFour = 0;
+                if(userAnswerMultipleChoice.userChoices.contains(1))
+                  question.numberOne = 1;
+                if(userAnswerMultipleChoice.userChoices.contains(2))
+                  question.numberTwo = 1;
+                if(userAnswerMultipleChoice.userChoices.contains(3))
+                  question.numberThree = 1;
+                if(userAnswerMultipleChoice.userChoices.contains(4))
+                  question.numberFour = 1;
                 question.userAnswer = userAnswerMultipleChoice;
               }
               else if(question.kind == "SHORTANSWER"){
@@ -334,11 +347,23 @@ class _ClassExamsState extends State<ClassExams> {
                 userAnswerShort.answerText = questionGradeAnswerInfo["answerText"];
                 question.userAnswer = userAnswerShort;
               }
-              //TODO USER ANSWER LONG
+              else{
+                UserAnswerLong userAnswerLong = new UserAnswerLong();
+                if (questionGradeAnswerInfo["answerText"] != null)
+                  userAnswerLong.answerText =
+                  questionGradeAnswerInfo["answerText"];
+                else
+                  userAnswerLong.answerText = "";
+                if (questionGradeAnswerInfo["answerFile"] != null)
+                  userAnswerLong.answerFile =
+                  questionGradeAnswerInfo["answerFile"];
+                else
+                  userAnswerLong.answerFile = "";
+                question.userAnswer = userAnswerLong;
+              }
             }
             question.grade = questionGradeAnswerInfo["grade"].toDouble();
-            question.answerString = questionGradeAnswerInfo["answerText"];
-            //question.answerFile = questionInfoAndGrad["answerText"];
+            //print(question);
             exam.questions.add(question);
           }
           Navigator.push(context, MaterialPageRoute(builder: (context) => TakeExamPage(exam)));

@@ -30,8 +30,8 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
 //  Question UserAnswerQuestion = new Question();
   File _AnswerFile;
   bool registeredAnswer = false;
-  bool hasAnsweFile;
-  String fileName;
+  //bool hasAnsweFile;
+  //String fileName;
 
   void chooseFile() async
   {
@@ -40,8 +40,8 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
     setState(() {
       if (pickedFile != null ) {
         _AnswerFile = File(pickedFile.path);
-        hasAnsweFile = true;
-        fileName = basename(_AnswerFile.path);
+        //hasAnsweFile = true;
+        //fileName = basename(_AnswerFile.path);
       }
     });
   }
@@ -202,8 +202,8 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
           registeredAnswer = false;
         }
         _AnswerFile = null;
-        hasAnsweFile = false;
-        fileName = null;
+        //hasAnsweFile = false;
+        //fileName = null;
         widget.question.numberOne = null;
         widget.question.numberTwo = null;
         widget.question.numberThree = null;
@@ -221,6 +221,7 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
   @override
   void initState() {
     super.initState();
+    print(widget.question);
     if (widget.question.kind == "TEST")
     {
       if (widget.question.numberOne != null)
@@ -235,29 +236,29 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
         registeredAnswer = true;
       }
     }
-    if (widget.question.kind == "LONGANSWER")
-    {
-      UserAnswerLong userAnswerLong = widget.question.userAnswer;  
-      if (userAnswerLong.answerText != null)
-      {
-        controllers.TashrihiTextController.text = userAnswerLong.answerText;
-        registeredAnswer = true;
-        if (userAnswerLong.answerFile != null)
-        {
-          hasAnsweFile = true;
-          fileName = userAnswerLong.answerFile.split('/').last;
-        }
-      }
-    }
-    if (widget.question.kind == "SHORTANSWER")
-    {
-      UserAnswerShort userAnswerShort = widget.question.userAnswer;
-      if (userAnswerShort.answerText != null)
-      {
-        controllers.BlankTextController.text = userAnswerShort.answerText;
-        registeredAnswer = true;
-      }
-    }
+    // if (widget.question.kind == "LONGANSWER")
+    // {
+    //   UserAnswerLong userAnswerLong = widget.question.userAnswer;
+    //   if (userAnswerLong.answerText != null)
+    //   {
+    //     controllers.TashrihiTextController.text = userAnswerLong.answerText;
+    //     registeredAnswer = true;
+    //     if (userAnswerLong.answerFile != null)
+    //     {
+    //       //hasAnsweFile = true;
+    //       //fileName = userAnswerLong.answerFile.split('/').last;
+    //     }
+    //   }
+    // }
+    // if (widget.question.kind == "SHORTANSWER")
+    // {
+    //   UserAnswerShort userAnswerShort = widget.question.userAnswer;
+    //   if (userAnswerShort.answerText != null)
+    //   {
+    //     controllers.BlankTextController.text = userAnswerShort.answerText;
+    //     registeredAnswer = true;
+    //   }
+    // }
   }
   // void filePicker()async
   // {
@@ -343,11 +344,11 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
                 //   else if (widget.question.kind == "LONGANSWER") EditingLongAnswer(question: widget.question,controllers: controllers,showChooseImage: false,),
                 //Container(child:questionKind ,height: 500,),
                 questionKind,
-                (hasAnsweFile) ? Row(
+                (_AnswerFile != null) ? Row(
                   children: [
                     IconButton(icon: Icon(Icons.clear), onPressed: () => deleteAnswer(false),color: Colors.red,),
                     Expanded(child: Container()),
-                    Text(fileName,textDirection: TextDirection.rtl,),
+                    Text(basename(_AnswerFile.path),textDirection: TextDirection.rtl,),
                   ],
                 ) : Container(),
                 //Expanded(child: Container(height: 30,),),
