@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:loading_overlay/loading_overlay.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/UserAnswer.dart';
@@ -34,54 +35,19 @@ class _ClassExamsState extends State<ClassExams> {
   String _getExamsOfClassInfoURL = "http://parham-backend.herokuapp.com/class/";
   String _removeExamURL = "http://parham-backend.herokuapp.com/exam/";
   List<Exam> classExams = [];
+  List<bool> examIsOpen = [];
+  bool loadingPage = true;
 
   @override
-  Widget build(BuildContext context) {
-    return eachExamCard();
-    // return Container(
-    //   child: Card(
-    //     elevation: 4,
-    //     shape: RoundedRectangleBorder(
-    //         borderRadius: BorderRadius.all(Radius.circular(30))),
-    //     //color: Colors.black45,
-    //     child: FlatButton(
-    //       onPressed: () {
-    //         _getExamsListFromServer();
-    //       },
-    //       child: Center(
-    //         child: Column(
-    //           mainAxisAlignment: MainAxisAlignment.center,
-    //           children: [
-    //             Container(
-    //               child: Icon(
-    //                 FontAwesomeIcons.questionCircle,
-    //                 size: 50,
-    //                 color: Color(0xFF3D5A80),
-    //               ),
-    //               alignment: Alignment.center,
-    //             ),
-    //             Padding(
-    //               padding: EdgeInsets.only(top: 15),
-    //               child: AutoSizeText(
-    //                 "لیست آزمون ها",
-    //                 maxLines: 1,
-    //                 style: TextStyle(
-    //                   color: Colors.black,
-    //                   fontWeight: FontWeight.w900,
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
+  void initState() {
+    super.initState();
+    _getExamsListFromServer();
   }
 
   void _getExamsListFromServer() async {
-    InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
+    setState(() {
+      loadingPage = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
@@ -99,6 +65,7 @@ class _ClassExamsState extends State<ClassExams> {
         });
         classExams = [];
         if (response.statusCode == 200) {
+          print(response.body);
           var examsInfo = json.decode(utf8.decode(response.bodyBytes))["exams"];
           for (var examInfo in examsInfo) {
             Exam exam = Exam(
@@ -108,12 +75,14 @@ class _ClassExamsState extends State<ClassExams> {
                 DateTime.parse(examInfo["endDate"]),
                 examInfo['examLength']);
             classExams.add(exam);
+            examIsOpen.add(false);
+            print(exam);
             DateTime d = DateTime.parse(examInfo["startDate"]);
             Jalali j = Jalali.fromDateTime(d);
           }
           classExams.sort((t1, t2) => t1.startDate.compareTo(t2.startDate));
           classExams = classExams.reversed.toList();
-          examsListBottomSheet();
+          setState(() {});
         } else {
           setState(() {
             Alert(
@@ -136,211 +105,234 @@ class _ClassExamsState extends State<ClassExams> {
         ).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
+    setState(() {
+      loadingPage = false;
+    });
   }
 
-  void examsListBottomSheet() => showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(25),
-        topRight: Radius.circular(25),
-      )),
-      barrierColor: Colors.black45.withOpacity(0.8),
-      builder: (context) => Column(
-            //mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                child: Icon(FontAwesomeIcons.gripLines),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
-                  ),
-                ),
-              ),
-              Expanded(child: examsList()),
-            ],
-          ));
+  @override
+  Widget build(BuildContext context) {
+    return LoadingOverlay(child: examsList(), isLoading: loadingPage,);
+  }
 
   Widget examsList() {
     return ListView.builder(
         itemCount: classExams.length,
         itemBuilder: (BuildContext context, int index) {
-          return eachExamCard();
+          return eachExamCard(index);
         });
   }
 
-  Widget eachExamCard() {
-    // String date = convertDateToJalaliString(exam.startDate);
-    // String dateAndTime = addTimeToDate(date, exam.startDate);
+  Widget eachExamCard(int examIndex) {
     return Card(
       child: Column(
         children: [
           ListTile(
+            tileColor: Color(0xFF3D5A80),
             leading: IconButton(
-              icon: Icon(Icons.expand_more_sharp),
-              onPressed: () {},
+              icon: Icon(
+                examIsOpen[examIndex]
+                    ? FontAwesomeIcons.chevronCircleUp
+                    : FontAwesomeIcons.chevronCircleDown,
+                size: 25,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  examIsOpen[examIndex] = !examIsOpen[examIndex];
+                });
+              },
             ),
-            trailing: Text("Title of exam"),
+            trailing: Text(
+              classExams[examIndex].name,
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
           ),
           Container(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: ListTile(
-                        trailing: Icon(Icons.calendar_today_sharp),
-                        title: Text("1399/10/10"),
+            child: examIsOpen[examIndex]
+                ? Column(
+                    children: [
+                      ListTile(
+                        trailing: Icon(
+                          FontAwesomeIcons.playCircle,
+                          color: Color.fromRGBO(14, 145, 140, 1),
+                        ),
+                        title: Text(
+                          "ساعت شروع آزمون: ",
+                          style: TextStyle(),
+                          textDirection: TextDirection.rtl,
+                          textAlign: TextAlign.right,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: ListTile(
-                        trailing: Icon(Icons.alarm),
-                        title: Text("10:30"),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50),
+                                    child: Text(convertDateTimeToString(classExams[examIndex].startDate)),
+                                  ),
+                                  Icon(Icons.alarm),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(convertDateToJalaliString(classExams[examIndex].startDate)),
+                                  Icon(FontAwesomeIcons.calendarCheck),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ListTile(
-                        trailing: Icon(Icons.calendar_today_sharp),
-                        title: Text("1399/10/10"),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListTile(
-                        trailing: Icon(Icons.alarm),
-                        title: Text("10:30"),
-                      ),
-                    ),
-                  ],
-                ),
-                ButtonBar(
-                  children: [
-                    Container(
-                      child: FlatButton(
-                        onPressed: () {},
-                        child: Text(
-                          "پاسخ شما",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: ListTile(
+                          trailing: Icon(
+                            FontAwesomeIcons.stopCircle,
+                            color: Colors.red,
+                          ),
+                          title: Text(
+                            "ساعت پایان آزمون: ",
+                            style: TextStyle(),
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.right,
                           ),
                         ),
                       ),
-                      width: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30), bottomLeft: Radius.circular(30)),
-                        //color: userAnswer ? Colors.black : Colors.black26,
-                      ),
-                    ),
-                    Container(
-                      child: FlatButton(
-                          onPressed: () {
-                          },
-                          child: Text(
-                            "پاسخ سوال",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50),
+                                    child: Text(convertDateTimeToString(classExams[examIndex].endDate)),
+                                  ),
+                                  Icon(Icons.alarm),
+                                ],
+                              ),
                             ),
-                          )),
-                      width: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(30),
-                            bottomRight: Radius.circular(30)),
-                        //color: userAnswer ? Colors.black26 : Colors.black,
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(convertDateToJalaliString(classExams[examIndex].endDate)),
+                                  Icon(FontAwesomeIcons.calendarCheck),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+                      InsidClassPage.isAdmin?adminActions(classExams[examIndex]):memberActions(classExams[examIndex])
+                    ],
+                  )
+                : SizedBox(
+                    height: 1,
+                    child: Container(
+                      color: Colors.black,
                     ),
-                  ],
-                  alignment: MainAxisAlignment.center,
-                )
-              ],
-            ),
+                  ),
           )
         ],
       ),
     );
   }
 
-  Future<void> _showInfoOfExam(Exam exam) async {
-    String startDate = convertDateToJalaliString(exam.startDate);
-    String startDateAndTime = addTimeToDate(startDate, exam.startDate);
-    String endDate = convertDateToJalaliString(exam.endDate);
-    String endDateAndTime = addTimeToDate(endDate, exam.endDate);
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "اطلاعات آزمون",
-            textAlign: TextAlign.center,
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                AutoSizeText(
-                  startDateAndTime + " :شروع آزمون",
-                  style: TextStyle(),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                ),
-                AutoSizeText(
-                  endDateAndTime + " :پایان آزمون",
-                  style: TextStyle(),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                ),
-                AutoSizeText(
-                  exam.examLength.toString() + " :مدت زمان",
-                  style: TextStyle(),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget memberActions(Exam exam) {
-    return Row(
-      children: [
-        FlatButton(
-          onPressed: () {
-            if (endTimeIsAfter(exam))
-              getQuestions(exam);
-            else
-              getQuestionAndAnswerForReview(exam);
-          },
-          child: Container(
-            color: Color.fromRGBO(14, 145, 140, 1),
-            child: Padding(
-              child: Center(
-                child: AutoSizeText(
-                  endTimeIsAfter(exam) ? "شرکت در آزمون" : "مرور آزمون",
+    var memberAction;
+    if(exam.endDate.add(Duration(hours: 3, minutes: 30)).isAfter(DateTime.now()))
+      memberAction = Container(
+        child: FlatButton(
+          onPressed: () {},
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Icon(
+              //   Icons.remove_circle,
+              //   color: Color.fromRGBO(14, 145, 140, 1),
+              // ),
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Text(
+                  "شرکت آزمون",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color:Colors.red
                   ),
                 ),
               ),
-              padding: EdgeInsets.only(left: 2, right: 7, top: 2, bottom: 2),
-            ),
+            ],
           ),
-          padding: EdgeInsets.all(0),
         ),
-      ],
+        width: 120,
+        decoration: BoxDecoration(
+          //color: Colors.red,
+          borderRadius:
+          BorderRadius.all(Radius.circular(30)),
+          //color: userAnswer ? Colors.black : Colors.black26,
+        ),
+      );
+    else
+      memberAction = Container(
+        child: FlatButton(
+          onPressed: () {},
+          child: Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.search,
+                color: Color.fromRGBO(14, 145, 140, 1),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 5),
+                child: Text(
+                  "مرور آزمون",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(14, 145, 140, 1),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        width: 120,
+        decoration: BoxDecoration(
+          //color: Colors.red,
+          borderRadius:
+          BorderRadius.all(Radius.circular(30)),
+          //color: userAnswer ? Colors.black : Colors.black26,
+        ),
+      );
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: ButtonBar(
+        alignment: MainAxisAlignment.center,
+        children: [
+          memberAction,
+        ],
+      ),
     );
   }
 
@@ -462,48 +454,72 @@ class _ClassExamsState extends State<ClassExams> {
   }
 
   Widget adminActions(Exam exam) {
-    return PopupMenuButton<String>(
-      onSelected: (String value) {},
-      child: Icon(
-        Icons.more_vert,
-        size: 35,
-        color: Colors.red,
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: ButtonBar(
+        alignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            child: FlatButton(
+              onPressed: () {},
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.remove_circle,
+                    color: Colors.red,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: Text(
+                      "حذف آزمون",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            width: 120,
+            decoration: BoxDecoration(
+              //color: Colors.red,
+              borderRadius:
+              BorderRadius.all(Radius.circular(30)),
+              //color: userAnswer ? Colors.black : Colors.black26,
+            ),
+          ),
+          Container(
+            child: FlatButton(
+                onPressed: () {},
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit,
+                      color: Color.fromRGBO(14, 145, 140, 1),
+                    ),
+                    Text(
+                      "ویرایش آزمون",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color:
+                        Color.fromRGBO(14, 145, 140, 1),
+                      ),
+                    ),
+                  ],
+                )),
+            width: 120,
+            decoration: BoxDecoration(
+              borderRadius:
+              BorderRadius.all(Radius.circular(30)),
+              //color: Colors.red,
+              //color: userAnswer ? Colors.black26 : Colors.black,
+            ),
+          ),
+        ],
       ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          child: FlatButton(
-            child: Center(
-                child: Text(
-              'حذف ازمون',
-              style: TextStyle(color: Colors.red),
-            )),
-            padding: EdgeInsets.all(0),
-            onPressed: () {
-              _checkRemoveExam(exam);
-            },
-          ),
-        ),
-        PopupMenuItem<String>(
-          child: FlatButton(
-            child: Center(
-                child: Text(
-              'ویرایش آزمون',
-              style: TextStyle(color: Colors.red),
-            )),
-            padding: EdgeInsets.all(0),
-            onPressed: () {
-              print(exam.examId);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditExamPage(
-                            classId: InsidClassPage.currentClass.classId,
-                            examId: exam.examId,
-                          )));
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -711,10 +727,6 @@ class _ClassExamsState extends State<ClassExams> {
     widget?.insidClassPageSetState();
   }
 
-  bool endTimeIsAfter(Exam exam) {
-    return exam.endDate.isAfter(DateTime.now());
-  }
-
   String convertDateToJalaliString(DateTime time) {
     time = time.add(Duration(hours: 3, minutes: 30));
     Jalali jalaliTime = Jalali.fromDateTime(time);
@@ -724,12 +736,11 @@ class _ClassExamsState extends State<ClassExams> {
     return "$sal/$mah/$rooz";
   }
 
-  String addTimeToDate(String date, DateTime inputTime) {
+  String convertDateTimeToString(DateTime inputTime) {
     inputTime = inputTime.add(Duration(hours: 3, minutes: 30));
     int hour = inputTime.hour;
     String minute = inputTime.minute.toString();
     if (inputTime.minute < 10) minute = "0" + minute;
-    String time = " $hour:$minute";
-    return date + time;
+    return  " $hour:$minute";
   }
 }

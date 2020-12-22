@@ -11,11 +11,15 @@ import 'package:samproject/pages/insidClass/ClassMembers.dart';
 import 'package:samproject/pages/insidClass/classInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'BottomNavigator.dart';
 import 'ClassExams.dart';
 import 'ClassNotification.dart';
-import 'EditAndCreateExamButtons.dart';
+import 'EditAndRemoveButtons.dart';
 
 class InsidClassPage extends StatefulWidget {
+  static final PageController insideClassPageController = PageController(
+    initialPage: 3,
+  );
   static Class currentClass = Class("", "", "", false);
   static Person admin = Person();
   static bool isLoading = true;
@@ -33,52 +37,62 @@ class _InsidClassPageState extends State<InsidClassPage> {
   String _getClassInfoURL = "http://parham-backend.herokuapp.com/class/";
   String classId;
 
+
   _InsidClassPageState(this.classId);
 
   @override
   void initState() {
     super.initState();
     _getClassInformation();
+    BottomNavigator.customIcon = 3;
   }
 
   @override
   Widget build(BuildContext context) {
-    var editAndCreateExamButtons;
-    if(InsidClassPage.isAdmin)
-      editAndCreateExamButtons = Expanded(child: EditAndCreateExamButtons(toggleCoinCallback: insideClassSetState,));
-    else
-      editAndCreateExamButtons = Container();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        bottomNavigationBar: BottomNavigator(),
         body: LoadingOverlay(
-          child: Container(
-            color: Colors.black45.withOpacity(0.3),
-            child: Column(
-              children: [
-                Expanded(child: ClassInfoCard(toggleCoinCallback: navigatorPop,), flex: 4,),
-                editAndCreateExamButtons,
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    children: [
-                      Expanded(child: ClassMembers(toggleCoinCallback: insideClassSetState,)),
-                      Expanded(child: ClassExams(toggleCoinCallback: insideClassSetState,)),
-                    ],
-                  ),
-                ),
-                Expanded(child: ClassNotification(toggleCoinCallback: insideClassSetState,), flex: 3,),
-              ],
-            ),
+          child: PageView(
+          controller: InsidClassPage.insideClassPageController,
+          onPageChanged: (i) {
+            if (i == 0) {
+              setState(() {
+                BottomNavigator.customIcon = 0;
+              });
+            } else if (i == 1) {
+              setState(() {
+                BottomNavigator.customIcon = 1;
+              });
+            }
+            else if (i == 2) {
+              setState(() {
+                BottomNavigator.customIcon = 2;
+              });
+            }
+            else if (i == 3) {
+              setState(() {
+                BottomNavigator.customIcon = 3;
+              });
+            }
+          },
+          children: [
+            ClassExams(toggleCoinCallback: insideClassSetState),
+            Container(color: Colors.red,),
+            Container(color: Colors.blue,),
+            ClassInfoCard(toggleCoinCallback: insideClassSetState)
+
+          ],
           ),
           isLoading: InsidClassPage.isLoading,
         ),
-        ),
-      );
+    ),);
   }
 
-  void _getClassInformation() async{
+  void _getClassInformation() async {
     setState(() {
+      InsidClassPage.currentClass.classId = "";
       InsidClassPage.isLoading = true;
     });
     final prefs = await SharedPreferences.getInstance();
@@ -87,12 +101,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
     try {
       if (token != null) {
         token = "Bearer " + token;
-        // var queryParam = {
-        //   'classId': classId,
-        // };
-        // var url = Uri.http(_getClassInfoURL, "/class", queryParam);
-        // print(url);
-        var url = _getClassInfoURL  + classId;
+        var url = _getClassInfoURL + classId;
         final response = await get(url,
             headers: {
               'accept': 'application/json',
@@ -100,25 +109,29 @@ class _InsidClassPageState extends State<InsidClassPage> {
               'Content-Type': 'application/json',
             });
         print(classId);
-        var userClassesInfo = json.decode(utf8.decode(response.bodyBytes))["Class"];
-        InsidClassPage.currentClass = Class(userClassesInfo["name"], "", userClassesInfo["classId"] , false);
-        InsidClassPage.currentClass.classDescription = userClassesInfo["description"];
-        if(InsidClassPage.currentClass.classDescription == null)
+        var userClassesInfo = json.decode(
+            utf8.decode(response.bodyBytes))["Class"];
+        InsidClassPage.currentClass = Class(
+            userClassesInfo["name"], "", userClassesInfo["classId"], false);
+        InsidClassPage.currentClass.classDescription =
+        userClassesInfo["description"];
+        if (InsidClassPage.currentClass.classDescription == null)
           InsidClassPage.currentClass.classDescription = "";
         var adminInfo = userClassesInfo["admin"];
         InsidClassPage.admin.firstname = adminInfo["firstname"];
         InsidClassPage.admin.lastname = adminInfo["lastname"];
-        InsidClassPage.currentClass.ownerFullName = adminInfo["firstname"] + " " + adminInfo["lastname"];
+        InsidClassPage.currentClass.ownerFullName =
+            adminInfo["firstname"] + " " + adminInfo["lastname"];
         InsidClassPage.admin.avatarUrl = adminInfo["avatar"];
         InsidClassPage.admin.email = adminInfo["email"];
-        if(HomePage.user.email == InsidClassPage.admin.email)
+        if (HomePage.user.email == InsidClassPage.admin.email)
           InsidClassPage.isAdmin = true;
         else
           InsidClassPage.isAdmin = false;
         print(InsidClassPage.currentClass);
         print(userClassesInfo);
       }
-    }on Exception catch(e){
+    } on Exception catch (e) {
       print(e.toString());
     }
     setState(() {
@@ -126,12 +139,13 @@ class _InsidClassPageState extends State<InsidClassPage> {
     });
   }
 
-  void insideClassSetState(){
-    setState(() {
-    });
+  void insideClassSetState() {
+    setState(() {});
   }
 
-  void navigatorPop(){
+  void navigatorPop() {
     Navigator.pop(context);
   }
+
+
 }
