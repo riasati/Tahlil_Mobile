@@ -79,8 +79,8 @@ class _InsidClassPageState extends State<InsidClassPage> {
           },
           children: [
             ClassExams(toggleCoinCallback: insideClassSetState),
-            Container(color: Colors.red,),
-            Container(color: Colors.blue,),
+            Container(color: Colors.red,),//notification
+            ClassMembers(toggleCoinCallback: insideClassSetState),
             ClassInfoCard(toggleCoinCallback: insideClassSetState)
 
           ],

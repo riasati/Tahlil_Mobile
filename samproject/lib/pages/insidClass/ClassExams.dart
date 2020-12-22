@@ -149,7 +149,7 @@ class _ClassExamsState extends State<ClassExams> {
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ),
-          Container(
+          AnimatedContainer(
             child: examIsOpen[examIndex]
                 ? Column(
                     children: [
@@ -251,6 +251,8 @@ class _ClassExamsState extends State<ClassExams> {
                       color: Colors.black,
                     ),
                   ),
+            duration: Duration(seconds: 1),
+            curve: Curves.fastOutSlowIn,
           )
         ],
       ),
