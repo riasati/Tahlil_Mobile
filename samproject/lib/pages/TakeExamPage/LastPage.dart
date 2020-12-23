@@ -5,14 +5,17 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/pages/TakeExamPage/TakeExamPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LastPage extends StatefulWidget {
   String examId;
   bool finish;
+  Exam exam;
 
 
-  LastPage(this.examId, this.finish);
+  LastPage(this.examId, this.finish,this.exam);
 
   @override
   _LastPageState createState() => _LastPageState();
@@ -95,6 +98,7 @@ class _LastPageState extends State<LastPage> {
         ),
         onPressed: () {
           Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => TakeExamPage(widget.exam)));
         },
       ),
     );
@@ -115,7 +119,7 @@ class _LastPageState extends State<LastPage> {
         ),
         onPressed: () {
           Navigator.pop(context);
-          Navigator.pop(context);
+        //  Navigator.pop(context);
         },
       ),
     );
