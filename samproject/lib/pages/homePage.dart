@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
@@ -30,11 +31,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _signInURL = "https://parham-backend.herokuapp.com/user";
   bool _isLoading = true;
+  void initializeDownloader() async
+  {
+    WidgetsFlutterBinding.ensureInitialized();
+    await FlutterDownloader.initialize(
+        debug: true // optional: set false to disable printing logs to console
+    );
+  }
   @override
   void initState() {
     super.initState();
     _getToken();
     _getQuestionSpecification();
+    initializeDownloader();
   }
 
   @override

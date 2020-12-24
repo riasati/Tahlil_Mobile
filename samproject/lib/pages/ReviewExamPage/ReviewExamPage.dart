@@ -30,7 +30,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   {
     for(int i = 0;i<widget.exam.questions.length;i++)
     {
-      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i]));
+      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: false,));
     }
   }
 
@@ -52,7 +52,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
          //   padding: EdgeInsets.only(right: 40),
             alignment: Alignment.center,
             child: Text(//widget.exam.name
-              "مرور"  + widget.exam.name,
+              "مرور "  + widget.exam.name,
               textDirection: TextDirection.rtl,
               style: TextStyle(
                 color: Colors.white,

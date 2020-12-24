@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/UserAnswer.dart';
 import 'package:samproject/domain/UserAnswerLong.dart';
 import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
@@ -17,8 +19,8 @@ import 'package:path_provider/path_provider.dart';
 
 class QuestionViewInReviewExam extends StatefulWidget {
   Question question;
-
-  QuestionViewInReviewExam({Key key, this.question})
+  bool isTeacherUsing;
+  QuestionViewInReviewExam({Key key, this.question,this.isTeacherUsing = false})
       : super(key: key);
 
   @override
@@ -27,54 +29,265 @@ class QuestionViewInReviewExam extends StatefulWidget {
 }
 
 class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
+  TextEditingController TeacherGradeController = new TextEditingController();
+  final RoundedLoadingButtonController _submitGradeBtnController = new RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _downloadFileBtnController = new RoundedLoadingButtonController();
+  UserAnswerLong userAnswerLong;
+  bool IsGradeChange = false;
+  void downloaFile() async
+  {
+    //UserAnswerLong userAnswerLong = widget.question.userAnswer;
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    final taskId = await FlutterDownloader.enqueue(
+      url: userAnswerLong.answerFile,
+      savedDir: appDocDir.path,
+      showNotification: true, // show download progress in status bar (for Android)
+      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+    );
+  }
+  void submitGradeChange()
+  {
+
+  }
+  void onGradeChange(String value)
+  {
+    if (TeacherGradeController.text != 1.2.toString())
+    {
+      IsGradeChange = true;
+      setState(() {
+
+      });
+    }
+    else
+      {
+        IsGradeChange = false;
+        setState(() {
+
+        });
+      }
+  }
+  @override
+  void initState() {
+    super.initState();
+    TeacherGradeController.text = 1.2.toString();//widget.question.userAnswer.grade,
+    if (widget.question.kind == "LONGANSWER")
+    {
+      userAnswerLong = widget.question.userAnswer;
+    }
+  }
   @override
   Widget build(BuildContext context) {
+    var GradeColumn = Column(
+      textDirection: TextDirection.rtl,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Text(
+          "بارم",
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.center,
+        ),
+        Row(
+          children: [
+            (widget.isTeacherUsing) ? Container(
+              width: 35,
+              child: TextFormField(
+                textDirection: TextDirection.rtl,
+                controller: TeacherGradeController,
+                keyboardType: TextInputType.number,
+                onChanged: (value) => onGradeChange(value),
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  contentPadding:EdgeInsets.only(right: 5,top: 5,bottom: 5,left: 5),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ) :
+                Text(1.2.toString(),textDirection: TextDirection.rtl,textAlign: TextAlign.center, /*widget.question.userAnswer.grade*/),
+            Text("/"),
+            Text(widget.question.grade.toString(),
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.center
+            ),
+          ],
+        )
+      ],
+    );
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(4.0),
           child: Column(
-            //textDirection: TextDirection.rtl,
-            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            textDirection: TextDirection.rtl,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
+              Stack(
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: [
-                        Text(
-                          "بارم",
+                  Container(
+                    child: Card(
+                      child: Container(
+                        margin: EdgeInsets.fromLTRB(4, 15, 4, 4),
+                        padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                        child: Column(
                           textDirection: TextDirection.rtl,
-                          textAlign: TextAlign.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(widget.question.text,textDirection: TextDirection.rtl,),
+                            (widget.question.questionImage != null) ? Image.memory(base64Decode(widget.question.questionImage),fit: BoxFit.cover,height: 200,) : Container(),
+                          ],
                         ),
-                        Text(widget.question.grade.toString(),
-                            textDirection: TextDirection.rtl,
-                            textAlign: TextAlign.center),
-                      ],
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.grey),
+                          borderRadius: BorderRadius.circular(5),
+                          shape: BoxShape.rectangle,
+                        ),
+                      ),
                     ),
                   ),
-                  Expanded(
-                    flex: 7,
-                    child: NotEditingQuestionText(
-                      question: widget.question,
+                  Positioned(
+                      right: 20,
+                      top: 10,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 4, right: 4),
+                        color: Colors.white,
+                        child: Text("سوال",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),),
+                      )
+                  ),
+                  Positioned(
+                    top: 15,
+                    left: 4,
+                    child: Card(
+                      child:GradeColumn
                     ),
                   ),
                 ],
               ),
 
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       flex: 1,
+              //       child: GradeColumn
+              //       // Column(
+              //       //   children: [
+              //       //     Text(
+              //       //       "بارم",
+              //       //       textDirection: TextDirection.rtl,
+              //       //       textAlign: TextAlign.center,
+              //       //     ),
+              //       //     Text(widget.question.grade.toString(),
+              //       //         textDirection: TextDirection.rtl,
+              //       //         textAlign: TextAlign.center),
+              //       //   ],
+              //       // ),
+              //     ),
+              //     Expanded(
+              //       flex: 3,
+              //       child: NotEditingQuestionText(
+              //         question: widget.question,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+
               if (widget.question.kind ==
                   "MULTICHOISE")
-                MultiChoiceWidgetInReview(question: widget.question,userAnswerMultipleChoice: widget.question.userAnswer,)
+                Card(child: MultiChoiceWidgetInReview(question: widget.question,userAnswerMultipleChoice: widget.question.userAnswer,))
               else if (widget.question.kind ==
                   "TEST")
-                TestWidgetInReview(question: widget.question,userAnswerTest: widget.question.userAnswer,)
+                Card(child: TestWidgetInReview(question: widget.question,userAnswerTest: widget.question.userAnswer,))
               else if (widget.question.kind ==
                     "SHORTANSWER")
-                  ShortAnswerWidgetInReview(question: widget.question,)
+                  ShortAnswerWidgetInReview(question: widget.question,isTeacherUsing: widget.isTeacherUsing,)
                 else
-                  LongAnswerWidgetInReview(question: widget.question,),
+                  LongAnswerWidgetInReview(question: widget.question,isTeacherUsing: widget.isTeacherUsing,),
 
+              if (userAnswerLong == null && !IsGradeChange) Container()
+              else if (userAnswerLong == null && IsGradeChange)
+                RoundedLoadingButton(borderRadius: 0,
+                  width: 100,
+                  height: 40,
+                  onPressed: () => submitGradeChange(),
+                  child: Text("اعمال تغییرات",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                  color: Color(0xFF3D5A80),
+                  controller:_submitGradeBtnController,
+                )
+              //   Container(
+              //   child: FlatButton(
+              //     onPressed: submitGradeChange,
+              //     child: Text("اعمال تغییرات", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+              //   ),
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.all(Radius.circular(30)),
+              //     color: Color(0xFF3D5A80),
+              //   ),
+              //   width: 150,
+              // )
+              else if (userAnswerLong.answerFile != null && !IsGradeChange)
+                  RoundedLoadingButton(borderRadius: 0,
+                    width: 100,
+                    height: 40,
+                    onPressed: () => submitGradeChange(),
+                    child: Text("دانلود فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                    color: Color(0xFF3D5A80),
+                    controller:_downloadFileBtnController,
+                  )
+              //   Container(
+              //   child: FlatButton(
+              //     onPressed: downloaFile,
+              //     child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+              //   ),
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.all(Radius.circular(30)),
+              //     color: Color(0xFF3D5A80),
+              //   ),
+              //   width: 150,
+              // )
+              else if (userAnswerLong.answerFile != null && IsGradeChange) Row(
+                  textDirection: TextDirection.rtl,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    RoundedLoadingButton(borderRadius: 0,
+                      width: 100,
+                      height: 40,
+                      onPressed: () => submitGradeChange(),
+                      child: Text("دانلود فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                      color: Color(0xFF3D5A80),
+                      controller:_downloadFileBtnController,
+                    ),
+                    RoundedLoadingButton(borderRadius: 0,
+                      width: 100,
+                      height: 40,
+                      onPressed: () => submitGradeChange(),
+                      child: Text("اعمال تغییرات",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                      color: Color(0xFF0e918c),
+                      controller:_submitGradeBtnController,
+                    )
+
+                    // Container(
+                    //   child: FlatButton(
+                    //     onPressed: downloaFile,
+                    //     child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.all(Radius.circular(30)),
+                    //     color: Color(0xFF3D5A80),
+                    //   ),
+                    //   width: 150,
+                    // ),
+                    // Container(
+                    //   child: FlatButton(
+                    //     onPressed: submitGradeChange,
+                    //     child: Text("اعمال تغییرات", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.all(Radius.circular(30)),
+                    //     color: Color(0xFF3D5A80),
+                    //   ),
+                    //   width: 150,
+                    // ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -501,14 +714,14 @@ class _TestWidgetInReviewState extends State<TestWidgetInReview> {
   }
 }
 
-class LongAnswerWidgetInReview extends StatefulWidget {
+class LongAnswerWidgetInReview2 extends StatefulWidget {
   Question question;
-  LongAnswerWidgetInReview({Key key, this.question}) : super(key: key);
+  LongAnswerWidgetInReview2({Key key, this.question}) : super(key: key);
   @override
-  _LongAnswerWidgetInReviewState createState() => _LongAnswerWidgetInReviewState();
+  _LongAnswerWidgetInReview2State createState() => _LongAnswerWidgetInReview2State();
 }
 
-class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
+class _LongAnswerWidgetInReview2State extends State<LongAnswerWidgetInReview2> {
   bool userAnswer = false;
   final PageController pageController = PageController(
     initialPage: 1,
@@ -693,26 +906,215 @@ class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
   }
 }
 
+class LongAnswerWidgetInReview extends StatefulWidget {
+  Question question;
+  bool isTeacherUsing;
+  LongAnswerWidgetInReview({Key key, this.question, this.isTeacherUsing = false}) : super(key: key);
+  @override
+  _LongAnswerWidgetInReviewState createState() => _LongAnswerWidgetInReviewState();
+}
+
+class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
+  UserAnswerLong userAnswerLong;
+  @override
+  void initState() {
+    super.initState();
+    userAnswerLong = widget.question.userAnswer;
+  }
+  void downloaFile() async
+  {
+    //UserAnswerLong userAnswerLong = widget.question.userAnswer;
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    final taskId = await FlutterDownloader.enqueue(
+      url: userAnswerLong.answerFile,
+      savedDir: appDocDir.path,
+      showNotification: true, // show download progress in status bar (for Android)
+      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+  //  UserAnswerLong userAnswerLong = widget.question.userAnswer;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Stack(
+          children: [
+            Container(
+              child: Card(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(4, 15, 4, 4),
+                  padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                  child: Column(
+                    textDirection: TextDirection.rtl,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(widget.question.answerString,textDirection: TextDirection.rtl,textAlign: TextAlign.right,),
+                      (widget.question.answerImage != null) ? Image.memory(base64Decode(widget.question.answerImage),fit: BoxFit.cover,height: 200,) : Container(),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    shape: BoxShape.rectangle,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+                right: 20,
+                top: 10,
+                child: Container(
+                  padding: EdgeInsets.only(left: 4, right: 4),
+                  color: Colors.white,
+                  child: Text("پاسخ سوال",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),),
+                )
+            ),
+          ],
+        ),
+        Stack(
+          children: [
+            Container(
+              child: Card(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(4, 15, 4, 4),
+                  padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                  child: Column(
+                    textDirection: TextDirection.rtl,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      if (userAnswerLong.answerText != null) Text(userAnswerLong.answerText,textDirection: TextDirection.rtl,)
+                      else if (userAnswerLong.answerText == null && userAnswerLong.answerFile == null && widget.isTeacherUsing) Text("دانش آموز به این سوال پاسخی نداده است",textDirection: TextDirection.rtl,)
+                      else if (userAnswerLong.answerText == null && userAnswerLong.answerFile != null && widget.isTeacherUsing) Text("دانش آموز فایلی را به عنوان جواب ارسال کرده است",textDirection: TextDirection.rtl,)
+                      else if (userAnswerLong.answerText == null && userAnswerLong.answerFile == null && !widget.isTeacherUsing) Text("شما به این سوال پاسخی نداده اید",textDirection: TextDirection.rtl)
+                          else if (userAnswerLong.answerText == null && userAnswerLong.answerFile != null && !widget.isTeacherUsing) Text("شما فایلی را به عنوان جواب ارسال کرده اید",textDirection: TextDirection.rtl),
+                      Container(),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    shape: BoxShape.rectangle,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+                right: 20,
+                top: 10,
+                child: Container(
+                    padding: EdgeInsets.only(left: 4, right: 4),
+                    color: Colors.white,
+                    child: (widget.isTeacherUsing) ? Text("پاسخ دانش آموز",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),) :
+                    Text("پاسخ شما",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),)
+                )
+            ),
+          ],
+        ),
+        // (userAnswerLong.answerFile != null) ? Container(
+        //   child: FlatButton(
+        //     onPressed: downloaFile,
+        //     child: Text("دانلود فایل", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+        //   ),
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.all(Radius.circular(30)),
+        //     color: Color(0xFF3D5A80),
+        //   ),
+        //   width: 150,
+        // ) : Container(),
+      ],
+    );
+  }
+}
+
+
 class ShortAnswerWidgetInReview extends StatelessWidget {
   Question question;
-  ShortAnswerWidgetInReview({Key key, this.question}) : super(key: key);
+  bool isTeacherUsing;
+  ShortAnswerWidgetInReview({Key key, this.question, this.isTeacherUsing = false}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     UserAnswerShort userAnswerShort = question.userAnswer;
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Container(
-        width: double.infinity,
-        // height: 200,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.start,
+  //  userAnswerShort.answerText = null;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Stack(
           children: [
-            Text("پاسخ سوال: " + question.answerString , style: TextStyle(fontWeight: FontWeight.bold),textDirection: TextDirection.rtl),
-            Text("پاسخ شما: " + userAnswerShort.answerText, style: TextStyle(fontWeight: FontWeight.bold), textDirection: TextDirection.rtl,),
+            Container(
+              child: Card(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(4, 15, 4, 4),
+                  padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                  child: Column(
+                    textDirection: TextDirection.rtl,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(question.answerString,textDirection: TextDirection.rtl,textAlign: TextAlign.right,),
+                      (question.answerImage != null) ? Image.memory(base64Decode(question.answerImage),fit: BoxFit.cover,height: 200,) : Container(),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    shape: BoxShape.rectangle,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+                right: 20,
+                top: 10,
+                child: Container(
+                  padding: EdgeInsets.only(left: 4, right: 4),
+                  color: Colors.white,
+                  child: Text("پاسخ سوال",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),),
+                )
+            ),
           ],
         ),
-      ),
+        Stack(
+          children: [
+            Container(
+              child: Card(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(4, 15, 4, 4),
+                  padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
+                  child: Column(
+                    textDirection: TextDirection.rtl,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      if (userAnswerShort.answerText != null) Text(userAnswerShort.answerText,textDirection: TextDirection.rtl,)
+                      else if (userAnswerShort.answerText == null && isTeacherUsing) Text("دانش آموز به این سوال پاسخی نداده است",textDirection: TextDirection.rtl,)
+                      else if (userAnswerShort.answerText == null && !isTeacherUsing) Text("شما به این سوال پاسخی نداده اید",textDirection: TextDirection.rtl),
+                      Container(),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                    shape: BoxShape.rectangle,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+                right: 20,
+                top: 10,
+                child: Container(
+                  padding: EdgeInsets.only(left: 4, right: 4),
+                  color: Colors.white,
+                  child: (isTeacherUsing) ? Text("پاسخ دانش آموز",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),) :
+                  Text("پاسخ شما",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(fontSize: 10),)
+                )
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
