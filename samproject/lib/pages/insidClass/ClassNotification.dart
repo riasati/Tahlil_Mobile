@@ -51,18 +51,6 @@ class _ClassNotificationState extends State<ClassNotification> {
     _getNotificationsListFromServer();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return LoadingOverlay(
-        isLoading: isLoading,
-        child: Column(
-            children: [
-              Expanded(child: notificationList(), flex: 10,),
-              _createNotificationButton()
-            ])
-    );
-  }
-
   void _getNotificationsListFromServer() async {
     setState(() {
       isLoading = true;
@@ -87,7 +75,7 @@ class _ClassNotificationState extends State<ClassNotification> {
         classNotifications = [];
         if (response.statusCode == 200) {
           var notificationsInfo =
-              json.decode(utf8.decode(response.bodyBytes))["classNotes"];
+          json.decode(utf8.decode(response.bodyBytes))["classNotes"];
           for (var notificationInfo in notificationsInfo) {
             SumNotification notification = SumNotification(
                 notificationInfo["classNoteId"],
@@ -128,37 +116,47 @@ class _ClassNotificationState extends State<ClassNotification> {
     });
   }
 
-  Widget _createNotificationButton() {
-    if (InsidClassPage.isAdmin)
-      return Expanded(
-        child: FlatButton(
-          onPressed: () {
-          },
-          child: Container(
-            width: double.infinity,
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: new BorderRadius.all(Radius.circular(40.0)),
-                  color: Color(0xFF3D5A80),
-                ),
+  @override
+  Widget build(BuildContext context) {
+    return LoadingOverlay(
+        isLoading: isLoading,
+        child: Column(
+            children: [
+              Expanded(child: notificationList(), flex: 10,),
+              InsidClassPage.isAdmin?Container(
+                //color: Colors.red,
+                height: 60,
                 child: Center(
-                  child: Text(
-                    "ساخت اعلان",
-                    style: TextStyle(
-                      //fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  child: Container(
+                    width: 200,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(30),),
+                      color: Color.fromRGBO(14, 145, 140, 1),
+                    ),
+                    child: FlatButton(
+                      onPressed: (){
+                        _createNewNotificationBottomSheet();
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 15),
+                            child: Text("ساخت اعلان جدید", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                          ),
+                          Icon(
+                            FontAwesomeIcons.plus,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
-        ),
-      );
-    else
-      return Expanded(child: Text(""));
+              ):Container(),
+            ])
+    );
   }
 
   Widget notificationList() {
@@ -197,6 +195,10 @@ class _ClassNotificationState extends State<ClassNotification> {
             ),
           ),
           AnimatedContainer(
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Color(0xFF3D5A80),
+                )),
             child: notificationIsOpen[notificationIndex]
                 ? Column(
                     children: [
@@ -227,7 +229,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                       ),
                       notificationText(notificationIndex),
                       InsidClassPage.isAdmin
-                          ? adminActions(classNotifications[notificationIndex])
+                          ? adminActions(notificationIndex, classNotifications[notificationIndex])
                           : Text("")
                     ],
                   )
@@ -256,7 +258,7 @@ class _ClassNotificationState extends State<ClassNotification> {
     );
   }
 
-  Widget adminActions(SumNotification notification) {
+  Widget adminActions(int notificationIndex, SumNotification notification) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: ButtonBar(
@@ -264,12 +266,14 @@ class _ClassNotificationState extends State<ClassNotification> {
         children: [
           Container(
             child: FlatButton(
-              onPressed: () {},
+              onPressed: () {
+                _checkRemoveNotification(notificationIndex);
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(right: 5),
+                    padding: const EdgeInsets.only(right: 10),
                     child: Text(
                       "حذف اعلان",
                       textAlign: TextAlign.center,
@@ -295,7 +299,11 @@ class _ClassNotificationState extends State<ClassNotification> {
           ),
           Container(
             child: FlatButton(
-                onPressed: () {},
+                onPressed: () {
+                  editNotificationTitleController.text = notification.title;
+                  editNotificationDescriptionController.text = notification.body;
+                  _editNotificationBottomSheet(notificationIndex);
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -328,15 +336,114 @@ class _ClassNotificationState extends State<ClassNotification> {
     );
   }
 
-  void _editNotificationBottomSheet(SumNotification notification) =>
+  void _checkRemoveNotification(int notificationIndex) {
+    setState(() {
+      Alert(
+          context: context,
+          title: "مایل به ادامه کار هستید؟",
+          // content: Column(
+          //   children: [
+          //     Text(member.username),
+          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
+          //   ],
+          // ),
+          buttons: [
+            DialogButton(
+              child: Text(
+                "خیر",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              color: Colors.red,
+            ),
+            DialogButton(
+              child: Text(
+                "بله",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                _pressRemoveNotification(notificationIndex);
+              },
+              color: Colors.green,
+            ),
+            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
+          ]).show();
+    });
+  }
+
+  void _pressRemoveNotification(int notificationIndex) async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _removeNotificationURL +
+            InsidClassPage.currentClass.classId +
+            "/notes/" +
+            classNotifications[notificationIndex].id;
+        print(url);
+        final response = await delete(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          classNotifications.removeAt(notificationIndex);
+          notificationIsOpen.removeAt(notificationIndex);
+          notificationMoreText.removeAt(notificationIndex);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [],
+            ).show();
+          });
+        } else {
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [],
+            ).show();
+          });
+        }
+      }
+    } on Exception catch (e) {
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [],
+        ).show();
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void _editNotificationBottomSheet(int notificationIndex) =>
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        )),
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            )),
         barrierColor: Colors.black45.withOpacity(0.8),
         builder: (BuildContext context) {
           return Container(
@@ -349,7 +456,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                   decoration: BoxDecoration(
                     border: Border(
                       bottom:
-                          BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                      BorderSide(width: 1.0, color: Color(0xFFFF000000)),
                     ),
                   ),
                 ),
@@ -382,7 +489,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                             width: 3)),
                                     enabledBorder: OutlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Color(0xFF3D5A80)),
+                                      BorderSide(color: Color(0xFF3D5A80)),
                                     ),
                                     suffixIcon: Icon(
                                       FontAwesomeIcons.bell,
@@ -390,7 +497,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                     ),
                                     labelText: 'عنوان اعلان',
                                     labelStyle:
-                                        TextStyle(color: Color(0xFF3D5A80))),
+                                    TextStyle(color: Color(0xFF3D5A80))),
                               ),
                             ),
                           ),
@@ -407,7 +514,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                 textAlign: TextAlign.right,
                                 maxLines: 7,
                                 controller:
-                                    editNotificationDescriptionController,
+                                editNotificationDescriptionController,
                                 keyboardType: TextInputType.text,
                                 style: TextStyle(color: Colors.black),
                                 decoration: InputDecoration(
@@ -417,7 +524,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                             width: 3)),
                                     enabledBorder: OutlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Color(0xFF3D5A80)),
+                                      BorderSide(color: Color(0xFF3D5A80)),
                                     ),
                                     suffixIcon: Icon(
                                       FontAwesomeIcons.fileSignature,
@@ -442,24 +549,24 @@ class _ClassNotificationState extends State<ClassNotification> {
                     padding: EdgeInsets.only(bottom: 20),
                     child: Container(
                         child: RoundedLoadingButton(
-                      color: Color(0xFF3D5A80),
-                      controller: btnCreateController,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 42.0),
-                        child: Text(
-                          "ویرایش اعلان",
-                          style: TextStyle(
-                            color: Colors.white,
-                            // fontSize: MediaQuery.of(context).size.width * 0.045,
-                            // fontFamily: "WorkSansBold"
+                          color: Color(0xFF3D5A80),
+                          controller: btnCreateController,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 42.0),
+                            child: Text(
+                              "ویرایش اعلان",
+                              style: TextStyle(
+                                color: Colors.white,
+                                // fontSize: MediaQuery.of(context).size.width * 0.045,
+                                // fontFamily: "WorkSansBold"
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      onPressed: () {
-                        _pressEditNotification(notification);
-                      },
-                    )),
+                          onPressed: () {
+                            _pressEditNotification(notificationIndex);
+                          },
+                        )),
                   ),
                   flex: 2,
                 )
@@ -469,81 +576,41 @@ class _ClassNotificationState extends State<ClassNotification> {
         },
       );
 
-  Future<void> _showBodyOfNotification(SumNotification notification) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "متن اعلان",
-            textAlign: TextAlign.center,
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                AutoSizeText(
-                  notification.body,
-                  style: TextStyle(),
-                  textAlign: TextAlign.right,
-                  maxLines: 7,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _checkRemoveNotification(SumNotification notification) {
-    setState(() {
-      Alert(
-          context: context,
-          type: AlertType.warning,
-          title: "مایل به ادامه کار هستید؟",
-          // content: Column(
-          //   children: [
-          //     Text(member.username),
-          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
-          //   ],
-          // ),
-          buttons: [
-            DialogButton(
-              child: Text("بله"),
-              onPressed: () {
-                Navigator.of(context, rootNavigator: true).pop();
-                _pressRemoveNotification(notification);
-              },
-              color: Colors.amber,
-            ),
-            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
-          ]).show();
-    });
-  }
-
-  void _pressRemoveNotification(SumNotification notification) async {
-    Navigator.pop(context);
-    Navigator.pop(context);
-    InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
+  void _pressEditNotification(int notificationIndex) async {
     final prefs = await SharedPreferences.getInstance();
-    print(prefs.getString("token"));
     String token = prefs.getString("token");
     try {
       if (token != null) {
-        token = "Bearer " + token;
-        var url = _removeNotificationURL +
-            InsidClassPage.currentClass.classId +
-            "/notes/" +
-            notification.id;
-        print(url);
-        final response = await delete(url, headers: {
-          'accept': 'application/json',
-          'Authorization': token,
-          'Content-Type': 'application/json',
+        var body = jsonEncode(<String, Object>{
+          'title': editNotificationTitleController.text,
+          'body': editNotificationDescriptionController.text,
         });
-        if (response.statusCode == 200) {
+        token = "Bearer " + token;
+        final response = await put(
+            _createNewNotificationURL +
+                InsidClassPage.currentClass.classId +
+                "/notes/" +
+                classNotifications[notificationIndex].id,
+            headers: {
+              'accept': 'application/json',
+              'Authorization': token,
+              'Content-Type': 'application/json',
+            },
+            body: body);
+        print(response);
+        if (response.statusCode == 200 && response.body != null) {
+          var notificationInfo =
+          json.decode(utf8.decode(response.bodyBytes))["editedClassNote"];
+          print(notificationInfo);
+          classNotifications[notificationIndex].title = notificationInfo["title"];
+          classNotifications[notificationIndex].body = notificationInfo["body"];
+          classNotifications[notificationIndex].createTime = DateTime.parse(notificationInfo["createdAt"]);
+          print(classNotifications[notificationIndex]);
+          classNotifications
+              .sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
+          classNotifications = classNotifications.reversed.toList();
+          btnCreateController.success();
+          Navigator.pop(context);
           setState(() {
             Alert(
               context: context,
@@ -553,30 +620,186 @@ class _ClassNotificationState extends State<ClassNotification> {
             ).show();
           });
         } else {
+          var errorMsg = json.decode(utf8.decode(response.bodyBytes))['error'];
+          if (errorMsg == null) errorMsg = "";
+          btnCreateController.error();
+          Navigator.pop(context);
           setState(() {
             Alert(
-              context: context,
-              type: AlertType.error,
-              title: "عملیات ناموفق بود",
-              buttons: [],
-            ).show();
+                context: context,
+                type: AlertType.error,
+                title: errorMsg,
+                buttons: []).show();
           });
         }
+      } else {
+        btnCreateController.error();
+        Navigator.pop(context);
+        setState(() {
+          Alert(
+              context: context,
+              type: AlertType.error,
+              title: "ابتدا به حساب خود وارد شوید",
+              buttons: []).show();
+        });
       }
     } on Exception catch (e) {
       print(e.toString());
+      btnCreateController.error();
+      Navigator.pop(context);
       setState(() {
         Alert(
-          context: context,
-          type: AlertType.error,
-          title: "عملیات ناموفق بود",
-          buttons: [],
-        ).show();
+            context: context,
+            type: AlertType.error,
+            title: "عملیات ناموفق بود",
+            buttons: []).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
   }
+
+  void _createNewNotificationBottomSheet() => showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        )),
+    barrierColor: Colors.black45.withOpacity(0.8),
+    builder: (BuildContext context) {
+      return Container(
+        height: 550,
+        child: Column(
+          children: [
+            Container(
+              child: Icon(FontAwesomeIcons.gripLines),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child:
+                  Image.asset("assets/img/login_logo.png")),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 1,
+                            controller: notificationTitleController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder:
+                                new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color:
+                                        Color(0xFF3D5A80),
+                                        width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.bell,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'عنوان اعلان',
+                                labelStyle: TextStyle(
+                                    color: Color(0xFF3D5A80))),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Container(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: TextField(
+                            textAlign: TextAlign.right,
+                            maxLines: 7,
+                            controller: notificationDescriptionController,
+                            keyboardType: TextInputType.text,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                focusedBorder:
+                                new OutlineInputBorder(
+                                    borderSide: new BorderSide(
+                                        color:
+                                        Color(0xFF3D5A80),
+                                        width: 3)),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color(0xFF3D5A80)),
+                                ),
+                                suffixIcon: Icon(
+                                  FontAwesomeIcons.fileSignature,
+                                  // FontAwesomeIcons.envelope,
+                                  color: Colors.black,
+                                ),
+                                labelText: 'توضیحات',
+                                labelStyle: TextStyle(
+                                    color: Color(0xFF3D5A80),
+                                    fontSize: 25
+                                )),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              flex: 7,
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Container(
+                    child: RoundedLoadingButton(
+                      color: Color(0xFF3D5A80),
+                      controller: btnCreateController,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 42.0),
+                        child: Text(
+                          "ساخت",
+                          style: TextStyle(
+                            color: Colors.white,
+                            // fontSize: MediaQuery.of(context).size.width * 0.045,
+                            // fontFamily: "WorkSansBold"
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        _pressCreateNotification();
+                      },
+                    )),
+              ),
+              flex: 2,
+            )
+          ],
+        ),
+      );
+    },
+  );
 
   void _pressCreateNotification() async {
     final prefs = await SharedPreferences.getInstance();
@@ -609,6 +832,8 @@ class _ClassNotificationState extends State<ClassNotification> {
               notificationInfo["body"],
               DateTime.parse(notificationInfo["createdAt"]));
           classNotifications.add(newNotification);
+          notificationIsOpen.add(false);
+          notificationMoreText.add(false);
           classNotifications
               .sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
           classNotifications = classNotifications.reversed.toList();
@@ -661,89 +886,6 @@ class _ClassNotificationState extends State<ClassNotification> {
     }
     notificationDescriptionController.text = "";
     notificationTitleController.text = "";
-  }
-
-  void _pressEditNotification(SumNotification notification) async {
-    final prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    try {
-      if (token != null) {
-        var body = jsonEncode(<String, Object>{
-          'title': editNotificationTitleController.text,
-          'body': editNotificationDescriptionController.text,
-        });
-        token = "Bearer " + token;
-        final response = await put(
-            _createNewNotificationURL +
-                InsidClassPage.currentClass.classId +
-                "/notes/" +
-                notification.id,
-            headers: {
-              'accept': 'application/json',
-              'Authorization': token,
-              'Content-Type': 'application/json',
-            },
-            body: body);
-        print(response);
-        if (response.statusCode == 200 && response.body != null) {
-          var notificationInfo =
-              json.decode(utf8.decode(response.bodyBytes))["editedClassNote"];
-          print(notificationInfo);
-          notification = SumNotification(
-              notificationInfo["classNoteId"],
-              notificationInfo["title"],
-              notificationInfo["body"],
-              DateTime.parse(notificationInfo["createdAt"]));
-          print(notification);
-          classNotifications
-              .sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
-          classNotifications = classNotifications.reversed.toList();
-          btnCreateController.success();
-          Navigator.pop(context);
-          setState(() {
-            Alert(
-              context: context,
-              type: AlertType.success,
-              title: "عملیات موفق بود",
-              buttons: [],
-            ).show();
-          });
-        } else {
-          var errorMsg = json.decode(utf8.decode(response.bodyBytes))['error'];
-          if (errorMsg == null) errorMsg = "";
-          btnCreateController.error();
-          Navigator.pop(context);
-          setState(() {
-            Alert(
-                context: context,
-                type: AlertType.error,
-                title: errorMsg,
-                buttons: []).show();
-          });
-        }
-      } else {
-        btnCreateController.error();
-        Navigator.pop(context);
-        setState(() {
-          Alert(
-              context: context,
-              type: AlertType.error,
-              title: "ابتدا به حساب خود وارد شوید",
-              buttons: []).show();
-        });
-      }
-    } on Exception catch (e) {
-      print(e.toString());
-      btnCreateController.error();
-      Navigator.pop(context);
-      setState(() {
-        Alert(
-            context: context,
-            type: AlertType.error,
-            title: "عملیات ناموفق بود",
-            buttons: []).show();
-      });
-    }
   }
 
   String convertDateToJalaliString(DateTime time) {

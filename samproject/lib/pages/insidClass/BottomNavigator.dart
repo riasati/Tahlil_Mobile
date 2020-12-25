@@ -4,8 +4,6 @@ import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 
 class BottomNavigator extends StatefulWidget {
-  static int customIcon = 3;
-
   @override
   _BottomNavigatorState createState() => _BottomNavigatorState();
 }
@@ -17,78 +15,33 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     return BottomAppBar(
       elevation: 50,
       child: Container(
-        height: 100 / responsiveDivision,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FlatButton(
-                    child: Icon(
-                      Icons.question_answer,
-                      size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 0
-                          ? Color(0xFF3D5A80)
-                          : Colors.black,
-                    ),
-                    onPressed: _pressClassExamList,
-                  ),
-                ],
-              ),
+        height: 60,
+        child: TabBar(
+          labelColor: Color(0xFF3D5A80),
+          unselectedLabelColor: Colors.black,
+          indicatorColor: Color(0xFF3D5A80),
+          labelPadding: EdgeInsets.all(1),
+          labelStyle: TextStyle(fontWeight: FontWeight.bold),
+          tabs: [
+            Tab(
+              icon: Icon(FontAwesomeIcons.solidEdit),
+              text: "آزمون",
+              iconMargin: EdgeInsets.only(left: 5),
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    child: Icon(
-                      FontAwesomeIcons.bell,
-                      size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 1
-                          ? Color(0xFF3D5A80)
-                          : Colors.black,
-                    ),
-                    onPressed: _pressClassNotification,
-                  ),
-                ],
-              ),
+            Tab(
+              icon: Icon(FontAwesomeIcons.bell,),
+              text: "اعلان",
+              iconMargin: EdgeInsets.only(left: 5),
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    child: Icon(
-                      FontAwesomeIcons.users,
-                      size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 2
-                          ? Color(0xFF3D5A80)
-                          : Colors.black,
-                    ),
-                    onPressed: _pressClassMembers,
-                  ),
-                ],
-              ),
+            Tab(
+              icon: Icon(FontAwesomeIcons.users,),
+              text: "اعضا",
+              iconMargin: EdgeInsets.only(right: 5),
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    child: Icon(
-                      FontAwesomeIcons.infoCircle,
-                      size: 50 / responsiveDivision,
-                      color: BottomNavigator.customIcon == 3
-                          ? Color(0xFF3D5A80)
-                          : Colors.black,
-                    ),
-                    onPressed: _pressClassInfo,
-                  ),
-                ],
-              ),
+            Tab(
+              icon: Icon(FontAwesomeIcons.infoCircle,),
+              text: "اطلاعات",
+              iconMargin: EdgeInsets.only(left: 5),
             ),
           ],
         ),
@@ -96,23 +49,4 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     );
   }
 
-  void _pressClassExamList() {
-    InsidClassPage.insideClassPageController.animateToPage(0,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
-  }
-
-  void _pressClassNotification() {
-    InsidClassPage.insideClassPageController.animateToPage(1,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
-  }
-
-  void _pressClassMembers() {
-    InsidClassPage.insideClassPageController.animateToPage(2,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
-  }
-
-  void _pressClassInfo() {
-    InsidClassPage.insideClassPageController.animateToPage(3,
-        duration: Duration(milliseconds: 500), curve: Curves.decelerate);
-  }
 }

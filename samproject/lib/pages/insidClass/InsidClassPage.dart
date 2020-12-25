@@ -17,9 +17,6 @@ import 'ClassNotification.dart';
 import 'EditAndRemoveButtons.dart';
 
 class InsidClassPage extends StatefulWidget {
-  static final PageController insideClassPageController = PageController(
-    initialPage: 3,
-  );
   static Class currentClass = Class("", "", "", false);
   static Person admin = Person();
   static bool isLoading = true;
@@ -46,50 +43,31 @@ class _InsidClassPageState extends State<InsidClassPage> {
     InsidClassPage.currentClass.classDescription = "";
     InsidClassPage.admin.email = "";
     _getClassInformation();
-    BottomNavigator.customIcon = 3;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        bottomNavigationBar: BottomNavigator(),
-        body: LoadingOverlay(
-          child: PageView(
-          controller: InsidClassPage.insideClassPageController,
-          onPageChanged: (i) {
-            if (i == 0) {
-              setState(() {
-                BottomNavigator.customIcon = 0;
-              });
-            } else if (i == 1) {
-              setState(() {
-                BottomNavigator.customIcon = 1;
-              });
-            }
-            else if (i == 2) {
-              setState(() {
-                BottomNavigator.customIcon = 2;
-              });
-            }
-            else if (i == 3) {
-              setState(() {
-                BottomNavigator.customIcon = 3;
-              });
-            }
-          },
-          children: [
-            ClassExams(toggleCoinCallback: insideClassSetState),
-            ClassNotification(toggleCoinCallback: insideClassSetState),//notification
-            ClassMembers(toggleCoinCallback: insideClassSetState),
-            ClassInfoCard(toggleCoinCallback: insideClassSetState)
+      home: DefaultTabController(
+        initialIndex: 3,
+        length: 4,
+        child: Scaffold(
+          bottomNavigationBar: BottomNavigator(),
+          body: LoadingOverlay(
+            child: TabBarView(
+            children: [
+              ClassExams(toggleCoinCallback: insideClassSetState),
+              ClassNotification(toggleCoinCallback: insideClassSetState),//notification
+              ClassMembers(toggleCoinCallback: insideClassSetState),
+              ClassInfoCard(toggleCoinCallback: insideClassSetState)
 
-          ],
+            ],
+            ),
+            isLoading: InsidClassPage.isLoading,
           ),
-          isLoading: InsidClassPage.isLoading,
-        ),
-    ),);
+    ),
+      ),);
   }
 
   void _getClassInformation() async {

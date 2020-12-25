@@ -124,7 +124,7 @@ class _ClassExamsState extends State<ClassExams> {
           Expanded(child: examsList()),
           InsidClassPage.isAdmin?Container(
             //color: Colors.red,
-            height: 80,
+            height: 60,
             child: Center(
               child: Container(
                 width: 200,

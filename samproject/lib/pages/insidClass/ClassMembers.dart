@@ -144,6 +144,10 @@ class _ClassMembersState extends State<ClassMembers> {
             trailing: eachMemberCardAvatar(classMembers[memberIndex].avatarUrl),
           ),
           Container(
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Color(0xFF3D5A80),
+                )),
             // color: Colors.black.withOpacity(0.3),
             child: memberIsOpen[memberIndex]
                 ? Padding(
