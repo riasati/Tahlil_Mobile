@@ -43,6 +43,8 @@ class _InsidClassPageState extends State<InsidClassPage> {
   @override
   void initState() {
     super.initState();
+    InsidClassPage.currentClass.classDescription = "";
+    InsidClassPage.admin.email = "";
     _getClassInformation();
     BottomNavigator.customIcon = 3;
   }
@@ -79,7 +81,7 @@ class _InsidClassPageState extends State<InsidClassPage> {
           },
           children: [
             ClassExams(toggleCoinCallback: insideClassSetState),
-            Container(color: Colors.red,),//notification
+            ClassNotification(toggleCoinCallback: insideClassSetState),//notification
             ClassMembers(toggleCoinCallback: insideClassSetState),
             ClassInfoCard(toggleCoinCallback: insideClassSetState)
 

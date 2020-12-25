@@ -61,13 +61,10 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
           child: FlatButton(
               onPressed: () {},
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.remove_circle,
-                  color: Colors.red,
-                ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 5),
+                  padding: const EdgeInsets.only(right: 5),
                   child: Text(
                     "حذف کلاس",
                     textAlign: TextAlign.center,
@@ -76,6 +73,10 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
                       color: Colors.red,
                     ),
                   ),
+                ),
+                Icon(
+                  Icons.remove_circle,
+                  color: Colors.red,
                 ),
               ],
             ),),
@@ -99,19 +100,24 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
                 editClassBottomSheet();
               },
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Text(
+                      "ویرایش کلاس",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(14, 145, 140, 1),
+                      ),
+                    ),
+                  ),
                   Icon(
                     Icons.edit,
                     color: Color.fromRGBO(14, 145, 140, 1),
                   ),
-                  Text(
-                    "ویرایش کلاس",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(14, 145, 140, 1),
-                    ),
-                  ),
+
                 ],
               )),
         ),

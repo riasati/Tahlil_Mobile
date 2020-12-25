@@ -35,15 +35,13 @@ class _ClassMembersState extends State<ClassMembers> {
     _getMembersListFromServer();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return LoadingOverlay(child: Container(child: memberList(), color: Colors.black26,), isLoading: isLoading,);
-  }
-
   void _getMembersListFromServer() async {
     setState(() {
       isLoading = true;
     });
+    while(InsidClassPage.currentClass.classId == null || InsidClassPage.currentClass.classId == ""){
+      Future.delayed(Duration(milliseconds: 500));
+    }
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
@@ -61,7 +59,7 @@ class _ClassMembersState extends State<ClassMembers> {
         classMembers = [];
         if (response.statusCode == 200) {
           var membersInfo =
-              json.decode(utf8.decode(response.bodyBytes))["members"];
+          json.decode(utf8.decode(response.bodyBytes))["members"];
           for (var memberInfo in membersInfo) {
             Person member = Person();
             member.firstname = memberInfo["firstname"];
@@ -99,6 +97,11 @@ class _ClassMembersState extends State<ClassMembers> {
     });
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return LoadingOverlay(child: Container(child: memberList(), color: Colors.black26,), isLoading: isLoading,);
+  }
+
   Widget memberList() {
     return ListView.builder(
         itemCount: classMembers.length,
@@ -112,7 +115,7 @@ class _ClassMembersState extends State<ClassMembers> {
       child: Column(
         children: [
           ListTile(
-            //tileColor: Color(0xFF3D5A80).withOpacity(0.9),
+            tileColor: Color(0xFF3D5A80),
             leading: InsidClassPage.isAdmin
                 ? IconButton(
                     icon: Icon(
@@ -120,7 +123,7 @@ class _ClassMembersState extends State<ClassMembers> {
                           ? FontAwesomeIcons.chevronCircleUp
                           : FontAwesomeIcons.chevronCircleDown,
                       size: 25,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                     onPressed: () {
                       setState(() {
@@ -134,7 +137,7 @@ class _ClassMembersState extends State<ClassMembers> {
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.black
+                color: Colors.white
               ),
             ),
             //trailing: FlutterLogo(size: 45,),
@@ -159,7 +162,7 @@ class _ClassMembersState extends State<ClassMembers> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10),
-                                child: Icon(FontAwesomeIcons.userAlt, color: Color(0xFF3D5A80),),
+                                child: Icon(FontAwesomeIcons.userAlt, color: Color.fromRGBO(14, 145, 140, 1),),
                               )
                             ],
                           ),
@@ -175,12 +178,12 @@ class _ClassMembersState extends State<ClassMembers> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 10),
-                                child: Icon(FontAwesomeIcons.solidEnvelope, color: Color(0xFF3D5A80),),
+                                child: Icon(FontAwesomeIcons.solidEnvelope, color: Color.fromRGBO(14, 145, 140, 1),),
                               )
                             ],
                           ),
                         ),
-                        adminActions(classMembers[memberIndex]),
+                        adminActions(memberIndex, classMembers[memberIndex]),
                       ],
                     ),
                 )
@@ -196,7 +199,32 @@ class _ClassMembersState extends State<ClassMembers> {
     );
   }
 
-  Widget adminActions(Person member) {
+  Widget eachMemberCardAvatar(String avatarUrl) {
+    if (avatarUrl == null) {
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage: AssetImage("assets/img/unnamed.png"),
+        backgroundColor: Colors.white,
+
+      );
+    }
+    try {
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage: NetworkImage(avatarUrl),
+        backgroundColor: Colors.white,
+        //onBackgroundImageError: ,
+      );
+    } on Exception catch (e) {
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage: AssetImage("assets/img/unnamed.png"),
+        backgroundColor: Colors.white,
+      );
+    }
+  }
+
+  Widget adminActions(int memberIndex, Person member) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: ButtonBar(
@@ -204,15 +232,14 @@ class _ClassMembersState extends State<ClassMembers> {
         children: [
           Container(
             child: FlatButton(
-              onPressed: () {},
+              onPressed: () {
+                _checkRemoveMember(memberIndex);
+              },
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.remove_circle,
-                    color: Colors.red,
-                  ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 5),
+                    padding: const EdgeInsets.only(right: 5),
                     child: Text(
                       "حذف کاربر",
                       textAlign: TextAlign.center,
@@ -221,6 +248,10 @@ class _ClassMembersState extends State<ClassMembers> {
                         color: Colors.red,
                       ),
                     ),
+                  ),
+                  Icon(
+                    Icons.remove_circle,
+                    color: Colors.red,
                   ),
                 ],
               ),
@@ -237,11 +268,10 @@ class _ClassMembersState extends State<ClassMembers> {
     );
   }
 
-  void _checkRemoveMember(Person member) {
+  void _checkRemoveMember(int memberIndex) {
     setState(() {
       Alert(
           context: context,
-          type: AlertType.warning,
           title: "مایل به ادامه کار هستید؟",
           // content: Column(
           //   children: [
@@ -251,23 +281,36 @@ class _ClassMembersState extends State<ClassMembers> {
           // ),
           buttons: [
             DialogButton(
-              child: Text("بله"),
+              child: Text(
+                "خیر",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
-                _removeMember(member);
               },
-              color: Colors.amber,
+              color: Colors.red,
             ),
-            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
+            DialogButton(
+              child: Text(
+                "بله",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                _removeMember(memberIndex);
+              },
+              color: Colors.green,
+            ),
           ]).show();
     });
   }
 
-  void _removeMember(Person member) async {
-    Navigator.pop(context);
-    Navigator.pop(context);
-    InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
+  void _removeMember(int memberIndex) async {
+    setState(() {
+      isLoading = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
@@ -277,7 +320,7 @@ class _ClassMembersState extends State<ClassMembers> {
         var url = _removeMemberURL +
             InsidClassPage.currentClass.classId +
             "/members/" +
-            member.username;
+            classMembers[memberIndex].username;
         print(url);
         final response = await delete(url, headers: {
           'accept': 'application/json',
@@ -285,6 +328,8 @@ class _ClassMembersState extends State<ClassMembers> {
           'Content-Type': 'application/json',
         });
         if (response.statusCode == 200) {
+          classMembers.removeAt(memberIndex);
+          memberIsOpen.removeAt(memberIndex);
           setState(() {
             Alert(
               context: context,
@@ -315,30 +360,8 @@ class _ClassMembersState extends State<ClassMembers> {
         ).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
-  }
-
-  Widget eachMemberCardAvatar(String avatarUrl) {
-    if (avatarUrl == null) {
-      return CircleAvatar(
-        radius: 30.0,
-        backgroundImage: AssetImage("assets/img/unnamed.png"),
-        backgroundColor: Colors.transparent,
-      );
-    }
-    try {
-      return CircleAvatar(
-        radius: 30.0,
-        backgroundImage: NetworkImage(avatarUrl),
-        backgroundColor: Colors.transparent,
-      );
-    } on Exception catch (e) {
-      return CircleAvatar(
-        radius: 30.0,
-        backgroundImage: AssetImage("assets/img/unnamed.png"),
-        backgroundColor: Colors.transparent,
-      );
-    }
+    setState(() {
+      isLoading = false;
+    });
   }
 }
