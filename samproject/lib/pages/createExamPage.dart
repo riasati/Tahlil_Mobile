@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/Exam.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/popupMenuData.dart';
@@ -41,10 +42,10 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
     Question changedQuestion = widget.question.CopyQuestion();
     void onEditButton() async
     {
-      final prefs = await SharedPreferences.getInstance();
-      String token = prefs.getString("token");
-      if (token == null) {return;}
-      String tokenplus = "Bearer" + " " + token;
+      // final prefs = await SharedPreferences.getInstance();
+      // String token = prefs.getString("token");
+      // if (token == null) {return;}
+      // String tokenplus = "Bearer" + " " + token;
       // widget.question.grade = double.tryParse(controllers.GradeController.text);
       // widget.question.text = controllers.QuestionTextController.text;
       // widget.question.paye = payeData.name;
@@ -61,131 +62,140 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
       changedQuestion.difficulty = difficultyData.name;
       changedQuestion.id = widget.question.id;
 
-      String ServerPaye = HomePage.maps.RSPayeMap[changedQuestion.paye];
-      String ServerBook = HomePage.maps.RSBookMap[changedQuestion.book];
-      String ServerChapter = HomePage.maps.RSChapterMap[changedQuestion.chapter];
-      String ServerKind = HomePage.maps.RSKindMap[changedQuestion.kind];
-      String ServerDifficulty = HomePage.maps.RSDifficultyMap[changedQuestion.difficulty];
+      // String ServerPaye = HomePage.maps.RSPayeMap[changedQuestion.paye];
+      // String ServerBook = HomePage.maps.RSBookMap[changedQuestion.book];
+      // String ServerChapter = HomePage.maps.RSChapterMap[changedQuestion.chapter];
+      // String ServerKind = HomePage.maps.RSKindMap[changedQuestion.kind];
+      // String ServerDifficulty = HomePage.maps.RSDifficultyMap[changedQuestion.difficulty];
 
-      dynamic data;
+      //dynamic data;
 
       //if (widget.question.kind == HomePage.maps.SKindMap["MULTICHOISE"])
-      if (changedQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"])
-      {
-        // widget.question.optionOne = controllers.MultiOptionText1Controller.text;
-        // widget.question.optionTwo = controllers.MultiOptionText2Controller.text;
-        // widget.question.optionThree = controllers.MultiOptionText3Controller.text;
-        // widget.question.optionFour = controllers.MultiOptionText4Controller.text;
-        changedQuestion.optionOne = controllers.MultiOptionText1Controller.text;
-        changedQuestion.optionTwo = controllers.MultiOptionText2Controller.text;
-        changedQuestion.optionThree = controllers.MultiOptionText3Controller.text;
-        changedQuestion.optionFour = controllers.MultiOptionText4Controller.text;
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
-        data = jsonEncode(<String,dynamic>{
-          "questionId":qs.id,
-          "type": ServerKind,
-          "public": qs.public,
-          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
-          "question": qs.question,
-          "answers": qs.answer,
-          "base": ServerPaye,
-          "hardness" : ServerDifficulty,
-          "course": ServerBook,
-          "options" : qs.options,
-          "chapter" : ServerChapter,
-        });
-      }
+      // if (changedQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"])
+      // {
+      //   // widget.question.optionOne = controllers.MultiOptionText1Controller.text;
+      //   // widget.question.optionTwo = controllers.MultiOptionText2Controller.text;
+      //   // widget.question.optionThree = controllers.MultiOptionText3Controller.text;
+      //   // widget.question.optionFour = controllers.MultiOptionText4Controller.text;
+      //   changedQuestion.optionOne = controllers.MultiOptionText1Controller.text;
+      //   changedQuestion.optionTwo = controllers.MultiOptionText2Controller.text;
+      //   changedQuestion.optionThree = controllers.MultiOptionText3Controller.text;
+      //   changedQuestion.optionFour = controllers.MultiOptionText4Controller.text;
+      //   QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+      //   data = jsonEncode(<String,dynamic>{
+      //     "questionId":qs.id,
+      //     "type": ServerKind,
+      //     "public": qs.public,
+      //     if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+      //     "question": qs.question,
+      //     "answers": qs.answer,
+      //     "base": ServerPaye,
+      //     "hardness" : ServerDifficulty,
+      //     "course": ServerBook,
+      //     "options" : qs.options,
+      //     "chapter" : ServerChapter,
+      //   });
+      // }
       //else if (widget.question.kind == HomePage.maps.SKindMap["TEST"])
-      else if (changedQuestion.kind == HomePage.maps.SKindMap["TEST"])
-      {
-        // widget.question.optionOne = controllers.TestText1Controller.text;
-        // widget.question.optionTwo = controllers.TestText2Controller.text;
-        // widget.question.optionThree = controllers.TestText3Controller.text;
-        // widget.question.optionFour = controllers.TestText4Controller.text;
-        changedQuestion.optionOne = controllers.TestText1Controller.text;
-        changedQuestion.optionTwo = controllers.TestText2Controller.text;
-        changedQuestion.optionThree = controllers.TestText3Controller.text;
-        changedQuestion.optionFour = controllers.TestText4Controller.text;
-
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
-        data = jsonEncode(<String,dynamic>{
-          "questionId":qs.id,
-          "type": ServerKind,
-          "public": qs.public,
-          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
-          "question": qs.question,
-          "answers": qs.answer,
-          "base": ServerPaye,
-          "hardness" : ServerDifficulty,
-          "course": ServerBook,
-          "options" : qs.options,
-          "chapter" : ServerChapter,
-        });
-      }
-      else if (changedQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"]){
-     // else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]){
-        //widget.question.answerString = controllers.TashrihiTextController.text;
-        changedQuestion.answerString = controllers.TashrihiTextController.text;
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
-        data = jsonEncode(<String,dynamic>{
-          "questionId":qs.id,
-          "type": ServerKind,
-          "public": qs.public,
-          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
-          if(changedQuestion.answerImage != null) "imageAnswer" : changedQuestion.answerImage,
-          "question": qs.question,
-          "answers": qs.answer,
-          "base": ServerPaye,
-          "hardness" : ServerDifficulty,
-          "course": ServerBook,
-          "chapter" : ServerChapter,
-        });
-      }
-      else if (changedQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"]){
-        changedQuestion.answerString = controllers.BlankTextController.text;
-        QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
-        data = jsonEncode(<String,dynamic>{
-          "questionId":qs.id,
-          "type": ServerKind,
-          "public": qs.public,
-          if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
-          "question": qs.question,
-          "answers": qs.answer,
-          "base": ServerPaye,
-          "hardness" : ServerDifficulty,
-          "course": ServerBook,
-          "chapter" : ServerChapter,
-        });
-     // else if (widget.question.kind == HomePage.maps.SKindMap["SHORTANSWER"])
-      //{
-      //  widget.question.answerString = controllers.BlankTextController.text;
-      }
-      final response = await http.put('https://parham-backend.herokuapp.com/question',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': tokenplus,
-            'Content-Type': 'application/json',
-          },
-          body: data
-      );
-      if (response.statusCode == 200){
-       // ShowCorrectnessDialog(true,context);
-        print("Question changed ");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
+      // else if (changedQuestion.kind == HomePage.maps.SKindMap["TEST"])
+      // {
+      //   // widget.question.optionOne = controllers.TestText1Controller.text;
+      //   // widget.question.optionTwo = controllers.TestText2Controller.text;
+      //   // widget.question.optionThree = controllers.TestText3Controller.text;
+      //   // widget.question.optionFour = controllers.TestText4Controller.text;
+      //   changedQuestion.optionOne = controllers.TestText1Controller.text;
+      //   changedQuestion.optionTwo = controllers.TestText2Controller.text;
+      //   changedQuestion.optionThree = controllers.TestText3Controller.text;
+      //   changedQuestion.optionFour = controllers.TestText4Controller.text;
+      //
+      //   QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+      //   data = jsonEncode(<String,dynamic>{
+      //     "questionId":qs.id,
+      //     "type": ServerKind,
+      //     "public": qs.public,
+      //     if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+      //     "question": qs.question,
+      //     "answers": qs.answer,
+      //     "base": ServerPaye,
+      //     "hardness" : ServerDifficulty,
+      //     "course": ServerBook,
+      //     "options" : qs.options,
+      //     "chapter" : ServerChapter,
+      //   });
+      // }
+     //  else if (changedQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"]){
+     // // else if (widget.question.kind == HomePage.maps.SKindMap["LONGANSWER"]){
+     //    //widget.question.answerString = controllers.TashrihiTextController.text;
+     //    changedQuestion.answerString = controllers.TashrihiTextController.text;
+     //    QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+     //    data = jsonEncode(<String,dynamic>{
+     //      "questionId":qs.id,
+     //      "type": ServerKind,
+     //      "public": qs.public,
+     //      if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+     //      if(changedQuestion.answerImage != null) "imageAnswer" : changedQuestion.answerImage,
+     //      "question": qs.question,
+     //      "answers": qs.answer,
+     //      "base": ServerPaye,
+     //      "hardness" : ServerDifficulty,
+     //      "course": ServerBook,
+     //      "chapter" : ServerChapter,
+     //    });
+     //  }
+     //  else if (changedQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"]){
+     //    changedQuestion.answerString = controllers.BlankTextController.text;
+     //    QuestionServer qs = QuestionServer.QuestionToQuestionServer(changedQuestion,ServerKind);
+     //    data = jsonEncode(<String,dynamic>{
+     //      "questionId":qs.id,
+     //      "type": ServerKind,
+     //      "public": qs.public,
+     //      if(changedQuestion.questionImage != null) "imageQuestion" : changedQuestion.questionImage,
+     //      "question": qs.question,
+     //      "answers": qs.answer,
+     //      "base": ServerPaye,
+     //      "hardness" : ServerDifficulty,
+     //      "course": ServerBook,
+     //      "chapter" : ServerChapter,
+     //    });
+     // // else if (widget.question.kind == HomePage.maps.SKindMap["SHORTANSWER"])
+     //  //{
+     //  //  widget.question.answerString = controllers.BlankTextController.text;
+     //  }
+      // final response = await http.put('https://parham-backend.herokuapp.com/question',
+      //     headers: {
+      //       'accept': 'application/json',
+      //       'Authorization': tokenplus,
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: data
+      // );
+      // if (response.statusCode == 200){
+      //  // ShowCorrectnessDialog(true,context);
+      //   print("Question changed ");
+      //   final responseJson = jsonDecode(response.body);
+      //   print(responseJson.toString());
 
         // CreateExamPage.totalGrade += changedQuestion.grade;
+      // for (int i = 0 ; i<CreateExamPage.questionList.length;i++)
+      // {
+      //   print(CreateExamPage.questionList[i]);
+      // }
         CreateExamPage.questionList.insert(CreateExamPage.questionList.indexOf(widget.question), changedQuestion.CopyQuestion());
         CreateExamPage.questionList.removeAt(CreateExamPage.questionList.indexOf(widget.question));
+      //   print("fasele");
+      // for (int i = 0 ; i<CreateExamPage.questionList.length;i++)
+      // {
+      //   print(CreateExamPage.questionList[i]);
+      // }
         widget.question = changedQuestion.CopyQuestion();
-      }
-      else{
-        ShowCorrectnessDialog(false,context);
-        print("Question failed");
-        final responseJson = jsonDecode(response.body);
-        print(responseJson.toString());
-        widget.question.grade = changedQuestion.grade;
-      }
+      //}
+      // else{
+      //   ShowCorrectnessDialog(false,context);
+      //   print("Question failed");
+      //   final responseJson = jsonDecode(response.body);
+      //   print(responseJson.toString());
+      //   widget.question.grade = changedQuestion.grade;
+      // }
       CreateExamPageState.calculateTotalGrade(widget.parent);
       setState(() {
         IsEdit = false;
@@ -432,6 +442,10 @@ class CreateExamPageState extends State<CreateExamPage> {
   TextEditingController examFinishTime = new TextEditingController();
   TextEditingController examDurationTime = new TextEditingController();
 
+  final RoundedLoadingButtonController _createExamController = new RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _createQuestionController = new RoundedLoadingButtonController();
+
+
   bool presedCreatedNewQuestion = false;
   Controllers controller = new Controllers();
   Question newQuestion = new Question();
@@ -467,7 +481,23 @@ class CreateExamPageState extends State<CreateExamPage> {
     showDialog(
       context: context,
       builder: (BuildContext _) {
+        String initialValue = "0:0";
+        if (IsStart)
+        {
+          if (examStartTime.text.split(":").length == 2)
+          {
+            initialValue = examStartTime.text;
+          }
+        }
+        else
+          {
+            if (examFinishTime.text.split(":").length == 2)
+            {
+              initialValue = examFinishTime.text;
+            }
+          }
         return  PersianDateTimePicker(
+          initial: initialValue,
           type: 'time',
           onSelect: (time) {
             print(time);
@@ -519,6 +549,7 @@ class CreateExamPageState extends State<CreateExamPage> {
     if (newQuestion.text == null || newQuestion.paye == null || newQuestion.book == null || newQuestion.chapter == null || newQuestion.difficulty == null || newQuestion.kind == null)
     {
       ShowCorrectnessDialog(false, context);
+      _createQuestionController.stop();
       return ;
     }
     String ServerPaye = HomePage.maps.RSPayeMap[newQuestion.paye];
@@ -621,12 +652,14 @@ class CreateExamPageState extends State<CreateExamPage> {
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
       newQuestion.id = responseJson["questionId"];
+      _createQuestionController.stop();
       //_btnController.stop();
     } else {
       ShowCorrectnessDialog(false, context);
       print("Question failed");
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
+      _createQuestionController.stop();
       return;
       //_btnController.stop();
     }
@@ -687,15 +720,85 @@ class CreateExamPageState extends State<CreateExamPage> {
     List questionObjects = [];
     for (int i = 0;i<CreateExamPage.questionList.length;i++)
     {
-      String id = CreateExamPage.questionList[i].id;
-      print(CreateExamPage.questionList[i].id);
+      dynamic questionObject = {};
+      String ServerPaye = HomePage.maps.RSPayeMap[CreateExamPage.questionList[i].paye];
+      String ServerBook = HomePage.maps.RSBookMap[CreateExamPage.questionList[i].book];
+      String ServerChapter = HomePage.maps.RSChapterMap[CreateExamPage.questionList[i].chapter];
+      String ServerKind = HomePage.maps.RSKindMap[CreateExamPage.questionList[i].kind];
+      String ServerDifficulty = HomePage.maps.RSDifficultyMap[CreateExamPage.questionList[i].difficulty];
+      QuestionServer qs = QuestionServer.QuestionToQuestionServer(CreateExamPage.questionList[i],ServerKind);
+
+      if (CreateExamPage.questionList[i].kind == HomePage.maps.SKindMap["TEST"])
+      {
+        questionObject = {
+          "type": ServerKind,
+          "public": qs.public,
+          if(CreateExamPage.questionList[i].questionImage != null) "imageQuestion" : CreateExamPage.questionList[i].questionImage,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness": ServerDifficulty,
+          "course": ServerBook,
+          "options": qs.options,
+          "chapter": ServerChapter,
+        };
+      }
+      else if (CreateExamPage.questionList[i].kind == HomePage.maps.SKindMap["SHORTANSWER"])
+      {
+        questionObject = {
+          "type": ServerKind,
+          if(CreateExamPage.questionList[i].questionImage != null) "imageQuestion" : CreateExamPage.questionList[i].questionImage,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness": ServerDifficulty,
+          "course": ServerBook,
+          "chapter": ServerChapter,
+        };
+      }
+      else if (CreateExamPage.questionList[i].kind == HomePage.maps.SKindMap["MULTICHOISE"])
+      {
+        questionObject = {
+          "type": ServerKind,
+          if(CreateExamPage.questionList[i].questionImage != null) "imageQuestion" : CreateExamPage.questionList[i].questionImage,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness": ServerDifficulty,
+          "course": ServerBook,
+          "options": qs.options,
+          "chapter": ServerChapter,
+        };
+      }
+      else if (CreateExamPage.questionList[i].kind == HomePage.maps.SKindMap["LONGANSWER"])
+      {
+        questionObject = {
+          "type": ServerKind,
+          if(CreateExamPage.questionList[i].questionImage != null) "imageQuestion" : CreateExamPage.questionList[i].questionImage,
+          if(CreateExamPage.questionList[i].answerImage != null) "imageAnswer" : CreateExamPage.questionList[i].answerImage,
+          "public": qs.public,
+          "question": qs.question,
+          "answers": qs.answer,
+          "base": ServerPaye,
+          "hardness": ServerDifficulty,
+          "course": ServerBook,
+          "chapter": ServerChapter,
+        };
+      }
+
+      //print(CreateExamPage.questionList[i]);
+     // String id = CreateExamPage.questionList[i].id;
+     // print(CreateExamPage.questionList[i].id);
       double grade = CreateExamPage.questionList[i].grade;
-      questionObjects.add({"question" : id , "grade" : grade});
+      questionObjects.add({"question" : questionObject , "grade" : grade});
       //print(CreateExamPage.questionList[i].id);
     }
     if (examDate.text.isEmpty || examStartTime.text.isEmpty || examFinishTime.text.isEmpty || examDurationTime.text.isEmpty)
     {
       ShowCorrectnessDialog(false, context);
+      _createExamController.stop();
       return;
     }
     Exam newExam = new Exam(null,examTopic.text,null,null,int.tryParse(examDurationTime.text));
@@ -711,7 +814,7 @@ class CreateExamPageState extends State<CreateExamPage> {
       "questions": questionObjects,//[{"question" : "adsfasd","grade":3}],
       "useInClass": widget.classId,
     });
-    //print(data);
+    print(data);
     final response = await http.post(url,
         headers: {
           'accept': 'application/json',
@@ -724,14 +827,19 @@ class CreateExamPageState extends State<CreateExamPage> {
       ShowCorrectnessDialog(true, context);
       final responseJson = jsonDecode(response.body);
       print(responseJson.toString());
+      _createExamController.stop();
       CreateExamPage.questionList.clear();
       CreateExamPage.totalGrade = 0;
+      setState(() {
+
+      });
     }
     else
       {
         ShowCorrectnessDialog(false, context);
         final responseJson = jsonDecode(response.body);
         print(responseJson.toString());
+        _createExamController.stop();
       }
   }
 
@@ -1117,19 +1225,34 @@ class CreateExamPageState extends State<CreateExamPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text( "جمع نمرات : "+CreateExamPage.totalGrade.toStringAsPrecision(3) ,textDirection: TextDirection.rtl,),
-                              RaisedButton(
-                                  textColor: Colors.white,
-                                  color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
-                                  child: Row(
-                                    textDirection: TextDirection.rtl,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text('ایجاد آزمون',style: TextStyle(color: Colors.white),textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
-                                      Icon(Icons.add,color: Colors.white,),
-                                    ],
-                                  ),//Text("ایجاد آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
-                                  onPressed: CreateExam
+                              RoundedLoadingButton(borderRadius: 0,
+                                width: 120,
+                                height: 40,
+                                onPressed: () => CreateExam(),
+                                child: Row(
+                                        textDirection: TextDirection.rtl,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text('ایجاد آزمون',style: TextStyle(color: Colors.white),textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                                          Icon(Icons.add,color: Colors.white,),
+                                        ],
+                                      ),//Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                                color: Color(0xFF3D5A80),
+                                controller:_createExamController,
                               ),
+                              // RaisedButton(
+                              //     textColor: Colors.white,
+                              //     color: Color(0xFF3D5A80),//Color.fromRGBO(238, 108,77 ,1.0),//Color(0xFF3D5A80),
+                              //     child: Row(
+                              //       textDirection: TextDirection.rtl,
+                              //       mainAxisAlignment: MainAxisAlignment.center,
+                              //       children: [
+                              //         Text('ایجاد آزمون',style: TextStyle(color: Colors.white),textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                              //         Icon(Icons.add,color: Colors.white,),
+                              //       ],
+                              //     ),//Text("ایجاد آزمون",textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
+                              //     onPressed: CreateExam
+                              // ),
                             ],
                           ),
                         )
@@ -1192,22 +1315,41 @@ class CreateExamPageState extends State<CreateExamPage> {
                             (kindData.name == HomePage.maps.SKindMap["TEST"]) ? EditingTest(question: newQuestion,controllers: controller,) : Container(),
                             EditingGrade(controllers: controller,),
                             AddInBankOption(question: newQuestion,),
-                            RaisedButton(
-                              textColor: Colors.white,
-                              color: Color(0xFF3D5A80),
-                              child:Container(
-                                width: 100,
+                            RoundedLoadingButton(borderRadius: 0,
+                           //   width: 50,
+                              height: 40,
+                              onPressed: () => onCreateQuestion(),
+                              child: Container(
+                                width: 120,
+                             //   height: 40,
                                 child: Row(
                                   textDirection: TextDirection.rtl,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('ایجاد سوال', style: TextStyle(color: Colors.white),),
+                                    Text('ایجاد سوال',style: TextStyle(color: Colors.white),textDirection: TextDirection.rtl,textAlign: TextAlign.center,),
                                     Icon(Icons.create,color: Colors.white,),
                                   ],
                                 ),
-                              ),
-                              onPressed: onCreateQuestion,
+                              ),//Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
+                              color: Color(0xFF3D5A80),
+                              controller:_createQuestionController,
                             ),
+                            // RaisedButton(
+                            //   textColor: Colors.white,
+                            //   color: Color(0xFF3D5A80),
+                            //   child:Container(
+                            //     width: 100,
+                            //     child: Row(
+                            //       textDirection: TextDirection.rtl,
+                            //       mainAxisAlignment: MainAxisAlignment.center,
+                            //       children: [
+                            //         Text('ایجاد سوال', style: TextStyle(color: Colors.white),),
+                            //         Icon(Icons.create,color: Colors.white,),
+                            //       ],
+                            //     ),
+                            //   ),
+                            //   onPressed: onCreateQuestion,
+                            // ),
                           ],
                         ) : Container(),
                       ],

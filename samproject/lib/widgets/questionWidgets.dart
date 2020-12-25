@@ -295,7 +295,7 @@ class EditAndAddtoExamButton extends StatelessWidget {
                   textDirection: TextDirection.rtl,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('اانصراف',style: TextStyle(color: Colors.white),),
+                    Text('انصراف',style: TextStyle(color: Colors.white),),
                     Icon(Icons.cancel,color: Colors.white,),
                   ],
                 ),
