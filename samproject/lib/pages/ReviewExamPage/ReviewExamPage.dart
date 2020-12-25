@@ -26,11 +26,12 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   GlobalKey<ScrollSnapListState> questionRouterKey = GlobalKey();
   PageController controller=PageController();
   List<Widget> _list=<Widget>[];
+  bool isTeacherUsing = true;
   void fillPageList()
   {
     for(int i = 0;i<widget.exam.questions.length;i++)
     {
-      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: false,));
+      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: isTeacherUsing,));
     }
   }
 
@@ -51,7 +52,15 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
           title: Container(
          //   padding: EdgeInsets.only(right: 40),
             alignment: Alignment.center,
-            child: Text(//widget.exam.name
+            child: (isTeacherUsing) ? Text(//widget.exam.name
+              "تصحیح "  + widget.exam.name,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+              ),
+              textAlign: TextAlign.center,
+            ) :Text(//widget.exam.name
               "مرور "  + widget.exam.name,
               textDirection: TextDirection.rtl,
               style: TextStyle(

@@ -153,8 +153,9 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
         _registerBtnController.stop();
         if (_AnswerFile != null)
         {
-          UserAnswerLong userAnswerLong = widget.question.userAnswer;
+          UserAnswerLong userAnswerLong = new UserAnswerLong();//widget.question.userAnswer;
           userAnswerLong.answerFile = "notNull";
+          userAnswerLong.answerText = answer;
           widget.question.userAnswer = userAnswerLong;
         }
         // if (isRegisterBtn)

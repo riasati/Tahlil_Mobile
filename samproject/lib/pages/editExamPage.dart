@@ -535,15 +535,15 @@ class EditExamPageState extends State<EditExamPage> {
         qs.id = responseJson["exam"]["questions"][i]["question"]["_id"];
         qs.imageQuestion = responseJson["exam"]["questions"][i]["question"]["imageQuestion"];
         qs.imageAnswer = responseJson["exam"]["questions"][i]["question"]["imageAnswer"];
-        if (responseJson["exam"]["questions"][i]["grade"] == 0)
-        {
-          qs.grade = 0;
-        }
-        else if (responseJson["exam"]["questions"][i]["grade"] != null)
+        // if (responseJson["exam"]["questions"][i]["grade"] == 0)
+        // {
+        //   qs.grade = 0;
+        // }
+        if (responseJson["exam"]["questions"][i]["grade"] != null)
         {
           // print(qs.id);
           // print(responseJson["exam"]["questions"][i]["grade"]);
-          qs.grade = responseJson["exam"]["questions"][i]["grade"];
+          qs.grade = double.tryParse(responseJson["exam"]["questions"][i]["grade"].toString());
         }
 
         Question q = Question.QuestionServerToQuestion(qs,qs.type);

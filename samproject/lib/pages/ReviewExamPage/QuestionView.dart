@@ -131,7 +131,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                           textDirection: TextDirection.rtl,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(widget.question.text,textDirection: TextDirection.rtl,),
+                            Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl,)),
                             (widget.question.questionImage != null) ? Image.memory(base64Decode(widget.question.questionImage),fit: BoxFit.cover,height: 200,) : Container(),
                           ],
                         ),
@@ -227,7 +227,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                   RoundedLoadingButton(borderRadius: 0,
                     width: 100,
                     height: 40,
-                    onPressed: () => submitGradeChange(),
+                    onPressed: () => downloaFile(),
                     child: Text("دانلود فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
                     color: Color(0xFF3D5A80),
                     controller:_downloadFileBtnController,
@@ -250,7 +250,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                     RoundedLoadingButton(borderRadius: 0,
                       width: 100,
                       height: 40,
-                      onPressed: () => submitGradeChange(),
+                      onPressed: () => downloaFile(),
                       child: Text("دانلود فایل",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
                       color: Color(0xFF3D5A80),
                       controller:_downloadFileBtnController,
@@ -949,7 +949,7 @@ class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
                     textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(widget.question.answerString,textDirection: TextDirection.rtl,textAlign: TextAlign.right,),
+                      Container(alignment: Alignment.centerRight,child: Text(widget.question.answerString,textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
                       (widget.question.answerImage != null) ? Image.memory(base64Decode(widget.question.answerImage),fit: BoxFit.cover,height: 200,) : Container(),
                     ],
                   ),
@@ -984,7 +984,7 @@ class _LongAnswerWidgetInReviewState extends State<LongAnswerWidgetInReview> {
                     textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      if (userAnswerLong.answerText != null) Text(userAnswerLong.answerText,textDirection: TextDirection.rtl,)
+                      if (userAnswerLong.answerText != null) Container(alignment: Alignment.centerRight,child: Text(userAnswerLong.answerText,textDirection: TextDirection.rtl,))
                       else if (userAnswerLong.answerText == null && userAnswerLong.answerFile == null && widget.isTeacherUsing) Text("دانش آموز به این سوال پاسخی نداده است",textDirection: TextDirection.rtl,)
                       else if (userAnswerLong.answerText == null && userAnswerLong.answerFile != null && widget.isTeacherUsing) Text("دانش آموز فایلی را به عنوان جواب ارسال کرده است",textDirection: TextDirection.rtl,)
                       else if (userAnswerLong.answerText == null && userAnswerLong.answerFile == null && !widget.isTeacherUsing) Text("شما به این سوال پاسخی نداده اید",textDirection: TextDirection.rtl)
@@ -1052,7 +1052,7 @@ class ShortAnswerWidgetInReview extends StatelessWidget {
                     textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(question.answerString,textDirection: TextDirection.rtl,textAlign: TextAlign.right,),
+                      Container(alignment: Alignment.centerRight,child: Text(question.answerString,textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
                       (question.answerImage != null) ? Image.memory(base64Decode(question.answerImage),fit: BoxFit.cover,height: 200,) : Container(),
                     ],
                   ),
@@ -1087,7 +1087,7 @@ class ShortAnswerWidgetInReview extends StatelessWidget {
                     textDirection: TextDirection.rtl,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      if (userAnswerShort.answerText != null) Text(userAnswerShort.answerText,textDirection: TextDirection.rtl,)
+                      if (userAnswerShort.answerText != null) Container(alignment: Alignment.centerRight,child: Text(userAnswerShort.answerText,textDirection: TextDirection.rtl,))
                       else if (userAnswerShort.answerText == null && isTeacherUsing) Text("دانش آموز به این سوال پاسخی نداده است",textDirection: TextDirection.rtl,)
                       else if (userAnswerShort.answerText == null && !isTeacherUsing) Text("شما به این سوال پاسخی نداده اید",textDirection: TextDirection.rtl),
                       Container(),
