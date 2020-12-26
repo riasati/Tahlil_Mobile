@@ -1,6 +1,7 @@
 import 'package:samproject/domain/question.dart';
 class QuestionServer
 {
+  int index;
   String type;
   bool public;
   String question;

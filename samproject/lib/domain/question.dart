@@ -50,6 +50,7 @@ class Question {
     q.isPublic = this.isPublic;
     q.id = this.id;
     q.grade = this.grade;
+    q.index = this.index;
     return q;
   }
 
@@ -66,6 +67,7 @@ class Question {
     Q.questionImage = QS.imageQuestion;
     Q.answerImage = QS.imageAnswer;
     Q.grade = QS.grade;
+    Q.index = QS.index;
 
     if (QS.public != null) {
       if (QS.public == true) {
@@ -144,6 +146,6 @@ class Question {
 
   @override
   String toString() {
-    return 'Question{text: $text, kind: $kind, answerString: $answerString, numberOne: $numberOne, numberTwo: $numberTwo, numberThree: $numberThree, numberFour: $numberFour, optionOne: $optionOne, optionTwo: $optionTwo, optionThree: $optionThree, optionFour: $optionFour, grade: $grade, userAnswer: $userAnswer}';
+    return 'Question{text: $text, kind: $kind, answerString: $answerString, index: $index,numberOne: $numberOne, numberTwo: $numberTwo, numberThree: $numberThree, numberFour: $numberFour, optionOne: $optionOne, optionTwo: $optionTwo, optionThree: $optionThree, optionFour: $optionFour, grade: $grade, userAnswer: $userAnswer}';
   }
 }

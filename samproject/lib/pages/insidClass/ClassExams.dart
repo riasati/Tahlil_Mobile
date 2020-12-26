@@ -14,6 +14,7 @@ import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/ReviewExamPage/ReviewExamPage.dart';
 import 'package:samproject/pages/TakeExamPage/TakeExamPage.dart';
+import 'package:samproject/pages/editExamAfterStartPage.dart';
 import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -424,8 +425,10 @@ class _ClassExamsState extends State<ClassExams> {
             onPressed: () {
               print(exam.examId);
               Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                  EditExamPage(classId: InsidClassPage.currentClass.classId,
-                    examId: exam.examId,)));
+                  EditExamAfterStartPage(classId: InsidClassPage.currentClass.classId,examId:exam.examId,)
+                  // EditExamPage(classId: InsidClassPage.currentClass.classId,
+                  //   examId: exam.examId,)
+              ));
             },
           ),
         ),
