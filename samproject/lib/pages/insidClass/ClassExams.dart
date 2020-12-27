@@ -327,30 +327,34 @@ class _ClassExamsState extends State<ClassExams> {
         .add(Duration(hours: 3, minutes: 30))
         .isAfter(DateTime.now()))
       memberAction = Container(
-        child: FlatButton(
-          onPressed: () {},
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon(
-              //   Icons.remove_circle,
-              //   color: Color.fromRGBO(14, 145, 140, 1),
-              // ),
-              Padding(
-                padding: const EdgeInsets.only(left: 5),
-                child: Text(
-                  "شرکت آزمون",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red),
+        child: Center(
+          child: FlatButton(
+            onPressed: () {
+              getQuestionsForTakeExam(exam);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Text(
+                    "شرکت آزمون",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(100, 0, 0, 1)),
+                  ),
                 ),
-              ),
-            ],
+                Icon(
+                  Icons.edit,
+                  color: Color.fromRGBO(100, 0, 0, 1),
+                ),
+              ],
+            ),
           ),
         ),
-        width: 120,
+        width: 200,
         decoration: BoxDecoration(
           //color: Colors.red,
           borderRadius: BorderRadius.all(Radius.circular(30)),
@@ -360,7 +364,9 @@ class _ClassExamsState extends State<ClassExams> {
     else
       memberAction = Container(
         child: FlatButton(
-          onPressed: () {},
+          onPressed: () {
+            getQuestionAndAnswerForReview(exam);
+          },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -504,7 +510,7 @@ class _ClassExamsState extends State<ClassExams> {
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
-              color: Colors.red,
+              color: Color.fromRGBO(100, 0, 0, 1),
             ),
             DialogButton(
               child: Text(
@@ -516,7 +522,7 @@ class _ClassExamsState extends State<ClassExams> {
                 Navigator.of(context, rootNavigator: true).pop();
                 _pressRemoveExam(examIndex);
               },
-              color: Colors.green,
+              color: Color.fromRGBO(0, 100, 0, 1),
             ),
           ]).show();
     });
@@ -577,11 +583,10 @@ class _ClassExamsState extends State<ClassExams> {
     });
   }
 
-  void getQuestions(Exam exam) async {
-    Navigator.pop(context);
-    InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
-    print(exam.examId);
+  void getQuestionsForTakeExam(Exam exam) async {
+    setState(() {
+      loadingPage = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     try {
@@ -662,7 +667,6 @@ class _ClassExamsState extends State<ClassExams> {
               }
             }
             question.grade = questionGradeAnswerInfo["grade"].toDouble();
-            //print(question);
             exam.questions.add(question);
           }
           Navigator.push(context,
@@ -690,14 +694,15 @@ class _ClassExamsState extends State<ClassExams> {
         ).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
+    setState(() {
+      loadingPage = false;
+    });
   }
 
   void getQuestionAndAnswerForReview(Exam exam) async {
-    Navigator.pop(context);
-    //InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
+    setState(() {
+      loadingPage = true;
+    });
     print(exam.examId);
     final prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
@@ -815,8 +820,9 @@ class _ClassExamsState extends State<ClassExams> {
         ).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
+    setState(() {
+      loadingPage = false;
+    });
   }
 
   String convertDateToJalaliString(DateTime time) {

@@ -123,9 +123,6 @@ class _InsidClassPageState extends State<InsidClassPage> {
     setState(() {});
   }
 
-  void navigatorPop() {
-    Navigator.pop(context);
-  }
 
 
 }

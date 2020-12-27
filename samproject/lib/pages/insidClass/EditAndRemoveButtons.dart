@@ -31,6 +31,7 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
   final TextEditingController classDescriptionController =
       TextEditingController();
   bool applyNewClassId = false;
+  String _removeClassUrl = "http://parham-backend.herokuapp.com/class/";
   String _updateClassUrl = "http://parham-backend.herokuapp.com/class/";
 
   @override
@@ -59,7 +60,9 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
         widthFactor: 0.9,
         child: Container(
           child: FlatButton(
-              onPressed: () {},
+              onPressed: () {
+                //_checkRemoveClass();
+              },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -83,6 +86,102 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
         ),
       ),
     );
+  }
+
+  void _checkRemoveClass() {
+    setState(() {
+      Alert(context: context, title: "مایل به ادامه کار هستید؟",
+          // content: Column(
+          //   children: [
+          //     Text(member.username),
+          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
+          //   ],
+          // ),
+          buttons: [
+            DialogButton(
+              child: Text(
+                "خیر",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              color: Color.fromRGBO(100, 0, 0, 1),
+            ),
+            DialogButton(
+              child: Text(
+                "بله",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                _pressRemoveClass();
+              },
+              color: Color.fromRGBO(0, 100, 0, 1),
+            ),
+            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
+          ]).show();
+    });
+  }
+
+  void _pressRemoveClass() async {
+    InsidClassPage.isLoading = true;
+    widget?.classInfoSetState();
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _removeClassUrl +
+            InsidClassPage.currentClass.classId;
+        print(url);
+        final response = await delete(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          InsidClassPage.isLoading = false;
+          widget?.classInfoSetState();
+          //Navigator.of(context).pop();
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [],
+            ).show();
+          });
+        } else {
+          InsidClassPage.isLoading = false;
+          widget?.classInfoSetState();
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [],
+            ).show();
+          });
+        }
+      }
+    } on Exception catch (e) {
+      InsidClassPage.isLoading = false;
+      widget?.classInfoSetState();
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.classInfoSetState();
   }
 
   // ignore: non_constant_identifier_names
@@ -345,15 +444,15 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
               context: context,
               type: AlertType.success,
               title: "عملیات موفق بود",
-              content: Column(
+              content: applyNewClassId?Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(":کد ورود به کلاس"),
                   Text(editedClassInfo['classId']),
                 ],
-              ),
-              buttons: [
+              ):Container(),
+              buttons: applyNewClassId?[
                 DialogButton(
                   child: Text(
                     "کپی",
@@ -365,7 +464,7 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
                   },
                   color: Color(0xFF3D5A80),
                 ),
-              ],
+              ]:[],
             ).show();
           });
         } else {

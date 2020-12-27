@@ -293,7 +293,7 @@ class _ClassMembersState extends State<ClassMembers> {
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
-              color: Colors.red,
+              color: Color.fromRGBO(100, 0, 0, 1),
             ),
             DialogButton(
               child: Text(
@@ -305,7 +305,7 @@ class _ClassMembersState extends State<ClassMembers> {
                 Navigator.of(context, rootNavigator: true).pop();
                 _removeMember(memberIndex);
               },
-              color: Colors.green,
+              color: Color.fromRGBO(0, 100, 0, 1),
             ),
           ]).show();
     });

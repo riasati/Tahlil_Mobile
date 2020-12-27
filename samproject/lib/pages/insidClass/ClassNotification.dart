@@ -55,7 +55,8 @@ class _ClassNotificationState extends State<ClassNotification> {
     setState(() {
       isLoading = true;
     });
-    while(InsidClassPage.currentClass.classId == null || InsidClassPage.currentClass.classId == ""){
+    while (InsidClassPage.currentClass.classId == null ||
+        InsidClassPage.currentClass.classId == "") {
       Future.delayed(Duration(milliseconds: 500));
     }
     final prefs = await SharedPreferences.getInstance();
@@ -75,7 +76,7 @@ class _ClassNotificationState extends State<ClassNotification> {
         classNotifications = [];
         if (response.statusCode == 200) {
           var notificationsInfo =
-          json.decode(utf8.decode(response.bodyBytes))["classNotes"];
+              json.decode(utf8.decode(response.bodyBytes))["classNotes"];
           for (var notificationInfo in notificationsInfo) {
             SumNotification notification = SumNotification(
                 notificationInfo["classNoteId"],
@@ -120,43 +121,53 @@ class _ClassNotificationState extends State<ClassNotification> {
   Widget build(BuildContext context) {
     return LoadingOverlay(
         isLoading: isLoading,
-        child: Column(
-            children: [
-              Expanded(child: notificationList(), flex: 10,),
-              InsidClassPage.isAdmin?Container(
-                //color: Colors.red,
-                height: 60,
-                child: Center(
-                  child: Container(
-                    width: 200,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(30),),
-                      color: Color.fromRGBO(14, 145, 140, 1),
-                    ),
-                    child: FlatButton(
-                      onPressed: (){
-                        _createNewNotificationBottomSheet();
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 15),
-                            child: Text("ساخت اعلان جدید", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                          ),
-                          Icon(
-                            FontAwesomeIcons.plus,
-                            color: Colors.white,
-                          ),
-                        ],
+        child: Column(children: [
+          Expanded(
+            child: notificationList(),
+            flex: 10,
+          ),
+          InsidClassPage.isAdmin
+              ? Container(
+                  //color: Colors.red,
+                  height: 60,
+                  child: Center(
+                    child: Container(
+                      width: 200,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(30),
+                        ),
+                        color: Color.fromRGBO(14, 145, 140, 1),
+                      ),
+                      child: FlatButton(
+                        onPressed: () {
+                          _createNewNotificationBottomSheet();
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 15),
+                              child: Text(
+                                "ساخت اعلان جدید",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Icon(
+                              FontAwesomeIcons.plus,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ):Container(),
-            ])
-    );
+                )
+              : Container(),
+        ]));
   }
 
   Widget notificationList() {
@@ -197,8 +208,8 @@ class _ClassNotificationState extends State<ClassNotification> {
           AnimatedContainer(
             decoration: BoxDecoration(
                 border: Border.all(
-                  color: Color(0xFF3D5A80),
-                )),
+              color: Color(0xFF3D5A80),
+            )),
             child: notificationIsOpen[notificationIndex]
                 ? Column(
                     children: [
@@ -229,7 +240,8 @@ class _ClassNotificationState extends State<ClassNotification> {
                       ),
                       notificationText(notificationIndex),
                       InsidClassPage.isAdmin
-                          ? adminActions(notificationIndex, classNotifications[notificationIndex])
+                          ? adminActions(notificationIndex,
+                              classNotifications[notificationIndex])
                           : Text("")
                     ],
                   )
@@ -249,11 +261,11 @@ class _ClassNotificationState extends State<ClassNotification> {
 
   Widget notificationText(int notificationIndex) {
     return Padding(
-      padding: const EdgeInsets.only(right: 10),
+      padding: const EdgeInsets.only(right: 15),
       child: Text(
         classNotifications[notificationIndex].body,
         textDirection: TextDirection.rtl,
-        textAlign: TextAlign.justify,
+        textAlign: TextAlign.right,
       ),
     );
   }
@@ -301,7 +313,8 @@ class _ClassNotificationState extends State<ClassNotification> {
             child: FlatButton(
                 onPressed: () {
                   editNotificationTitleController.text = notification.title;
-                  editNotificationDescriptionController.text = notification.body;
+                  editNotificationDescriptionController.text =
+                      notification.body;
                   _editNotificationBottomSheet(notificationIndex);
                 },
                 child: Row(
@@ -338,9 +351,7 @@ class _ClassNotificationState extends State<ClassNotification> {
 
   void _checkRemoveNotification(int notificationIndex) {
     setState(() {
-      Alert(
-          context: context,
-          title: "مایل به ادامه کار هستید؟",
+      Alert(context: context, title: "مایل به ادامه کار هستید؟",
           // content: Column(
           //   children: [
           //     Text(member.username),
@@ -352,24 +363,24 @@ class _ClassNotificationState extends State<ClassNotification> {
               child: Text(
                 "خیر",
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
-              color: Colors.red,
+              color: Color.fromRGBO(100, 0, 0, 1),
             ),
             DialogButton(
               child: Text(
                 "بله",
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
                 _pressRemoveNotification(notificationIndex);
               },
-              color: Colors.green,
+              color: Color.fromRGBO(0, 100, 0, 1),
             ),
             //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
           ]).show();
@@ -441,9 +452,9 @@ class _ClassNotificationState extends State<ClassNotification> {
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            )),
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        )),
         barrierColor: Colors.black45.withOpacity(0.8),
         builder: (BuildContext context) {
           return Container(
@@ -456,16 +467,16 @@ class _ClassNotificationState extends State<ClassNotification> {
                   decoration: BoxDecoration(
                     border: Border(
                       bottom:
-                      BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                          BorderSide(width: 1.0, color: Color(0xFFFF000000)),
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Image.asset("assets/img/login_logo.png")),
-                ),
+                // Expanded(
+                //   flex: 3,
+                //   child: Padding(
+                //       padding: EdgeInsets.only(top: 10),
+                //       child: Image.asset("assets/img/login_logo.png")),
+                // ),
                 Expanded(
                   child: Column(
                     children: [
@@ -476,20 +487,26 @@ class _ClassNotificationState extends State<ClassNotification> {
                             widthFactor: 0.9,
                             child: Directionality(
                               textDirection: TextDirection.rtl,
-                              child: TextField(
+                              child: TextFormField(
                                 textAlign: TextAlign.right,
                                 maxLines: 1,
                                 controller: editNotificationTitleController,
                                 keyboardType: TextInputType.text,
                                 style: TextStyle(color: Colors.black),
+                                validator: (value) => _validateTitle(value),
                                 decoration: InputDecoration(
+                                  //errorText: "حداکثر ۲۵ کاراکتر",
+                                    errorBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.red),
+                                    ),
                                     focusedBorder: new OutlineInputBorder(
                                         borderSide: new BorderSide(
                                             color: Color(0xFF3D5A80),
                                             width: 3)),
                                     enabledBorder: OutlineInputBorder(
                                       borderSide:
-                                      BorderSide(color: Color(0xFF3D5A80)),
+                                          BorderSide(color: Color(0xFF3D5A80)),
                                     ),
                                     suffixIcon: Icon(
                                       FontAwesomeIcons.bell,
@@ -497,7 +514,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                     ),
                                     labelText: 'عنوان اعلان',
                                     labelStyle:
-                                    TextStyle(color: Color(0xFF3D5A80))),
+                                        TextStyle(color: Color(0xFF3D5A80))),
                               ),
                             ),
                           ),
@@ -514,7 +531,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                 textAlign: TextAlign.right,
                                 maxLines: 7,
                                 controller:
-                                editNotificationDescriptionController,
+                                    editNotificationDescriptionController,
                                 keyboardType: TextInputType.text,
                                 style: TextStyle(color: Colors.black),
                                 decoration: InputDecoration(
@@ -524,7 +541,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                                             width: 3)),
                                     enabledBorder: OutlineInputBorder(
                                       borderSide:
-                                      BorderSide(color: Color(0xFF3D5A80)),
+                                          BorderSide(color: Color(0xFF3D5A80)),
                                     ),
                                     suffixIcon: Icon(
                                       FontAwesomeIcons.fileSignature,
@@ -549,24 +566,24 @@ class _ClassNotificationState extends State<ClassNotification> {
                     padding: EdgeInsets.only(bottom: 20),
                     child: Container(
                         child: RoundedLoadingButton(
-                          color: Color(0xFF3D5A80),
-                          controller: btnCreateController,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 42.0),
-                            child: Text(
-                              "ویرایش اعلان",
-                              style: TextStyle(
-                                color: Colors.white,
-                                // fontSize: MediaQuery.of(context).size.width * 0.045,
-                                // fontFamily: "WorkSansBold"
-                              ),
-                            ),
+                      color: Color(0xFF3D5A80),
+                      controller: btnCreateController,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 42.0),
+                        child: Text(
+                          "ویرایش اعلان",
+                          style: TextStyle(
+                            color: Colors.white,
+                            // fontSize: MediaQuery.of(context).size.width * 0.045,
+                            // fontFamily: "WorkSansBold"
                           ),
-                          onPressed: () {
-                            _pressEditNotification(notificationIndex);
-                          },
-                        )),
+                        ),
+                      ),
+                      onPressed: () {
+                        _pressEditNotification(notificationIndex);
+                      },
+                    )),
                   ),
                   flex: 2,
                 )
@@ -600,11 +617,13 @@ class _ClassNotificationState extends State<ClassNotification> {
         print(response);
         if (response.statusCode == 200 && response.body != null) {
           var notificationInfo =
-          json.decode(utf8.decode(response.bodyBytes))["editedClassNote"];
+              json.decode(utf8.decode(response.bodyBytes))["editedClassNote"];
           print(notificationInfo);
-          classNotifications[notificationIndex].title = notificationInfo["title"];
+          classNotifications[notificationIndex].title =
+              notificationInfo["title"];
           classNotifications[notificationIndex].body = notificationInfo["body"];
-          classNotifications[notificationIndex].createTime = DateTime.parse(notificationInfo["createdAt"]);
+          classNotifications[notificationIndex].createTime =
+              DateTime.parse(notificationInfo["createdAt"]);
           print(classNotifications[notificationIndex]);
           classNotifications
               .sort((t1, t2) => t1.createTime.compareTo(t2.createTime));
@@ -658,122 +677,117 @@ class _ClassNotificationState extends State<ClassNotification> {
   }
 
   void _createNewNotificationBottomSheet() => showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
+        context: context,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
         )),
-    barrierColor: Colors.black45.withOpacity(0.8),
-    builder: (BuildContext context) {
-      return Container(
-        height: 550,
-        child: Column(
-          children: [
-            Container(
-              child: Icon(FontAwesomeIcons.gripLines),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+        barrierColor: Colors.black45.withOpacity(0.8),
+        builder: (BuildContext context) {
+          return Container(
+            height: 550,
+            child: Column(
+              children: [
+                Container(
+                  child: Icon(FontAwesomeIcons.gripLines),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom:
+                          BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child:
-                  Image.asset("assets/img/login_logo.png")),
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: Container(
-                      child: FractionallySizedBox(
-                        widthFactor: 0.9,
-                        child: Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: TextField(
-                            textAlign: TextAlign.right,
-                            maxLines: 1,
-                            controller: notificationTitleController,
-                            keyboardType: TextInputType.text,
-                            style: TextStyle(color: Colors.black),
-                            decoration: InputDecoration(
-                                focusedBorder:
-                                new OutlineInputBorder(
-                                    borderSide: new BorderSide(
-                                        color:
-                                        Color(0xFF3D5A80),
-                                        width: 3)),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color(0xFF3D5A80)),
-                                ),
-                                suffixIcon: Icon(
-                                  FontAwesomeIcons.bell,
-                                  color: Colors.black,
-                                ),
-                                labelText: 'عنوان اعلان',
-                                labelStyle: TextStyle(
-                                    color: Color(0xFF3D5A80))),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Image.asset("assets/img/login_logo.png")),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Container(
+                          child: FractionallySizedBox(
+                            widthFactor: 0.9,
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: TextField(
+                                textAlign: TextAlign.right,
+                                maxLines: 1,
+                                controller: notificationTitleController,
+                                keyboardType: TextInputType.text,
+                                style: TextStyle(color: Colors.black),
+                                decoration: InputDecoration(
+                                    focusedBorder: new OutlineInputBorder(
+                                        borderSide: new BorderSide(
+                                            color: Color(0xFF3D5A80),
+                                            width: 3)),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Color(0xFF3D5A80)),
+                                    ),
+                                    suffixIcon: Icon(
+                                      FontAwesomeIcons.bell,
+                                      color: Colors.black,
+                                    ),
+                                    labelText: 'عنوان اعلان',
+                                    labelStyle:
+                                        TextStyle(color: Color(0xFF3D5A80))),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10),
-                    child: Container(
-                      child: FractionallySizedBox(
-                        widthFactor: 0.9,
-                        child: Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: TextField(
-                            textAlign: TextAlign.right,
-                            maxLines: 7,
-                            controller: notificationDescriptionController,
-                            keyboardType: TextInputType.text,
-                            style: TextStyle(color: Colors.black),
-                            decoration: InputDecoration(
-                                focusedBorder:
-                                new OutlineInputBorder(
-                                    borderSide: new BorderSide(
-                                        color:
-                                        Color(0xFF3D5A80),
-                                        width: 3)),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Color(0xFF3D5A80)),
-                                ),
-                                suffixIcon: Icon(
-                                  FontAwesomeIcons.fileSignature,
-                                  // FontAwesomeIcons.envelope,
-                                  color: Colors.black,
-                                ),
-                                labelText: 'توضیحات',
-                                labelStyle: TextStyle(
-                                    color: Color(0xFF3D5A80),
-                                    fontSize: 25
-                                )),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Container(
+                          child: FractionallySizedBox(
+                            widthFactor: 0.9,
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: TextField(
+                                textAlign: TextAlign.right,
+                                maxLines: 7,
+                                controller: notificationDescriptionController,
+                                keyboardType: TextInputType.text,
+                                style: TextStyle(color: Colors.black),
+                                decoration: InputDecoration(
+                                    focusedBorder: new OutlineInputBorder(
+                                        borderSide: new BorderSide(
+                                            color: Color(0xFF3D5A80),
+                                            width: 3)),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Color(0xFF3D5A80)),
+                                    ),
+                                    suffixIcon: Icon(
+                                      FontAwesomeIcons.fileSignature,
+                                      // FontAwesomeIcons.envelope,
+                                      color: Colors.black,
+                                    ),
+                                    labelText: 'توضیحات',
+                                    labelStyle: TextStyle(
+                                        color: Color(0xFF3D5A80),
+                                        fontSize: 25)),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-              flex: 7,
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: Container(
-                    child: RoundedLoadingButton(
+                  flex: 7,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Container(
+                        child: RoundedLoadingButton(
                       color: Color(0xFF3D5A80),
                       controller: btnCreateController,
                       child: Padding(
@@ -792,14 +806,14 @@ class _ClassNotificationState extends State<ClassNotification> {
                         _pressCreateNotification();
                       },
                     )),
-              ),
-              flex: 2,
-            )
-          ],
-        ),
+                  ),
+                  flex: 2,
+                )
+              ],
+            ),
+          );
+        },
       );
-    },
-  );
 
   void _pressCreateNotification() async {
     final prefs = await SharedPreferences.getInstance();
@@ -903,5 +917,9 @@ class _ClassNotificationState extends State<ClassNotification> {
     String minute = inputTime.minute.toString();
     if (inputTime.minute < 10) minute = "0" + minute;
     return " $hour:$minute";
+  }
+
+  String _validateTitle(String value) {
+    return "حداکثر ۲۵ کاراکتر";
   }
 }

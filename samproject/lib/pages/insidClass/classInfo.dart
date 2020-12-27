@@ -6,10 +6,10 @@ import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 import 'EditAndRemoveButtons.dart';
 
 class ClassInfoCard extends StatefulWidget {
-  final insidClassPageNavigatorPop;
+  final insidClassPageSetState;
 
   ClassInfoCard({@required void toggleCoinCallback()})
-      : insidClassPageNavigatorPop = toggleCoinCallback;
+      : insidClassPageSetState = toggleCoinCallback;
 
   @override
   _ClassInfoCardState createState() => _ClassInfoCardState();
@@ -27,25 +27,25 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
             width: double.infinity,
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      child: FlatButton(
-                        onPressed: () {
-                          //Navigator.pop(context);
-                        },
-                        child: Icon(
-                          FontAwesomeIcons.arrowLeft,
-                          color: Colors.white,
-                        ),
-                      ),
-                      padding: EdgeInsets.only(top: 25),
-                    )
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.start,
+                //   children: [
+                //     Padding(
+                //       child: FlatButton(
+                //         onPressed: () {
+                //           //Navigator.pop(context);
+                //         },
+                //         child: Icon(
+                //           FontAwesomeIcons.arrowLeft,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //       padding: EdgeInsets.only(top: 25),
+                //     )
+                //   ],
+                // ),
                 Padding(
-                  padding: EdgeInsets.only(top: 0),
+                  padding: EdgeInsets.only(top: 45),
                   child: AutoSizeText(
                     InsidClassPage.currentClass.className,
                     maxLines: 1,
@@ -145,7 +145,7 @@ class _ClassInfoCardState extends State<ClassInfoCard> {
 
   void classInfoSetSate(){
     setState(() {
-
+      widget?.insidClassPageSetState();
     });
   }
 }
