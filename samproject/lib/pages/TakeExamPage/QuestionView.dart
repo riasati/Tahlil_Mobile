@@ -499,7 +499,7 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
                           textDirection: TextDirection.rtl,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Text(widget.question.text,textDirection: TextDirection.rtl,),
+                            Container(alignment: Alignment.centerRight,child: Text(widget.question.text,textDirection: TextDirection.rtl,)),
                             (widget.question.questionImage != null) ? Image.memory(base64Decode(widget.question.questionImage),fit: BoxFit.cover,height: 200,) : Container(),
                           ],
                         ),

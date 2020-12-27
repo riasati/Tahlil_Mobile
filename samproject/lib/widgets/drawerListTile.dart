@@ -7,6 +7,7 @@ import 'package:samproject/pages/editExamPage.dart';
 import 'package:samproject/pages/editProfilePage.dart';
 import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
+import 'package:samproject/pages/reportCardPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class DrawerListTile extends StatefulWidget {
   final callHomePageBiuld;
@@ -104,28 +105,28 @@ class _DrawerListTileState extends State<DrawerListTile> {
             );
           },
         ),
-        // ListTile(
-        //   //leading: Icon(Icons.alarm),
-        //   title: Row(
-        //     textDirection: TextDirection.rtl,
-        //     children: [
-        //       Icon(Icons.book),
-        //       Padding(
-        //         padding: const EdgeInsets.only(right: 10.0),
-        //         child: Text('ایجاد آزمون'),
-        //       ),
-        //     ],
-        //   ),
-        //   onTap: () {
-        //     Navigator.pop(context);
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) => CreateExamPage(classId: "kuTwxu"),
-        //       ),
-        //     );
-        //   },
-        // ),
+        ListTile(
+          //leading: Icon(Icons.alarm),
+          title: Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              Icon(Icons.book),
+              Padding(
+                padding: const EdgeInsets.only(right: 10.0),
+                child: Text('کارنامه'),
+              ),
+            ],
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReportCardPage(),
+              ),
+            );
+          },
+        ),
         // ListTile(
         //   //leading: Icon(Icons.alarm),
         //   title: Row(
