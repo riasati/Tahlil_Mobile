@@ -11,126 +11,214 @@ import 'package:samproject/pages/createExamPage.dart';
 import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class EditAndCreateExamButtons extends StatefulWidget {
-  final insidClassPageSetState;
+class EditAndRemoveButtons extends StatefulWidget {
+  final classInfoSetState;
+
   //String classId;
 
-  EditAndCreateExamButtons( {@required void toggleCoinCallback() }):
-        insidClassPageSetState = toggleCoinCallback;
+  EditAndRemoveButtons({@required void toggleCoinCallback()})
+      : classInfoSetState = toggleCoinCallback;
+
   @override
-  _EditAndCreateExamButtonsState createState() =>
-      _EditAndCreateExamButtonsState();
+  _EditAndRemoveButtonsState createState() =>
+      _EditAndRemoveButtonsState();
 }
 
-class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
+class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
   final RoundedLoadingButtonController btnCreateController =
       new RoundedLoadingButtonController();
   final TextEditingController classTitleController = TextEditingController();
   final TextEditingController classDescriptionController =
       TextEditingController();
   bool applyNewClassId = false;
+  String _removeClassUrl = "http://parham-backend.herokuapp.com/class/";
   String _updateClassUrl = "http://parham-backend.herokuapp.com/class/";
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: [
-          Expanded(
-            child: EditButton(),
-          ),
-          Expanded(
-            child: CreateExamButton(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ignore: non_constant_identifier_names
-  Widget EditButton() {
-    Gradient _gradient =
-        LinearGradient(colors: [Color(0xFF3D5A80), Color(0xFF3D5A80)]);
-    return Container(
-      width: double.infinity,
-      height: 40,
-      child: FractionallySizedBox(
-        widthFactor: 0.9,
-        child: Container(
-          decoration: BoxDecoration(
-              borderRadius: new BorderRadius.all(Radius.circular(40.0)),
-              gradient: _gradient,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[500],
-                  offset: Offset(0.0, 1.5),
-                  blurRadius: 1.5,
-                ),
-              ]),
-          child: Material(
-            color: Colors.transparent,
-            borderRadius: new BorderRadius.all(Radius.circular(40.0)),
-            child: FlatButton(
-                onPressed: () {
-                  classTitleController.text =
-                      InsidClassPage.currentClass.className;
-                  classDescriptionController.text =
-                      InsidClassPage.currentClass.classDescription;
-                  editClassBottomSheet();
-                },
-                child: Text(
-                  "ویرایش کلاس",
-                  style: TextStyle(
-                    //fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                )),
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(child: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: RemoveClassButton(),
+            )),
+            Expanded(child: EditClassButton()),
+          ],
         ),
       ),
     );
   }
 
   // ignore: non_constant_identifier_names
-  Widget CreateExamButton() {
-    Gradient _gradient = LinearGradient(colors: [
-      Color.fromRGBO(14, 145, 140, 1),
-      Color.fromRGBO(14, 145, 140, 1)
-    ]);
+  Widget RemoveClassButton() {
     return Container(
-      width: double.infinity,
-      height: 40,
       child: FractionallySizedBox(
         widthFactor: 0.9,
         child: Container(
-          decoration: BoxDecoration(
-              borderRadius: new BorderRadius.all(Radius.circular(40.0)),
-              gradient: _gradient,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[500],
-                  offset: Offset(0.0, 1.5),
-                  blurRadius: 1.5,
+          child: FlatButton(
+              onPressed: () {
+                //_checkRemoveClass();
+              },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Text(
+                    "حذف کلاس",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
                 ),
-              ]),
-          child: Material(
-            color: Colors.transparent,
-            borderRadius: new BorderRadius.all(Radius.circular(40.0)),
-            child: FlatButton(
-                onPressed: ()
-                {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => CreateExamPage(classId: InsidClassPage.currentClass.classId,)));
-                } ,
-                child: Center(
+                Icon(
+                  Icons.remove_circle,
+                  color: Colors.red,
+                ),
+              ],
+            ),),
+        ),
+      ),
+    );
+  }
+
+  void _checkRemoveClass() {
+    setState(() {
+      Alert(context: context, title: "مایل به ادامه کار هستید؟",
+          // content: Column(
+          //   children: [
+          //     Text(member.username),
+          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
+          //   ],
+          // ),
+          buttons: [
+            DialogButton(
               child: Text(
-                "ساخت آزمون",
-                style: TextStyle(
-                  //fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                "خیر",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
-            )),
-          ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              color: Color.fromRGBO(100, 0, 0, 1),
+            ),
+            DialogButton(
+              child: Text(
+                "بله",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                _pressRemoveClass();
+              },
+              color: Color.fromRGBO(0, 100, 0, 1),
+            ),
+            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
+          ]).show();
+    });
+  }
+
+  void _pressRemoveClass() async {
+    InsidClassPage.isLoading = true;
+    widget?.classInfoSetState();
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = _removeClassUrl +
+            InsidClassPage.currentClass.classId;
+        print(url);
+        final response = await delete(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          InsidClassPage.isLoading = false;
+          widget?.classInfoSetState();
+          //Navigator.of(context).pop();
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [],
+            ).show();
+          });
+        } else {
+          InsidClassPage.isLoading = false;
+          widget?.classInfoSetState();
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: "عملیات ناموفق بود",
+              buttons: [],
+            ).show();
+          });
+        }
+      }
+    } on Exception catch (e) {
+      InsidClassPage.isLoading = false;
+      widget?.classInfoSetState();
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [],
+        ).show();
+      });
+    }
+    InsidClassPage.isLoading = false;
+    widget?.classInfoSetState();
+  }
+
+  // ignore: non_constant_identifier_names
+  Widget EditClassButton() {
+    return Container(
+      child: FractionallySizedBox(
+        widthFactor: 0.9,
+        child: Container(
+          child: FlatButton(
+              onPressed: () {
+                classTitleController.text =
+                    InsidClassPage.currentClass.className;
+                classDescriptionController.text =
+                    InsidClassPage.currentClass.classDescription;
+                editClassBottomSheet();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Text(
+                      "ویرایش کلاس",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(14, 145, 140, 1),
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.edit,
+                    color: Color.fromRGBO(14, 145, 140, 1),
+                  ),
+
+                ],
+              )),
         ),
       ),
     );
@@ -154,7 +242,6 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
             )),
             onClosing: () {},
             enableDrag: true,
-
             builder: (BuildContext context) {
               return StatefulBuilder(
                   builder: (BuildContext context, setState) => Container(
@@ -166,7 +253,8 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 border: Border(
-                                  bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                                  bottom: BorderSide(
+                                      width: 1.0, color: Color(0xFFFF000000)),
                                 ),
                               ),
                             ),
@@ -331,37 +419,40 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
           "generateNewClassId": applyNewClassId,
         });
         token = "Bearer " + token;
-        final response = await put(_updateClassUrl + InsidClassPage.currentClass.classId,
-            headers: {
-              'accept': 'application/json',
-              'Authorization': token,
-              'Content-Type': 'application/json',
-            },
-            body: body);
+        final response =
+            await put(_updateClassUrl + InsidClassPage.currentClass.classId,
+                headers: {
+                  'accept': 'application/json',
+                  'Authorization': token,
+                  'Content-Type': 'application/json',
+                },
+                body: body);
         if (response.statusCode == 200 && response.body != null) {
           var editedClassInfo =
               json.decode(utf8.decode(response.bodyBytes))["editedClass"];
           InsidClassPage.currentClass.className = editedClassInfo["name"];
-          InsidClassPage.currentClass.classDescription = editedClassInfo["description"];
-          if(InsidClassPage.currentClass.classDescription == null)
+          InsidClassPage.currentClass.classDescription =
+              editedClassInfo["description"];
+          if (InsidClassPage.currentClass.classDescription == null)
             InsidClassPage.currentClass.classDescription = "";
           InsidClassPage.currentClass.classId = editedClassInfo["classId"];
           btnCreateController.success();
           Navigator.pop(context);
+          widget?.classInfoSetState();
           setState(() {
             Alert(
               context: context,
               type: AlertType.success,
               title: "عملیات موفق بود",
-              content: Column(
+              content: applyNewClassId?Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(":کد ورود به کلاس"),
                   Text(editedClassInfo['classId']),
                 ],
-              ),
-              buttons: [
+              ):Container(),
+              buttons: applyNewClassId?[
                 DialogButton(
                   child: Text(
                     "کپی",
@@ -370,11 +461,10 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
                   onPressed: () => {
                     Clipboard.setData(
                         ClipboardData(text: editedClassInfo['classId'])),
-                      widget?.insidClassPageSetState(),
                   },
                   color: Color(0xFF3D5A80),
                 ),
-              ],
+              ]:[],
             ).show();
           });
         } else {
@@ -383,11 +473,10 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
           Navigator.pop(context);
           setState(() {
             Alert(
-              context: context,
-              type: AlertType.error,
-              title: errorMsg,
-              buttons: []
-            ).show();
+                context: context,
+                type: AlertType.error,
+                title: errorMsg,
+                buttons: []).show();
           });
         }
       } else {
@@ -395,11 +484,10 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
         Navigator.pop(context);
         setState(() {
           Alert(
-            context: context,
-            type: AlertType.error,
-            title: "ابتدا به حساب خود وارد شوید",
-            buttons: []
-          ).show();
+              context: context,
+              type: AlertType.error,
+              title: "ابتدا به حساب خود وارد شوید",
+              buttons: []).show();
         });
       }
     } on Exception catch (e) {
@@ -408,18 +496,15 @@ class _EditAndCreateExamButtonsState extends State<EditAndCreateExamButtons> {
       Navigator.pop(context);
       setState(() {
         Alert(
-          context: context,
-          type: AlertType.error,
-          title: "عملیات ناموفق بود",
-          buttons: []
-        ).show();
+            context: context,
+            type: AlertType.error,
+            title: "عملیات ناموفق بود",
+            buttons: []).show();
       });
     }
   }
 
-  void editSetState(){
-    setState(() {
-
-    });
+  void editSetState() {
+    setState(() {});
   }
 }

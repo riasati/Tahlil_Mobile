@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -13,100 +12,54 @@ import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ClassMembers extends StatefulWidget {
-
   final insidClassPageSetState;
 
-  ClassMembers( {@required void toggleCoinCallback() }):
-        insidClassPageSetState = toggleCoinCallback;
+  ClassMembers({@required void toggleCoinCallback()})
+      : insidClassPageSetState = toggleCoinCallback;
 
   @override
   _ClassMembersState createState() => _ClassMembersState();
 }
 
 class _ClassMembersState extends State<ClassMembers> {
-  bool isLoading = false;
-  String _getMembersOfClassInfoURL = "http://parham-backend.herokuapp.com/class/";
+  String _getMembersOfClassInfoURL =
+      "http://parham-backend.herokuapp.com/class/";
   String _removeMemberURL = "http://parham-backend.herokuapp.com/class/";
   List<Person> classMembers = [];
+  List<bool> memberIsOpen = [];
+  bool isLoading = true;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30))),
-        //color: Colors.black45,
-        child: FlatButton(
-          onPressed: () {
-            _getMembersListFromServer();
-          },
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  child: Icon(
-                    FontAwesomeIcons.users,
-                    size: 50,
-                    color: Color(0xFF3D5A80),
-                  ),
-                  alignment: Alignment.center,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 15),
-                  child: AutoSizeText(
-                    "لیست اعضا",
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                // Padding(
-                //   padding: EdgeInsets.only(top: 8),
-                //   child: Container(
-                //     alignment: Alignment.centerRight,
-                //     child: AutoSizeText(
-                //       "تعداد: 10",
-                //       maxLines: 1,
-                //       style: TextStyle(
-                //         color: Colors.black,
-                //         fontWeight: FontWeight.w600,
-                //       ),
-                //     ),
-                //   ),
-                // )
-
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+    _getMembersListFromServer();
   }
 
   void _getMembersListFromServer() async {
-    InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
+    setState(() {
+      isLoading = true;
+    });
+    while(InsidClassPage.currentClass.classId == null || InsidClassPage.currentClass.classId == ""){
+      Future.delayed(Duration(milliseconds: 500));
+    }
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = _getMembersOfClassInfoURL  + InsidClassPage.currentClass.classId + "/members";
-        final response = await get(url,
-            headers: {
-              'accept': 'application/json',
-              'Authorization': token,
-              'Content-Type': 'application/json',
-            });
+        var url = _getMembersOfClassInfoURL +
+            InsidClassPage.currentClass.classId +
+            "/members";
+        final response = await get(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
         classMembers = [];
-        if(response.statusCode == 200) {
-          var membersInfo = json.decode(
-              utf8.decode(response.bodyBytes))["members"];
+        if (response.statusCode == 200) {
+          var membersInfo =
+          json.decode(utf8.decode(response.bodyBytes))["members"];
           for (var memberInfo in membersInfo) {
             Person member = Person();
             member.firstname = memberInfo["firstname"];
@@ -115,121 +68,214 @@ class _ClassMembersState extends State<ClassMembers> {
             member.username = memberInfo["username"];
             member.email = memberInfo["email"];
             classMembers.add(member);
+            memberIsOpen.add(false);
           }
-          membersListBottomSheet();
-        }else{
+        } else {
           setState(() {
             Alert(
               context: context,
               type: AlertType.error,
               title: "عملیات ناموفق بود",
-              buttons: [
-              ],
+              buttons: [],
             ).show();
           });
         }
       }
-    }on Exception catch(e){
+    } on Exception catch (e) {
       print(e.toString());
       setState(() {
         Alert(
           context: context,
           type: AlertType.error,
           title: "عملیات ناموفق بود",
-          buttons: [
-          ],
+          buttons: [],
         ).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  void membersListBottomSheet() => showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
+  @override
+  Widget build(BuildContext context) {
+    return LoadingOverlay(child: Container(child: memberList(), color: Colors.black26,), isLoading: isLoading,);
+  }
+
+  Widget memberList() {
+    return ListView.builder(
+        itemCount: classMembers.length,
+        itemBuilder: (BuildContext context, int index) {
+          return eachMemberCard(index);
+        });
+  }
+
+  Widget eachMemberCard(int memberIndex) {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            tileColor: Color(0xFF3D5A80),
+            leading: InsidClassPage.isAdmin
+                ? IconButton(
+                    icon: Icon(
+                      memberIsOpen[memberIndex]
+                          ? FontAwesomeIcons.chevronCircleUp
+                          : FontAwesomeIcons.chevronCircleDown,
+                      size: 25,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        memberIsOpen[memberIndex] = !memberIsOpen[memberIndex];
+                      });
+                    },
+                  )
+                : Text(""),
+            title: Text(
+                  classMembers[memberIndex].lastname,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white
+              ),
+            ),
+            //trailing: FlutterLogo(size: 45,),
+            trailing: eachMemberCardAvatar(classMembers[memberIndex].avatarUrl),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Color(0xFF3D5A80),
+                )),
+            // color: Colors.black.withOpacity(0.3),
+            child: memberIsOpen[memberIndex]
+                ? Padding(
+                  padding: const EdgeInsets.only(top: 25),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 60, bottom: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SelectableText(
+                                classMembers[memberIndex].username,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Icon(FontAwesomeIcons.userAlt, color: Color.fromRGBO(14, 145, 140, 1),),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 60),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              SelectableText(
+                                classMembers[memberIndex].email,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Icon(FontAwesomeIcons.solidEnvelope, color: Color.fromRGBO(14, 145, 140, 1),),
+                              )
+                            ],
+                          ),
+                        ),
+                        adminActions(memberIndex, classMembers[memberIndex]),
+                      ],
+                    ),
+                )
+                : SizedBox(
+                    height: 1,
+                    child: Container(
+                      color: Colors.black,
+                    ),
+                  ),
           )
+        ],
       ),
-      barrierColor: Colors.black45.withOpacity(0.8),
-      builder: (context) => Column(
-        //mainAxisSize: MainAxisSize.min,
+    );
+  }
+
+  Widget eachMemberCardAvatar(String avatarUrl) {
+    if (avatarUrl == null) {
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage: AssetImage("assets/img/unnamed.png"),
+        backgroundColor: Colors.white,
+
+      );
+    }
+    try {
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage: NetworkImage(avatarUrl),
+        backgroundColor: Colors.white,
+        //onBackgroundImageError: ,
+      );
+    } on Exception catch (e) {
+      return CircleAvatar(
+        radius: 30.0,
+        backgroundImage: AssetImage("assets/img/unnamed.png"),
+        backgroundColor: Colors.white,
+      );
+    }
+  }
+
+  Widget adminActions(int memberIndex, Person member) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: ButtonBar(
+        alignment: MainAxisAlignment.center,
         children: [
           Container(
-              child: Icon(FontAwesomeIcons.gripLines),
-          width: double.infinity,
-          decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+            child: FlatButton(
+              onPressed: () {
+                _checkRemoveMember(memberIndex);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Text(
+                      "حذف کاربر",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.remove_circle,
+                    color: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+            width: 120,
+            decoration: BoxDecoration(
+              //color: Colors.red,
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              //color: userAnswer ? Colors.black : Colors.black26,
             ),
           ),
-          ),
-          Expanded(child: memberList()),
         ],
-      ));
-
-  Widget memberList(){
-    return ListView.builder(
-      itemCount: classMembers.length,
-        itemBuilder: (BuildContext context, int index) {
-          return eachMemberCard(classMembers[index]);
-        }
-    );
-  }
-
-  Widget eachMemberCard(Person member){
-    return Card(
-      child: FlatButton(
-        padding: EdgeInsets.all(0),
-        minWidth: double.infinity,
-        onPressed: () {
-          if(InsidClassPage.isAdmin)
-            _showCompleteUserInfo(member);
-        },
-        child: ListTile(
-          leading: InsidClassPage.isAdmin?_userFunctionForAdmin(member):Text(""),
-          title: Text(member.firstname + " " + member.lastname, textAlign: TextAlign.right,),
-          //trailing: FlutterLogo(size: 45,),
-          trailing: eachMemberCardAvatar(member.avatarUrl),
-        ),
       ),
     );
   }
 
-  Widget _userFunctionForAdmin(Person member){
-    return PopupMenuButton<String>(
-      onSelected: (String value) {
-      },
-      child: Icon(
-        Icons.more_vert,
-        size: 35,
-        color: Colors.red,
-        //size: 1,
-        // onPressed: () {
-        //   print('Hello world');
-        // },
-      ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-         PopupMenuItem<String>(
-          child: FlatButton(
-            child: Center(child: Text('حذف کاربر', style: TextStyle(color: Colors.red),)),
-            padding: EdgeInsets.all(0),
-            onPressed: () {
-              _checkRemoveMember( member);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _checkRemoveMember( Person member){
+  void _checkRemoveMember(int memberIndex) {
     setState(() {
       Alert(
           context: context,
-          type: AlertType.warning,
           title: "مایل به ادامه کار هستید؟",
           // content: Column(
           //   children: [
@@ -239,137 +285,87 @@ class _ClassMembersState extends State<ClassMembers> {
           // ),
           buttons: [
             DialogButton(
-              child: Text("بله"),
-              onPressed: (){
+              child: Text(
+                "خیر",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
-                _removeMember(member);
               },
-              color: Colors.amber,
+              color: Color.fromRGBO(100, 0, 0, 1),
             ),
-            //DialogButton(child: Text("خیر"), onPressed: (){Navigator.of(context, rootNavigator: true).pop();}, color: Colors.amber,),
-
-          ]
-      ).show();
+            DialogButton(
+              child: Text(
+                "بله",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                _removeMember(memberIndex);
+              },
+              color: Color.fromRGBO(0, 100, 0, 1),
+            ),
+          ]).show();
     });
   }
 
-  void _removeMember(Person member) async {
-    Navigator.pop(context);
-    Navigator.pop(context);
-    InsidClassPage.isLoading = true;
-    widget?.insidClassPageSetState();
+  void _removeMember(int memberIndex) async {
+    setState(() {
+      isLoading = true;
+    });
     final prefs = await SharedPreferences.getInstance();
     print(prefs.getString("token"));
     String token = prefs.getString("token");
     try {
       if (token != null) {
         token = "Bearer " + token;
-        var url = _removeMemberURL  + InsidClassPage.currentClass.classId + "/members/" + member.username;
+        var url = _removeMemberURL +
+            InsidClassPage.currentClass.classId +
+            "/members/" +
+            classMembers[memberIndex].username;
         print(url);
-        final response = await delete(url,
-            headers: {
-              'accept': 'application/json',
-              'Authorization': token,
-              'Content-Type': 'application/json',
-            });
-        if(response.statusCode == 200){
+        final response = await delete(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          classMembers.removeAt(memberIndex);
+          memberIsOpen.removeAt(memberIndex);
           setState(() {
             Alert(
               context: context,
               type: AlertType.success,
               title: "عملیات موفق بود",
-              buttons: [
-              ],
+              buttons: [],
             ).show();
           });
-        }
-        else{
+        } else {
           setState(() {
             Alert(
               context: context,
               type: AlertType.error,
               title: "عملیات ناموفق بود",
-              buttons: [
-              ],
+              buttons: [],
             ).show();
           });
         }
       }
-    }on Exception catch(e){
+    } on Exception catch (e) {
       print(e.toString());
       setState(() {
         Alert(
           context: context,
           type: AlertType.error,
           title: "عملیات ناموفق بود",
-          buttons: [
-          ],
+          buttons: [],
         ).show();
       });
     }
-    InsidClassPage.isLoading = false;
-    widget?.insidClassPageSetState();
+    setState(() {
+      isLoading = false;
+    });
   }
-
-  Widget eachMemberCardAvatar(String avatarUrl){
-    if(avatarUrl == null){
-      return CircleAvatar(
-        radius: 30.0,
-        backgroundImage:
-        AssetImage("assets/img/unnamed.png"),
-        backgroundColor: Colors.transparent,
-      );
-    }
-    try{
-      return CircleAvatar(
-        radius: 30.0,
-        backgroundImage:
-        NetworkImage(avatarUrl),
-        backgroundColor: Colors.transparent,
-      );
-    }on Exception catch(e){
-      return CircleAvatar(
-        radius: 30.0,
-        backgroundImage:
-        AssetImage("assets/img/unnamed.png"),
-        backgroundColor: Colors.transparent,
-      );
-    }
-
-  }
-
-  Future<void> _showCompleteUserInfo(Person member) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Image(
-            image: AssetImage("assets/img/unnamed.png"),
-            height: 100,
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                AutoSizeText(member.username + " :نام کاربری", style: TextStyle(), textAlign: TextAlign.right, maxLines: 1,),
-                AutoSizeText(member.email + ' :ایمیل', style: TextStyle(), textAlign: TextAlign.right,maxLines: 1,),
-              ],
-            ),
-          ),
-          // actions: <Widget>[
-          //   TextButton(
-          //     style: ButtonStyle(
-          //
-          //     ),
-          //     child: Text('Approve'),
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //     },
-          //   ),
-          // ],
-        );
-      },
-    );
-  }
-
 }
