@@ -16,7 +16,8 @@ import 'QuestionView.dart';
 
 class ReviewExamPage extends StatefulWidget {
   Exam exam;
-  ReviewExamPage(this.exam);
+  ReviewExamPage(this.exam,this.isTeacherUsing);
+  bool isTeacherUsing = false;
   @override
   _ReviewExamPageState createState() => _ReviewExamPageState();
 }
@@ -26,7 +27,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   GlobalKey<ScrollSnapListState> questionRouterKey = GlobalKey();
   PageController controller=PageController();
   List<Widget> _list=<Widget>[];
-  bool isTeacherUsing = true;
+  bool isTeacherUsing = false;
   void fillPageList()
   {
     for(int i = 0;i<widget.exam.questions.length;i++)

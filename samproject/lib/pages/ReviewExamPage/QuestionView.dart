@@ -74,6 +74,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
     {
       userAnswerLong = widget.question.userAnswer;
     }
+    print(widget.question);
   }
   @override
   Widget build(BuildContext context) {

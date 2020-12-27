@@ -106,13 +106,13 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
     return value.length < 6 ? 'نام کاربری باید حداقل 6 کاراکتر باشد' : null;
   }
 
-  String _validateFirstName(String value) {
-    return value.length < 4 ? 'نام  باید حداقل 4 کاراکتر باشد' : null;
-  }
-
-  String _validateLastName(String value) {
-    return value.length < 4 ? 'نام خانوادگی باید حداقل 4 کاراکتر باشد' : null;
-  }
+  // String _validateFirstName(String value) {
+  //   return value.length < 4 ? 'نام  باید حداقل 4 کاراکتر باشد' : null;
+  // }
+  //
+  // String _validateLastName(String value) {
+  //   return value.length < 4 ? 'نام خانوادگی باید حداقل 4 کاراکتر باشد' : null;
+  // }
   String _validatePassword(String value)
   {
     if (value.isEmpty == true)
@@ -190,7 +190,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                      border: OutlineInputBorder(),
                    ),
                   onSaved: (value) => HomePage.user.firstname = value,
-                  validator: (value) => _validateFirstName(value),
+             //     validator: (value) => _validateFirstName(value),
                 ),
               ),
             ),
@@ -212,7 +212,7 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                     border: OutlineInputBorder(),
                   ),
                   onSaved: (value) => HomePage.user.lastname = value,
-                  validator: (value) => _validateLastName(value),
+             //     validator: (value) => _validateLastName(value),
                 ),
               ),
             ),
