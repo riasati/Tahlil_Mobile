@@ -9,6 +9,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/pages/createExamPage.dart';
 import 'package:samproject/pages/insidClass/InsidClassPage.dart';
+import 'package:samproject/pages/insidClass/classInfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditAndRemoveButtons extends StatefulWidget {
@@ -61,7 +62,7 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
         child: Container(
           child: FlatButton(
               onPressed: () {
-                //_checkRemoveClass();
+                _checkRemoveClass();
               },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -145,15 +146,9 @@ class _EditAndRemoveButtonsState extends State<EditAndRemoveButtons> {
         });
         if (response.statusCode == 200) {
           InsidClassPage.isLoading = false;
+          InsidClassPage.removeClass = true;
           widget?.classInfoSetState();
-          //Navigator.of(context).pop();
           setState(() {
-            Alert(
-              context: context,
-              type: AlertType.success,
-              title: "عملیات موفق بود",
-              buttons: [],
-            ).show();
           });
         } else {
           InsidClassPage.isLoading = false;

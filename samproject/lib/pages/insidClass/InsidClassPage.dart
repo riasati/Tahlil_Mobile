@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:samproject/domain/Class.dart';
 import 'package:samproject/domain/personProfile.dart';
 import 'package:samproject/pages/editProfilePage.dart';
@@ -21,6 +22,7 @@ class InsidClassPage extends StatefulWidget {
   static Person admin = Person();
   static bool isLoading = true;
   static bool isAdmin = false;
+  static bool removeClass = false;
   final String classId;
 
 
@@ -33,6 +35,7 @@ class InsidClassPage extends StatefulWidget {
 class _InsidClassPageState extends State<InsidClassPage> {
   String _getClassInfoURL = "http://parham-backend.herokuapp.com/class/";
   String classId;
+
 
 
   _InsidClassPageState(this.classId);
@@ -88,31 +91,48 @@ class _InsidClassPageState extends State<InsidClassPage> {
               'Authorization': token,
               'Content-Type': 'application/json',
             });
-        print(classId);
-        var userClassesInfo = json.decode(
-            utf8.decode(response.bodyBytes))["Class"];
-        InsidClassPage.currentClass = Class(
-            userClassesInfo["name"], "", userClassesInfo["classId"], false);
-        InsidClassPage.currentClass.classDescription =
-        userClassesInfo["description"];
-        if (InsidClassPage.currentClass.classDescription == null)
-          InsidClassPage.currentClass.classDescription = "";
-        var adminInfo = userClassesInfo["admin"];
-        InsidClassPage.admin.firstname = adminInfo["firstname"];
-        InsidClassPage.admin.lastname = adminInfo["lastname"];
-        InsidClassPage.currentClass.ownerFullName =
-            adminInfo["firstname"] + " " + adminInfo["lastname"];
-        InsidClassPage.admin.avatarUrl = adminInfo["avatar"];
-        InsidClassPage.admin.email = adminInfo["email"];
-        if (HomePage.user.email == InsidClassPage.admin.email)
-          InsidClassPage.isAdmin = true;
-        else
-          InsidClassPage.isAdmin = false;
-        print(InsidClassPage.currentClass);
-        print(userClassesInfo);
+       if(response.statusCode == 200) {
+         var userClassesInfo = json.decode(
+             utf8.decode(response.bodyBytes))["Class"];
+         InsidClassPage.currentClass = Class(
+             userClassesInfo["name"], "", userClassesInfo["classId"], false);
+         InsidClassPage.currentClass.classDescription =
+         userClassesInfo["description"];
+         if (InsidClassPage.currentClass.classDescription == null)
+           InsidClassPage.currentClass.classDescription = "";
+         var adminInfo = userClassesInfo["admin"];
+         InsidClassPage.admin.firstname = adminInfo["firstname"];
+         InsidClassPage.admin.lastname = adminInfo["lastname"];
+         InsidClassPage.currentClass.ownerFullName =
+             adminInfo["firstname"] + " " + adminInfo["lastname"];
+         InsidClassPage.admin.avatarUrl = adminInfo["avatar"];
+         InsidClassPage.admin.email = adminInfo["email"];
+         if (HomePage.user.email == InsidClassPage.admin.email)
+           InsidClassPage.isAdmin = true;
+         else
+           InsidClassPage.isAdmin = false;
+       }else{
+         Navigator.pop(context);
+         setState(() {
+           Alert(
+             context: context,
+             type: AlertType.error,
+             title: "کلاس نامعتبر",
+             buttons: [],
+           ).show();
+         });
+       }
       }
     } on Exception catch (e) {
-      print(e.toString());
+      Navigator.pop(context);
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "مشکلی پیش آمده است",
+          buttons: [],
+        ).show();
+      });
     }
     setState(() {
       InsidClassPage.isLoading = false;
@@ -120,7 +140,21 @@ class _InsidClassPageState extends State<InsidClassPage> {
   }
 
   void insideClassSetState() {
-    setState(() {});
+    if(InsidClassPage.removeClass){
+      InsidClassPage.removeClass = false;
+      Navigator.pop(context);
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.success,
+          title: "عملیات موفق بود",
+          buttons: [],
+        ).show();
+      });
+
+    }else
+      setState(() {
+      });
   }
 
 

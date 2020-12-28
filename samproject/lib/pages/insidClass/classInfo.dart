@@ -8,6 +8,7 @@ import 'EditAndRemoveButtons.dart';
 class ClassInfoCard extends StatefulWidget {
   final insidClassPageSetState;
 
+
   ClassInfoCard({@required void toggleCoinCallback()})
       : insidClassPageSetState = toggleCoinCallback;
 

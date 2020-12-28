@@ -99,7 +99,7 @@ class _ClassMembersState extends State<ClassMembers> {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingOverlay(child: Container(child: memberList(), color: Colors.black26,), isLoading: isLoading,);
+    return LoadingOverlay(child: Container(child: memberList(),), isLoading: isLoading,);
   }
 
   Widget memberList() {
