@@ -16,6 +16,7 @@ import 'package:samproject/domain/question.dart';
 import 'package:samproject/pages/ReviewExamPage/ReviewExamPage.dart';
 import 'package:samproject/pages/TakeExamPage/TakeExamPage.dart';
 import 'package:samproject/pages/createExamPage.dart';
+import 'package:samproject/pages/editExamAfterStartPage.dart';
 import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -448,13 +449,24 @@ class _ClassExamsState extends State<ClassExams> {
           Container(
             child: FlatButton(
                 onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EditExamPage(
-                                examId: exam.examId,
-                                classId: InsidClassPage.currentClass.classId,
-                              )));
+                  if (exam.startDate
+                      .add(Duration(hours: 3, minutes: 30))
+                      .isAfter(DateTime.now()))
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditExamPage(
+                                  examId: exam.examId,
+                                  classId: InsidClassPage.currentClass.classId,
+                                )));
+                  else
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => EditExamAfterStartPage(
+                              examId: exam.examId,
+                              classId: InsidClassPage.currentClass.classId,
+                            )));
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
