@@ -6,7 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:samproject/domain/UserAnswerLong.dart';
+import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
 import 'package:samproject/domain/UserAnswerShort.dart';
+import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/controllers.dart';
 import 'package:samproject/domain/question.dart';
 import 'package:samproject/utils/showCorrectnessDialog.dart';
@@ -146,6 +148,35 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
       // });
       // final responseJson = jsonDecode(response.reasonPhrase);
       // print(responseJson.toString());
+      if (widget.question.kind == "TEST")
+      {
+        UserAnswerTest userAnswerTest = new UserAnswerTest();
+        userAnswerTest.userChoice = widget.question.numberOne;
+        widget.question.userAnswer = userAnswerTest;
+      }
+      else if (widget.question.kind == "MULTICHOISE")
+      {
+        UserAnswerMultipleChoice userAnswerMultipleChoice = new UserAnswerMultipleChoice();
+        (widget.question.numberOne == 1) ? userAnswerMultipleChoice.userChoices.add(1) : null;
+        (widget.question.numberTwo == 1) ? userAnswerMultipleChoice.userChoices.add(2) : null;
+        (widget.question.numberThree == 1) ? userAnswerMultipleChoice.userChoices.add(3) : null;
+        (widget.question.numberFour == 1) ? userAnswerMultipleChoice.userChoices.add(4) : null;
+        widget.question.userAnswer = userAnswerMultipleChoice;
+      }
+      else if (widget.question.kind == "SHORTANSWER")
+      {
+        UserAnswerShort userAnswerShort = new UserAnswerShort();
+        userAnswerShort.answerText = controllers.BlankTextController.text;
+        widget.question.userAnswer = userAnswerShort;
+      }
+      else if (widget.question.kind == "LONGANSWER")
+      {
+        UserAnswerLong userAnswerLong = new UserAnswerLong();
+        userAnswerLong.answerText = controllers.TashrihiTextController.text;
+        widget.question.userAnswer = userAnswerLong;
+      }
+
+
       var responseData = await response.stream.toBytes();
       var responseString = String.fromCharCodes(responseData);
       print("200" + responseString);
@@ -292,11 +323,14 @@ class _QuestionViewInTakeExamState extends State<QuestionViewInTakeExam> {
           registeredAnswer = true;
           if (userAnswerLong.answerFile != null)
           {
-            hasAnsweFile = true;
-            // final prefs = await SharedPreferences.getInstance();
-            // fileName = prefs.getString("FileNameQuestion"+ widget.questionIndex.toString());
-            fileName = userAnswerLong.answerFile.split('/').last;
-            initLongAnswer();
+            if (userAnswerLong.answerFile != "http://parham-backend.herokuapp.com/undefined")
+            {
+              hasAnsweFile = true;
+              // final prefs = await SharedPreferences.getInstance();
+              // fileName = prefs.getString("FileNameQuestion"+ widget.questionIndex.toString());
+              fileName = userAnswerLong.answerFile.split('/').last;
+              initLongAnswer();
+            }
 
           }
         }

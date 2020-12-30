@@ -44,6 +44,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
       showNotification: true, // show download progress in status bar (for Android)
       openFileFromNotification: true, // click on notification to open downloaded file (for Android)
     );
+    await _downloadFileBtnController.stop();
   }
   void submitGradeChange()
   {
@@ -155,7 +156,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                       )
                   ),
                   Positioned(
-                    top: 15,
+                    top: (widget.isTeacherUsing) ? 10 :15,
                     left: 4,
                     child: Card(
                       child:GradeColumn

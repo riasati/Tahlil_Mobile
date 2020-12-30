@@ -62,6 +62,30 @@ class QuestionViewInCreateExamState extends State<QuestionViewInCreateExam> {
       changedQuestion.difficulty = difficultyData.name;
       changedQuestion.id = widget.question.id;
 
+
+      if (changedQuestion.kind == HomePage.maps.SKindMap["MULTICHOISE"])
+      {
+        changedQuestion.optionOne = controllers.MultiOptionText1Controller.text;
+        changedQuestion.optionTwo = controllers.MultiOptionText2Controller.text;
+        changedQuestion.optionThree = controllers.MultiOptionText3Controller.text;
+        changedQuestion.optionFour = controllers.MultiOptionText4Controller.text;
+      }
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["TEST"])
+      {
+        changedQuestion.optionOne = controllers.TestText1Controller.text;
+        changedQuestion.optionTwo = controllers.TestText2Controller.text;
+        changedQuestion.optionThree = controllers.TestText3Controller.text;
+        changedQuestion.optionFour = controllers.TestText4Controller.text;
+      }
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["LONGANSWER"])
+      {
+        changedQuestion.answerString = controllers.TashrihiTextController.text;
+      }
+      else if (changedQuestion.kind == HomePage.maps.SKindMap["SHORTANSWER"])
+      {
+        changedQuestion.answerString = controllers.BlankTextController.text;
+      }
+
       // String ServerPaye = HomePage.maps.RSPayeMap[changedQuestion.paye];
       // String ServerBook = HomePage.maps.RSBookMap[changedQuestion.book];
       // String ServerChapter = HomePage.maps.RSChapterMap[changedQuestion.chapter];
@@ -1315,13 +1339,14 @@ class CreateExamPageState extends State<CreateExamPage> {
                             (kindData.name == HomePage.maps.SKindMap["TEST"]) ? EditingTest(question: newQuestion,controllers: controller,) : Container(),
                             EditingGrade(controllers: controller,),
                             AddInBankOption(question: newQuestion,),
-                            RoundedLoadingButton(borderRadius: 0,
-                           //   width: 50,
-                              height: 40,
-                              onPressed: () => onCreateQuestion(),
-                              child: Container(
-                                width: 120,
-                             //   height: 40,
+                            Container(
+                              width: 120,
+                              child: RoundedLoadingButton(
+                                borderRadius: 0,
+                                height: 40,
+                                onPressed: () => onCreateQuestion(),
+                                color: Color(0xFF3D5A80),
+                                controller:_createQuestionController,
                                 child: Row(
                                   textDirection: TextDirection.rtl,
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1330,9 +1355,7 @@ class CreateExamPageState extends State<CreateExamPage> {
                                     Icon(Icons.create,color: Colors.white,),
                                   ],
                                 ),
-                              ),//Text("ثبت پاسخ",textDirection: TextDirection.rtl,textAlign: TextAlign.center,style: TextStyle(color: Colors.white),),
-                              color: Color(0xFF3D5A80),
-                              controller:_createQuestionController,
+                              ),
                             ),
                             // RaisedButton(
                             //   textColor: Colors.white,
