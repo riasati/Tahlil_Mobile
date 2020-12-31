@@ -18,6 +18,7 @@ import 'ClassesListPage/ShowClassesListPage/ClassesList.dart';
 import 'addQuestionPage.dart';
 
 class HomePage extends StatefulWidget {
+  static Duration subDeviceTimeAndServerTime;
   static Person user = Person();
   static Maps maps;
   static final PageController homePageController = PageController(
@@ -43,6 +44,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _getToken();
     _getQuestionSpecification();
+    _getServerTime();
     initializeDownloader();
   }
 
@@ -190,6 +192,23 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _getServerTime() async{
+    final response = await get("http://parham-backend.herokuapp.com/public/time",
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+        });
+    if (response.statusCode == 200) {
+      print(response.body);
+      DateTime serverTime = DateTime.parse(json.decode(utf8.decode(response.bodyBytes))["date"]);
+      Duration subDeviceTimeAndServerTime;
+      subDeviceTimeAndServerTime = DateTime.now().toUtc().difference(serverTime);
+      HomePage.subDeviceTimeAndServerTime = subDeviceTimeAndServerTime;
+    }
+    else{
+      HomePage.subDeviceTimeAndServerTime = new Duration(seconds: 0);
+    }
+  }
   stopLoading(){
     setState(() {
       _isLoading = false;

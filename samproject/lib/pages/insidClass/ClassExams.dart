@@ -21,6 +21,7 @@ import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../homePage.dart';
 import 'InsidClassPage.dart';
 
 class ClassExams extends StatefulWidget {
@@ -77,14 +78,12 @@ class _ClassExamsState extends State<ClassExams> {
             Exam exam = Exam(
                 examInfo["_id"],
                 examInfo["name"],
-                DateTime.parse(examInfo["startDate"]),
-                DateTime.parse(examInfo["endDate"]),
+                DateTime.parse(examInfo["startDate"]).toUtc(),
+                DateTime.parse(examInfo["endDate"]).toUtc(),
                 examInfo['examLength']);
             classExams.add(exam);
             examIsOpen.add(false);
             print(exam);
-            DateTime d = DateTime.parse(examInfo["startDate"]);
-            Jalali j = Jalali.fromDateTime(d);
           }
           classExams.sort((t1, t2) => t1.startDate.compareTo(t2.startDate));
           classExams = classExams.reversed.toList();
@@ -325,8 +324,7 @@ class _ClassExamsState extends State<ClassExams> {
   Widget memberActions(Exam exam) {
     var memberAction;
     if (exam.endDate
-        .add(Duration(hours: 3, minutes: 30))
-        .isAfter(DateTime.now()))
+        .isAfter(DateTime.now().toUtc().add(HomePage.subDeviceTimeAndServerTime)))
       memberAction = Container(
         child: Center(
           child: FlatButton(
@@ -450,8 +448,7 @@ class _ClassExamsState extends State<ClassExams> {
             child: FlatButton(
                 onPressed: () {
                   if (exam.startDate
-                      .add(Duration(hours: 3, minutes: 30))
-                      .isAfter(DateTime.now()))
+                      .isAfter(DateTime.now().toUtc().add(HomePage.subDeviceTimeAndServerTime)))
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -613,6 +610,7 @@ class _ClassExamsState extends State<ClassExams> {
           'Content-Type': 'application/json',
         });
         exam.questions = [];
+        print(response.body);
         if (response.statusCode == 200) {
           var questionsInfo =
               json.decode(utf8.decode(response.bodyBytes))["questions"];
@@ -689,7 +687,7 @@ class _ClassExamsState extends State<ClassExams> {
             Alert(
               context: context,
               type: AlertType.error,
-              title: "زمان آزمون فرانرسیده",
+              title: json.decode(utf8.decode(response.bodyBytes))["error"],
               buttons: [],
             ).show();
           });

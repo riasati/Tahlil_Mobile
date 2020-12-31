@@ -87,7 +87,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                 notificationInfo["classNoteId"],
                 notificationInfo["title"],
                 notificationInfo["body"],
-                DateTime.parse(notificationInfo["createdAt"]));
+                DateTime.parse(notificationInfo["createdAt"]).toUtc());
             classNotifications.add(notification);
             notificationIsOpen.add(false);
             notificationMoreText.add(false);
