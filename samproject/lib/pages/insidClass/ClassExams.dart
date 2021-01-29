@@ -167,11 +167,31 @@ class _ClassExamsState extends State<ClassExams> {
   }
 
   Widget examsList() {
-    return ListView.builder(
-        itemCount: classExams.length,
-        itemBuilder: (BuildContext context, int index) {
-          return eachExamCard(index);
-        });
+    if(classExams.isNotEmpty)
+      return ListView.builder(
+          itemCount: classExams.length,
+          itemBuilder: (BuildContext context, int index) {
+            return eachExamCard(index);
+          });
+    else
+      return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              child: Icon(
+                FontAwesomeIcons.frown,
+              ),
+              padding: EdgeInsets.only(top: 200),
+            ),
+            Text(
+              "آزمونی وجود ندارد",
+            )
+          ],
+        ),
+        width: double.infinity,
+      );
   }
 
   Widget eachExamCard(int examIndex) {

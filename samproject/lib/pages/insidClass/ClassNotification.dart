@@ -178,11 +178,31 @@ class _ClassNotificationState extends State<ClassNotification> {
   }
 
   Widget notificationList() {
-    return ListView.builder(
-        itemCount: classNotifications.length,
-        itemBuilder: (BuildContext context, int index) {
-          return eachNotificationCard(index);
-        });
+    if(classNotifications.isNotEmpty)
+      return ListView.builder(
+          itemCount: classNotifications.length,
+          itemBuilder: (BuildContext context, int index) {
+            return eachNotificationCard(index);
+          });
+    else
+      return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              child: Icon(
+                FontAwesomeIcons.frown,
+              ),
+              padding: EdgeInsets.only(top: 200, ),
+            ),
+            Text(
+              "اعلانی وجود ندارد",
+            )
+          ],
+        ),
+        width: double.infinity,
+      );
   }
 
   Widget eachNotificationCard(int notificationIndex) {

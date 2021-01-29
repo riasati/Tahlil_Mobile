@@ -103,11 +103,31 @@ class _ClassMembersState extends State<ClassMembers> {
   }
 
   Widget memberList() {
-    return ListView.builder(
-        itemCount: classMembers.length,
-        itemBuilder: (BuildContext context, int index) {
-          return eachMemberCard(index);
-        });
+    if(classMembers.isNotEmpty)
+      return ListView.builder(
+          itemCount: classMembers.length,
+          itemBuilder: (BuildContext context, int index) {
+            return eachMemberCard(index);
+          });
+    else
+      return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              child: Icon(
+                FontAwesomeIcons.frown,
+              ),
+              padding: EdgeInsets.only(top: 200, left: 20),
+            ),
+            Text(
+              "کلاس خالی است",
+            )
+          ],
+        ),
+        width: double.infinity,
+      );
   }
 
   Widget eachMemberCard(int memberIndex) {
