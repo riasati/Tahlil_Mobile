@@ -21,7 +21,8 @@ class HomePage extends StatefulWidget {
   static Duration subDeviceTimeAndServerTime;
   static Person user = Person();
   static Maps maps;
-  static final PageController homePageController = PageController(
+  static bool isLoading = true;
+  static PageController homePageController = PageController(
     initialPage: 1,
   );
 
@@ -31,7 +32,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _signInURL = "https://parham-backend.herokuapp.com/user";
-  bool _isLoading = true;
   void initializeDownloader() async
   {
     WidgetsFlutterBinding.ensureInitialized();
@@ -81,8 +81,8 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.only(left: 20),
         ),
       ),
-      endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: stopLoading,),
-      bottomNavigationBar: BottomNavigator(),
+      endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: callSetState,),
+      bottomNavigationBar: HomePage.user.username != null?BottomNavigator():Container(child: Text(""),),
       body: LoadingOverlay(
         child: PageView(
           controller: HomePage.homePageController,
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
 
           ],
         ),
-        isLoading: _isLoading,
+        isLoading: HomePage.isLoading,
       ),
     );
   }
@@ -209,16 +209,22 @@ class _HomePageState extends State<HomePage> {
       HomePage.subDeviceTimeAndServerTime = new Duration(seconds: 0);
     }
   }
+
   stopLoading(){
     setState(() {
-      _isLoading = false;
+      HomePage.isLoading = false;
     });
   }
 
   startLoading(){
     setState(() {
-      _isLoading = true;
+      HomePage.isLoading = true;
     });
   }
 
+  callSetState(){
+    setState(() {
+      HomePage.isLoading = !HomePage.isLoading;
+    });
+  }
 }

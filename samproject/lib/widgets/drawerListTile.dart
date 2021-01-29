@@ -179,8 +179,12 @@ class _DrawerListTileState extends State<DrawerListTile> {
             ],
           ),
           onTap: () {
-            PersonLoggedout();
             Navigator.pop(context);
+            HomePage.isLoading = true;
+            widget?.callHomePageBiuld();
+            PersonLoggedout();
+            HomePage.isLoading = false;
+            widget?.callHomePageBiuld();
           },
         ): Container(),
       ],

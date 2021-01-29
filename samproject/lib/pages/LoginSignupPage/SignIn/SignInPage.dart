@@ -137,6 +137,20 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Colors.black45,
+
+                      ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 0,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Container(
@@ -177,19 +191,6 @@ class _SignInPageState extends State<SignInPage> {
               ),
             ],
           ),
-          // Padding(
-          //   padding: EdgeInsets.only(top: 15.0),
-          //   child: FlatButton(
-          //       onPressed: () {},
-          //       child: Text(
-          //         "فراموشی رمز عبور؟",
-          //         style: TextStyle(
-          //             decoration: TextDecoration.underline,
-          //             color: Colors.red,
-          //             fontSize: MediaQuery.of(context).size.width * 0.03,
-          //             fontFamily: "WorkSansMedium"),
-          //       )),
-          // ),
         ],
       ),
     );

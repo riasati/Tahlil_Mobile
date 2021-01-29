@@ -283,6 +283,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ],
                   ),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.black45,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 0,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Container(

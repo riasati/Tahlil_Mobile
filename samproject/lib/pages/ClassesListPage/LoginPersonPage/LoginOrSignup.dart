@@ -19,6 +19,12 @@ class _LoginOrSignupState extends State<LoginOrSignup> {
   _LoginOrSignupState( {@required void toggleCoinCallback() }):
         callHomePageBiuld = toggleCoinCallback;
 
+
+  // @override
+  // void initState() {
+  //   widget?.callHomePageBiuld();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Container(
