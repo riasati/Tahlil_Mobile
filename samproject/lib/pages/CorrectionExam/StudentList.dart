@@ -29,23 +29,7 @@ class _StudentListState extends State<StudentList> {
   @override
   void initState() {
     super.initState();
-    // _getStudentListFromServer();
-    Person person = new Person();
-    person.firstname = "حمیدرضا";
-    person.lastname = "آذرباد";
-    person.username = "lsjflskjfl";
-    person.email = "ljdlfsjd";
-    person.avatarUrl = null;
-    examStudents.add(person);
-    examStudents.add(person);
-    examStudents.add(person);
-    examStudents.add(person);
-    examStudents.add(person);
-    memberIsOpen.add(false);
-    memberIsOpen.add(false);
-    memberIsOpen.add(false);
-    memberIsOpen.add(false);
-    memberIsOpen.add(false);
+    _getStudentListFromServer();
   }
 
   void _getStudentListFromServer() async {
@@ -111,12 +95,21 @@ class _StudentListState extends State<StudentList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LoadingOverlay(
-        child: Container(
-          child: memberList(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(0xFF3D5A80),
+          title: Center(child: Padding(
+            padding: const EdgeInsets.only(right: 50),
+            child: Text("لیست دانش آموزان", style: TextStyle(fontWeight: FontWeight.bold),),
+          )),
         ),
-        isLoading: isLoading,
+        body: LoadingOverlay(
+          child: Container(
+            child: memberList(),
+          ),
+          isLoading: isLoading,
+        ),
       ),
     );
   }
@@ -240,13 +233,13 @@ class _StudentListState extends State<StudentList> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(14, 145, 140, 1),
+                        color: Colors.red,
                       ),
                     ),
                   ),
                   Icon(
                     FontAwesomeIcons.check,
-                    color: Color.fromRGBO(14, 145, 140, 1),
+                    color: Colors.red,
                   ),
                 ],
               ),
