@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Starter Template",
-      home: StudentList(),
+      home: StudentList("string"),
     );
   }
 }
