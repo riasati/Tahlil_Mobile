@@ -59,57 +59,59 @@ class _HomePageState extends State<HomePage> {
     }else{
       appBarTitle = "بانک سوالات";
     }
-    return Scaffold(
-      appBar:  AppBar(
-        backgroundColor: Color(0xFF3D5A80),
-        title: Padding(
-          child: Container(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Text(
-                appBarTitle,
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
+    return SafeArea(
+      child: Scaffold(
+        appBar:  AppBar(
+          backgroundColor: Color(0xFF3D5A80),
+          title: Padding(
+            child: Container(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text(
+                  appBarTitle,
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
+            padding: EdgeInsets.only(left: 20),
           ),
-          padding: EdgeInsets.only(left: 20),
         ),
-      ),
-      endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: callSetState,),
-      bottomNavigationBar: HomePage.user.username != null?BottomNavigator():Container(child: Text(""),),
-      body: LoadingOverlay(
-        child: PageView(
-          controller: HomePage.homePageController,
-          onPageChanged: (i) {
-            if (i == 0) {
-              setState(() {
-                BottomNavigator.customIcon = 0;
-              });
-            } else if (i == 1) {
-              setState(() {
-                BottomNavigator.customIcon = 1;
-              });
-            }
-            else if (i == 2) {
-              setState(() {
-                BottomNavigator.customIcon = 2;
-              });
-            }
-          },
-          children: [
-            AddQuestionPage(),
-            HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: stopLoading,),
-            SearchQuestionPage(),
+        endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: callSetState,),
+        bottomNavigationBar: HomePage.user.username != null?BottomNavigator():Container(child: Text(""),),
+        body: LoadingOverlay(
+          child: PageView(
+            controller: HomePage.homePageController,
+            onPageChanged: (i) {
+              if (i == 0) {
+                setState(() {
+                  BottomNavigator.customIcon = 0;
+                });
+              } else if (i == 1) {
+                setState(() {
+                  BottomNavigator.customIcon = 1;
+                });
+              }
+              else if (i == 2) {
+                setState(() {
+                  BottomNavigator.customIcon = 2;
+                });
+              }
+            },
+            children: [
+              AddQuestionPage(),
+              HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: stopLoading,),
+              SearchQuestionPage(),
 
-          ],
+            ],
+          ),
+          isLoading: HomePage.isLoading,
         ),
-        isLoading: HomePage.isLoading,
       ),
     );
   }

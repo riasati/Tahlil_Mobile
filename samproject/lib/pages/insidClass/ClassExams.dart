@@ -275,7 +275,7 @@ class _ClassExamsState extends State<ClassExams> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.only(top: 5),
                           child: ListTile(
                             trailing: Icon(
                               FontAwesomeIcons.stopCircle,
@@ -322,6 +322,21 @@ class _ClassExamsState extends State<ClassExams> {
                             ],
                           ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: ListTile(
+                            trailing: Icon(
+                              FontAwesomeIcons.hourglassHalf,
+                              color: Color(0xFF3D5A80),
+                            ),
+                            title: Text(
+                              "مدت آزمون:   " + classExams[examIndex].examLength.toString() + " دقیقه" ,
+                              style: TextStyle(),
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ),
                         InsidClassPage.isAdmin
                             ? adminActions(examIndex, classExams[examIndex])
                             : memberActions(classExams[examIndex])
@@ -352,7 +367,8 @@ class _ClassExamsState extends State<ClassExams> {
             onPressed: () {
               getQuestionsForTakeExam(exam);
             },
-            child: Row(
+            padding: EdgeInsets.all(0),
+              child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
@@ -387,6 +403,7 @@ class _ClassExamsState extends State<ClassExams> {
           onPressed: () {
             getQuestionAndAnswerForReview(exam);
           },
+          padding: EdgeInsets.all(0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -415,14 +432,11 @@ class _ClassExamsState extends State<ClassExams> {
           //color: userAnswer ? Colors.black : Colors.black26,
         ),
       );
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: ButtonBar(
-        alignment: MainAxisAlignment.center,
-        children: [
-          memberAction,
-        ],
-      ),
+    return ButtonBar(
+      alignment: MainAxisAlignment.center,
+      children: [
+        memberAction,
+      ],
     );
   }
 
@@ -430,8 +444,8 @@ class _ClassExamsState extends State<ClassExams> {
     var correctionButton;
     if (exam.startDate
         .isBefore(DateTime.now().toUtc().add(HomePage.subDeviceTimeAndServerTime)))
-      correctionButton = ButtonBar(
-        alignment: MainAxisAlignment.center,
+      correctionButton = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             child: FlatButton(
@@ -474,99 +488,97 @@ class _ClassExamsState extends State<ClassExams> {
       );
     else
       correctionButton = Text("");
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        children: [
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                child: FlatButton(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: FlatButton(
+                onPressed: () {
+                  _checkRemoveExam(examIndex);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 5),
+                      child: Text(
+                        "حذف آزمون",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.remove_circle,
+                      color: Colors.red,
+                    ),
+                  ],
+                ),
+              ),
+              //width: 120,
+              decoration: BoxDecoration(
+                //color: Colors.red,
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+                //color: userAnswer ? Colors.black : Colors.black26,
+              ),
+            ),
+            Container(
+              child: FlatButton(
                   onPressed: () {
-                    _checkRemoveExam(examIndex);
+                    if (exam.startDate
+                        .isAfter(DateTime.now().toUtc().add(HomePage.subDeviceTimeAndServerTime)))
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditExamPage(
+                                    examId: exam.examId,
+                                    classId: InsidClassPage.currentClass.classId,
+                                  )));
+                    else
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditExamAfterStartPage(
+                                examId: exam.examId,
+                                classId: InsidClassPage.currentClass.classId,
+                              )));
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 5),
+                        padding: const EdgeInsets.only(right: 2),
                         child: Text(
-                          "حذف آزمون",
+                          "ویرایش آزمون",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.red,
+                            color: Color(0xFF3D5A80),
                           ),
                         ),
                       ),
                       Icon(
-                        Icons.remove_circle,
-                        color: Colors.red,
+                        Icons.edit,
+                        color: Color(0xFF3D5A80),
                       ),
                     ],
-                  ),
-                ),
-                //width: 120,
-                decoration: BoxDecoration(
-                  //color: Colors.red,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  //color: userAnswer ? Colors.black : Colors.black26,
-                ),
+                  )),
+              //width: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+                //color: Colors.red,
+                //color: userAnswer ? Colors.black26 : Colors.black,
               ),
-              Container(
-                child: FlatButton(
-                    onPressed: () {
-                      if (exam.startDate
-                          .isAfter(DateTime.now().toUtc().add(HomePage.subDeviceTimeAndServerTime)))
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EditExamPage(
-                                      examId: exam.examId,
-                                      classId: InsidClassPage.currentClass.classId,
-                                    )));
-                      else
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EditExamAfterStartPage(
-                                  examId: exam.examId,
-                                  classId: InsidClassPage.currentClass.classId,
-                                )));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 2),
-                          child: Text(
-                            "ویرایش آزمون",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF3D5A80),
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.edit,
-                          color: Color(0xFF3D5A80),
-                        ),
-                      ],
-                    )),
-                //width: 120,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                  //color: Colors.red,
-                  //color: userAnswer ? Colors.black26 : Colors.black,
-                ),
-              ),
-            ],
-          ),
-          correctionButton
-        ],
-      ),
+            ),
+          ],
+        ),
+        correctionButton
+      ],
     );
   }
 
@@ -924,4 +936,5 @@ class _ClassExamsState extends State<ClassExams> {
     if (inputTime.minute < 10) minute = "0" + minute;
     return " $hour:$minute";
   }
+
 }

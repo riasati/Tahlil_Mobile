@@ -109,10 +109,20 @@ class _JoinButtonState extends State<JoinButton> {
           topRight: Radius.circular(25),
         )
       ),
-      barrierColor: Color(0xFF3D5A80).withOpacity(0.8),
+      barrierColor: Colors.black45.withOpacity(0.8),
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                child: Icon(FontAwesomeIcons.gripLines),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom:
+                    BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                  ),
+                ),
+              ),
               Expanded(child: Image.asset("assets/img/login_logo.png"), flex: 2,),
               Expanded(
                 child: Padding(
