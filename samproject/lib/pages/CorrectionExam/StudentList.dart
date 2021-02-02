@@ -122,11 +122,31 @@ class _StudentListState extends State<StudentList> {
   }
 
   Widget memberList() {
-    return ListView.builder(
+    if(examStudents.isNotEmpty)
+      return ListView.builder(
         itemCount: examStudents.length,
         itemBuilder: (BuildContext context, int index) {
           return eachMemberCard(index);
         });
+    else
+      return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              child: Icon(
+                FontAwesomeIcons.frown,
+              ),
+              padding: EdgeInsets.only(top: 200, left: 10),
+            ),
+            Text(
+              "کسی در آزمون شرکت نکرده است",
+            )
+          ],
+        ),
+        width: double.infinity,
+      );
   }
 
   Widget eachMemberCard(int memberIndex) {
@@ -230,6 +250,39 @@ class _StudentListState extends State<StudentList> {
           Container(
             child: FlatButton(
               onPressed: () {
+                _checkRemoveStudent(memberIndex);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Text(
+                      "حذف از آزمون",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.remove_circle,
+                    color: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+
+            decoration: BoxDecoration(
+              //color: Colors.red,
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              //color: userAnswer ? Colors.black : Colors.black26,
+            ),
+          ),
+          Container(
+            child: FlatButton(
+              onPressed: () {
                 _getStudentExam(member.username);
               },
               child: Row(
@@ -242,25 +295,24 @@ class _StudentListState extends State<StudentList> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: Color.fromRGBO(14, 145, 140, 1),
                       ),
                     ),
                   ),
                   Icon(
                     FontAwesomeIcons.check,
-                    color: Colors.red,
+                    color: Color.fromRGBO(14, 145, 140, 1),
                   ),
                 ],
               ),
             ),
-            width: 300,
+
             decoration: BoxDecoration(
               //color: Colors.red,
               borderRadius: BorderRadius.all(Radius.circular(30)),
               //color: userAnswer ? Colors.black : Colors.black26,
             ),
           ),
-          //TODO REMOVE STUDENT
         ],
       ),
     );
@@ -415,6 +467,104 @@ class _StudentListState extends State<StudentList> {
     }
     setState(() {
       isLoading = false;
+    });
+  }
+
+  void _checkRemoveStudent(int studentIndex) {
+    setState(() {
+      Alert(
+          context: context,
+          //type: AlertType.warning,
+          title: "مایل به ادامه کار هستید؟",
+          // content: Column(
+          //   children: [
+          //     Text(member.username),
+          //     Text(member.firstname + " " + member.lastname , textAlign: TextAlign.end,)
+          //   ],
+          // ),
+          buttons: [
+            DialogButton(
+              child: Text(
+                "خیر",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              color: Color.fromRGBO(100, 0, 0, 1),
+            ),
+            DialogButton(
+              child: Text(
+                "بله",
+                style:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                _pressRemoveStudent(studentIndex);
+              },
+              color: Color.fromRGBO(0, 100, 0, 1),
+            ),
+          ]).show();
+    });
+  }
+
+  void _pressRemoveStudent(int studentIndex) async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = "http://parham-backend.herokuapp.com/exam/" +
+            widget.examId + "/attendees/" + examStudents[studentIndex].username;
+        print(url);
+        final response = await delete(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          examStudents.removeAt(studentIndex);
+          memberIsOpen.removeAt(studentIndex);
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.success,
+              title: "عملیات موفق بود",
+              buttons: [],
+            ).show();
+          });
+        } else {
+          var errorString =
+          json.decode(utf8.decode(response.bodyBytes))["error"];
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: errorString,
+              buttons: [],
+            ).show();
+          });
+        }
+      }
+    } on Exception catch (e) {
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [],
+        ).show();
+      });
+    }
+    setState(() {
+      isLoading= false;
     });
   }
 }

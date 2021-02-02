@@ -398,39 +398,74 @@ class _ClassExamsState extends State<ClassExams> {
         ),
       );
     else
-      memberAction = Container(
-        child: FlatButton(
-          onPressed: () {
-            getQuestionAndAnswerForReview(exam);
-          },
-          padding: EdgeInsets.all(0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 5),
-                child: Text(
-                  "مرور آزمون",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+      memberAction = Row(
+        children: [
+          Container(
+            child: FlatButton(
+              onPressed: () {
+              },
+              padding: EdgeInsets.only(right: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 0),
+                    child: Text(
+                      "مشاهده کارنامه",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    FontAwesomeIcons.chartLine,
+                    color: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+            decoration: BoxDecoration(
+              //color: Colors.red,
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              //color: userAnswer ? Colors.black : Colors.black26,
+            ),
+          ),
+          Container(
+            child: FlatButton(
+              onPressed: () {
+                getQuestionAndAnswerForReview(exam);
+              },
+              padding: EdgeInsets.all(0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Text(
+                      "مرور آزمون",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(14, 145, 140, 1),
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    FontAwesomeIcons.search,
                     color: Color.fromRGBO(14, 145, 140, 1),
                   ),
-                ),
+                ],
               ),
-              Icon(
-                FontAwesomeIcons.search,
-                color: Color.fromRGBO(14, 145, 140, 1),
-              ),
-            ],
+            ),
+            decoration: BoxDecoration(
+              //color: Colors.red,
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              //color: userAnswer ? Colors.black : Colors.black26,
+            ),
           ),
-        ),
-        width: 120,
-        decoration: BoxDecoration(
-          //color: Colors.red,
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          //color: userAnswer ? Colors.black : Colors.black26,
-        ),
+        ],
       );
     return ButtonBar(
       alignment: MainAxisAlignment.center,
@@ -652,10 +687,12 @@ class _ClassExamsState extends State<ClassExams> {
           });
         } else {
           setState(() {
+            var errorString =
+            json.decode(utf8.decode(response.bodyBytes))["error"];
             Alert(
               context: context,
               type: AlertType.error,
-              title: "عملیات ناموفق بود",
+              title: errorString,
               buttons: [],
             ).show();
           });
@@ -823,7 +860,6 @@ class _ClassExamsState extends State<ClassExams> {
             question.questionImage = questionInfo["imageQuestion"];
             question.kind = questionInfo["type"];
             question.grade = questionGradeAnswerInfo["grade"].toDouble();
-            //TODO ANSWER GRADE
             if (question.kind == "MULTICHOISE") {
               question.optionOne = questionInfo["options"][0]["option"];
               question.numberOne = 0;
@@ -888,7 +924,7 @@ class _ClassExamsState extends State<ClassExams> {
                 userAnswerLong.answerFile = "";
               question.userAnswer = userAnswerLong;
             }
-            print(question);
+            question.userAnswer.grade = questionGradeAnswerInfo["answerGrade"].toString();
             exam.questions.add(question);
           }
           Navigator.push(context,
