@@ -5,7 +5,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:samproject/domain/Exam.dart';
+import 'package:samproject/domain/UserAnswerLong.dart';
+import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
+import 'package:samproject/domain/UserAnswerShort.dart';
+import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/personProfile.dart';
+import 'package:samproject/domain/question.dart';
+import 'package:samproject/pages/ReviewExamPage/ReviewExamPage.dart';
 import 'package:samproject/pages/insidClass/InsidClassPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -222,7 +229,9 @@ class _StudentListState extends State<StudentList> {
         children: [
           Container(
             child: FlatButton(
-              onPressed: () {},
+              onPressed: () {
+                _getStudentExam(member.username);
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -251,6 +260,7 @@ class _StudentListState extends State<StudentList> {
               //color: userAnswer ? Colors.black : Colors.black26,
             ),
           ),
+          //TODO REMOVE STUDENT
         ],
       ),
     );
@@ -278,5 +288,133 @@ class _StudentListState extends State<StudentList> {
         backgroundColor: Colors.white,
       );
     }
+  }
+
+  void _getStudentExam(String username) async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    print(prefs.getString("token"));
+    String token = prefs.getString("token");
+    try {
+      if (token != null) {
+        token = "Bearer " + token;
+        var url = "http://parham-backend.herokuapp.com/exam/" +
+            widget.examId +
+            "/attendees/" + username;
+        final response = await get(url, headers: {
+          'accept': 'application/json',
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        });
+        if (response.statusCode == 200) {
+          Exam studentExam = new Exam(widget.examId, "", DateTime.now(), DateTime.now(), 0);
+          var questionsInfo =
+          json.decode(utf8.decode(response.bodyBytes))["questions"];
+          print(questionsInfo);
+          for(var questionAndAnswerInfo in questionsInfo){
+            Question question = new Question();
+            var questionInfo = questionAndAnswerInfo["question"];
+            question.text = questionInfo["question"];
+            question.questionImage = questionInfo["imageQuestion"];
+            question.kind = questionInfo["type"];
+            question.answerImage = questionInfo["imageAnswer"];
+            question.grade = questionAndAnswerInfo["grade"].toDouble();
+            if (question.kind == "MULTICHOISE") {
+              question.optionOne = questionInfo["options"][0]["option"];
+              question.numberOne = 0;
+              question.optionTwo = questionInfo["options"][1]["option"];
+              question.numberTwo = 0;
+              question.optionThree = questionInfo["options"][2]["option"];
+              question.numberThree = 0;
+              question.optionFour = questionInfo["options"][3]["option"];
+              question.numberFour = 0;
+              for (var answer in questionInfo["answers"]) {
+                if (answer['answer'] == 1)
+                  question.numberOne = 1;
+                else if (answer['answer'] == 2)
+                  question.numberTwo = 1;
+                else if (answer['answer'] == 3)
+                  question.numberThree = 1;
+                else if (answer['answer'] == 4) question.numberFour = 1;
+              }
+              UserAnswerMultipleChoice userAnswerMultipleChoice =
+              new UserAnswerMultipleChoice();
+              if (questionAndAnswerInfo["answerText"] != null) {
+                String answerText = questionAndAnswerInfo["answerText"];
+                userAnswerMultipleChoice.userChoices =
+                    answerText.split(",").map(int.parse).toList();
+              } else
+                userAnswerMultipleChoice.userChoices = [];
+              question.userAnswer = userAnswerMultipleChoice;
+            } else if (question.kind == "TEST") {
+              question.optionOne = questionInfo["options"][0]["option"];
+              question.numberOne = questionInfo["answers"][0]["answer"];
+              question.optionTwo = questionInfo["options"][1]["option"];
+              question.optionThree = questionInfo["options"][2]["option"];
+              question.optionFour = questionInfo["options"][3]["option"];
+              UserAnswerTest userAnswerTest = new UserAnswerTest();
+              if (questionAndAnswerInfo["answerText"] != null)
+                userAnswerTest.userChoice =
+                    int.parse(questionAndAnswerInfo["answerText"]);
+              else
+                userAnswerTest.userChoice = -1;
+              question.userAnswer = userAnswerTest;
+            } else if (question.kind == "SHORTANSWER") {
+              question.answerString = questionInfo['answers'][0]['answer'];
+              UserAnswerShort userAnswerShort = new UserAnswerShort();
+              if (questionAndAnswerInfo["answerText"] != null)
+                userAnswerShort.answerText =
+                questionAndAnswerInfo["answerText"];
+              else
+                userAnswerShort.answerText = "";
+              question.userAnswer = userAnswerShort;
+            } else {
+              question.answerString = questionInfo['answers'][0]['answer'];
+              UserAnswerLong userAnswerLong = new UserAnswerLong();
+              if (questionAndAnswerInfo["answerText"] != null)
+                userAnswerLong.answerText =
+                questionAndAnswerInfo["answerText"];
+              else
+                userAnswerLong.answerText = "";
+              if (questionAndAnswerInfo["answerFile"] != null)
+                userAnswerLong.answerFile =
+                questionAndAnswerInfo["answerFile"];
+              else
+                userAnswerLong.answerFile = "";
+              question.userAnswer = userAnswerLong;
+            }
+            question.userAnswer.grade = questionAndAnswerInfo["answerGrade"].toString();
+            studentExam.questions.add(question);
+          }
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ReviewExamPage(studentExam, true)));
+        } else {
+          String error = json.decode(utf8.decode(response.bodyBytes))["error"];
+          setState(() {
+            Alert(
+              context: context,
+              type: AlertType.error,
+              title: error,
+              buttons: [],
+            ).show();
+          });
+        }
+      }
+    } on Exception catch (e) {
+      print(e.toString());
+      setState(() {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "عملیات ناموفق بود",
+          buttons: [],
+        ).show();
+      });
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 }

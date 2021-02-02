@@ -823,6 +823,7 @@ class _ClassExamsState extends State<ClassExams> {
             question.questionImage = questionInfo["imageQuestion"];
             question.kind = questionInfo["type"];
             question.grade = questionGradeAnswerInfo["grade"].toDouble();
+            //TODO ANSWER GRADE
             if (question.kind == "MULTICHOISE") {
               question.optionOne = questionInfo["options"][0]["option"];
               question.numberOne = 0;
