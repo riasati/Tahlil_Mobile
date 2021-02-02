@@ -87,7 +87,7 @@ class _ClassNotificationState extends State<ClassNotification> {
                 notificationInfo["classNoteId"],
                 notificationInfo["title"],
                 notificationInfo["body"],
-                DateTime.parse(notificationInfo["createdAt"]));
+                DateTime.parse(notificationInfo["createdAt"]).toUtc());
             classNotifications.add(notification);
             notificationIsOpen.add(false);
             notificationMoreText.add(false);
@@ -178,11 +178,31 @@ class _ClassNotificationState extends State<ClassNotification> {
   }
 
   Widget notificationList() {
-    return ListView.builder(
-        itemCount: classNotifications.length,
-        itemBuilder: (BuildContext context, int index) {
-          return eachNotificationCard(index);
-        });
+    if(classNotifications.isNotEmpty)
+      return ListView.builder(
+          itemCount: classNotifications.length,
+          itemBuilder: (BuildContext context, int index) {
+            return eachNotificationCard(index);
+          });
+    else
+      return Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              child: Icon(
+                FontAwesomeIcons.frown,
+              ),
+              padding: EdgeInsets.only(top: 200, ),
+            ),
+            Text(
+              "اعلانی وجود ندارد",
+            )
+          ],
+        ),
+        width: double.infinity,
+      );
   }
 
   Widget eachNotificationCard(int notificationIndex) {

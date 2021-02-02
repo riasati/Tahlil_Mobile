@@ -55,21 +55,23 @@ class _InsidClassPageState extends State<InsidClassPage> {
       home: DefaultTabController(
         initialIndex: 3,
         length: 4,
-        child: Scaffold(
-          bottomNavigationBar: BottomNavigator(),
-          body: LoadingOverlay(
-            child: TabBarView(
-            children: [
-              ClassExams(toggleCoinCallback: insideClassSetState),
-              ClassNotification(toggleCoinCallback: insideClassSetState),//notification
-              ClassMembers(toggleCoinCallback: insideClassSetState),
-              ClassInfoCard(toggleCoinCallback: insideClassSetState)
+        child: SafeArea(
+          child: Scaffold(
+            bottomNavigationBar: BottomNavigator(),
+            body: LoadingOverlay(
+              child: TabBarView(
+              children: [
+                ClassExams(toggleCoinCallback: insideClassSetState),
+                ClassNotification(toggleCoinCallback: insideClassSetState),//notification
+                ClassMembers(toggleCoinCallback: insideClassSetState),
+                ClassInfoCard(toggleCoinCallback: insideClassSetState)
 
-            ],
+              ],
+              ),
+              isLoading: InsidClassPage.isLoading,
             ),
-            isLoading: InsidClassPage.isLoading,
-          ),
     ),
+        ),
       ),);
   }
 

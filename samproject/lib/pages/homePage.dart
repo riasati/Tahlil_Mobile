@@ -18,9 +18,11 @@ import 'ClassesListPage/ShowClassesListPage/ClassesList.dart';
 import 'addQuestionPage.dart';
 
 class HomePage extends StatefulWidget {
+  static Duration subDeviceTimeAndServerTime;
   static Person user = Person();
   static Maps maps;
-  static final PageController homePageController = PageController(
+  static bool isLoading = true;
+  static PageController homePageController = PageController(
     initialPage: 1,
   );
 
@@ -30,7 +32,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _signInURL = "https://parham-backend.herokuapp.com/user";
-  bool _isLoading = true;
   void initializeDownloader() async
   {
     WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _getToken();
     _getQuestionSpecification();
+    _getServerTime();
     initializeDownloader();
   }
 
@@ -57,57 +59,59 @@ class _HomePageState extends State<HomePage> {
     }else{
       appBarTitle = "بانک سوالات";
     }
-    return Scaffold(
-      appBar:  AppBar(
-        backgroundColor: Color(0xFF3D5A80),
-        title: Padding(
-          child: Container(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: EdgeInsets.only(left: 20),
-              child: Text(
-                appBarTitle,
-                textDirection: TextDirection.rtl,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20.0,
+    return SafeArea(
+      child: Scaffold(
+        appBar:  AppBar(
+          backgroundColor: Color(0xFF3D5A80),
+          title: Padding(
+            child: Container(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text(
+                  appBarTitle,
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
+            padding: EdgeInsets.only(left: 20),
           ),
-          padding: EdgeInsets.only(left: 20),
         ),
-      ),
-      endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: stopLoading,),
-      bottomNavigationBar: BottomNavigator(),
-      body: LoadingOverlay(
-        child: PageView(
-          controller: HomePage.homePageController,
-          onPageChanged: (i) {
-            if (i == 0) {
-              setState(() {
-                BottomNavigator.customIcon = 0;
-              });
-            } else if (i == 1) {
-              setState(() {
-                BottomNavigator.customIcon = 1;
-              });
-            }
-            else if (i == 2) {
-              setState(() {
-                BottomNavigator.customIcon = 2;
-              });
-            }
-          },
-          children: [
-            AddQuestionPage(),
-            HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: stopLoading,),
-            SearchQuestionPage(),
+        endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: callSetState,),
+        bottomNavigationBar: HomePage.user.username != null?BottomNavigator():Container(child: Text(""),),
+        body: LoadingOverlay(
+          child: PageView(
+            controller: HomePage.homePageController,
+            onPageChanged: (i) {
+              if (i == 0) {
+                setState(() {
+                  BottomNavigator.customIcon = 0;
+                });
+              } else if (i == 1) {
+                setState(() {
+                  BottomNavigator.customIcon = 1;
+                });
+              }
+              else if (i == 2) {
+                setState(() {
+                  BottomNavigator.customIcon = 2;
+                });
+              }
+            },
+            children: [
+              AddQuestionPage(),
+              HomePage.user.username != null?ClassesList():LoginOrSignup(toggleCoinCallback: stopLoading,),
+              SearchQuestionPage(),
 
-          ],
+            ],
+          ),
+          isLoading: HomePage.isLoading,
         ),
-        isLoading: _isLoading,
       ),
     );
   }
@@ -190,16 +194,39 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _getServerTime() async{
+    final response = await get("http://parham-backend.herokuapp.com/public/time",
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+        });
+    if (response.statusCode == 200) {
+      print(response.body);
+      DateTime serverTime = DateTime.parse(json.decode(utf8.decode(response.bodyBytes))["date"]);
+      Duration subDeviceTimeAndServerTime;
+      subDeviceTimeAndServerTime = DateTime.now().toUtc().difference(serverTime);
+      HomePage.subDeviceTimeAndServerTime = subDeviceTimeAndServerTime;
+    }
+    else{
+      HomePage.subDeviceTimeAndServerTime = new Duration(seconds: 0);
+    }
+  }
+
   stopLoading(){
     setState(() {
-      _isLoading = false;
+      HomePage.isLoading = false;
     });
   }
 
   startLoading(){
     setState(() {
-      _isLoading = true;
+      HomePage.isLoading = true;
     });
   }
 
+  callSetState(){
+    setState(() {
+      HomePage.isLoading = !HomePage.isLoading;
+    });
+  }
 }

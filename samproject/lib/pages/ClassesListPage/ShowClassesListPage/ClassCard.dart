@@ -110,6 +110,7 @@ class _ClassCardState extends State<ClassCard> {
                   "استاد:" + classCard.ownerFullName,
                   maxLines: 1,
                   textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
                   style: TextStyle(
                     color: Colors.black,
                     //fontWeight: FontWeight.w600,

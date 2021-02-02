@@ -113,11 +113,21 @@ class _CreateClassButtonState extends State<CreateClassButton> {
         topLeft: Radius.circular(25),
         topRight: Radius.circular(25),
       )),
-      barrierColor: Color.fromRGBO(14, 145, 140, 0.8),
+      barrierColor: Colors.black45.withOpacity(0.8),
       builder: (context) => Container(
         height: 450,
         child: Column(
               children: [
+                Container(
+                  child: Icon(FontAwesomeIcons.gripLines),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom:
+                      BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                    ),
+                  ),
+                ),
                 Expanded(
                   flex: 2,
                   child: Padding(padding: EdgeInsets.only(top: 10),child: Image.asset("assets/img/login_logo.png")),
