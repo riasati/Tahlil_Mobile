@@ -16,8 +16,9 @@ import 'QuestionView.dart';
 
 class ReviewExamPage extends StatefulWidget {
   Exam exam;
-  ReviewExamPage(this.exam,this.isTeacherUsing);
+  ReviewExamPage(this.exam,this.isTeacherUsing,{this.userName = null});
   bool isTeacherUsing = false;
+  String userName;
   static List<double> grades = [];
   @override
   _ReviewExamPageState createState() => _ReviewExamPageState();
@@ -33,14 +34,14 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   {
     for(int i = 0;i<widget.exam.questions.length;i++)
     {
-      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: widget.isTeacherUsing,questionIndex:i+1));
+      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: widget.isTeacherUsing,questionIndex:i+1,examId: widget.exam.examId,userName: widget.userName,));
     }
   }
   void fillGrades()
   {
     for (int i = 0;i<widget.exam.questions.length;i++)
     {
-      if (widget.exam.questions[i].userAnswer.grade == null)
+      if (widget.exam.questions[i].userAnswer.grade == "null")
       {
         widget.exam.questions[i].userAnswer.grade = 0.toString();
       }

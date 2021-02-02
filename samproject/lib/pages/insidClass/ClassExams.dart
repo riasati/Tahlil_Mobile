@@ -21,6 +21,7 @@ import 'package:samproject/pages/editExamAfterStartPage.dart';
 import 'package:samproject/pages/editExamPage.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../homePage.dart';
 import 'InsidClassPage.dart';
@@ -402,8 +403,7 @@ class _ClassExamsState extends State<ClassExams> {
         children: [
           Container(
             child: FlatButton(
-              onPressed: () {
-              },
+              onPressed: _launchURL,
               padding: EdgeInsets.only(right: 25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -473,6 +473,15 @@ class _ClassExamsState extends State<ClassExams> {
         memberAction,
       ],
     );
+  }
+
+  _launchURL() async {
+    const url = 'https://flutter.dev';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   Widget adminActions(int examIndex, Exam exam) {

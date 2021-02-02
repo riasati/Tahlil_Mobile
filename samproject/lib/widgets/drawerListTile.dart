@@ -112,10 +112,7 @@ class _DrawerListTileState extends State<DrawerListTile> {
             textDirection: TextDirection.rtl,
             children: [
               Icon(Icons.book),
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Text('کارنامه'),
-              ),
+              Text('کارنامه'),
             ],
           ),
           onTap: () {
@@ -128,9 +125,9 @@ class _DrawerListTileState extends State<DrawerListTile> {
             );
           },
         ),
-        ListTile(
-          title: ReportButton(),
-        ),
+        // ListTile(
+        //   title: ReportButton(),
+        // ),
         // ListTile(
         //   //leading: Icon(Icons.alarm),
         //   title: Row(

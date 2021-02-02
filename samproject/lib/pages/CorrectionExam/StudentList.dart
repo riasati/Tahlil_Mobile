@@ -441,7 +441,7 @@ class _StudentListState extends State<StudentList> {
             studentExam.questions.add(question);
           }
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ReviewExamPage(studentExam, true)));
+              MaterialPageRoute(builder: (context) => ReviewExamPage(studentExam, true,userName: username,)));
         } else {
           String error = json.decode(utf8.decode(response.bodyBytes))["error"];
           setState(() {

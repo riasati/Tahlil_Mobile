@@ -216,24 +216,24 @@ class _EditProfileFormWidgetState extends State<EditProfileFormWidget> {
                 ),
               ),
             ),
-            Directionality(
-              textDirection: TextDirection.rtl,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
-                child: TextFormField(
-                  controller: _textFormBirthdayController,
-                  keyboardType: TextInputType.datetime,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    labelText: "تاریخ تولد",
-                    isCollapsed: true,
-                    contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
-                    border: OutlineInputBorder(),
-                  ),
-                  onSaved: (value) => HomePage.user.birthday = value,
-                ),
-              ),
-            ),
+            // Directionality(
+            //   textDirection: TextDirection.rtl,
+            //   child: Padding(
+            //     padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+            //     child: TextFormField(
+            //       controller: _textFormBirthdayController,
+            //       keyboardType: TextInputType.datetime,
+            //       textAlign: TextAlign.right,
+            //       decoration: InputDecoration(
+            //         labelText: "تاریخ تولد",
+            //         isCollapsed: true,
+            //         contentPadding:EdgeInsets.only(right: 12,top: 10,bottom: 5,left: 12),
+            //         border: OutlineInputBorder(),
+            //       ),
+            //       onSaved: (value) => HomePage.user.birthday = value,
+            //     ),
+            //   ),
+            // ),
             Divider(height: 10.0,),
             Directionality(
               textDirection: TextDirection.rtl,

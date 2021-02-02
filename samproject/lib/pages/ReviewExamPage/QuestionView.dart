@@ -51,6 +51,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
       showNotification: true, // show download progress in status bar (for Android)
       openFileFromNotification: true, // click on notification to open downloaded file (for Android)
     );
+    print(userAnswerLong.answerFile);
     await _downloadFileBtnController.stop();
   }
   void submitGradeChange() async
@@ -85,15 +86,15 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
     if (response.statusCode == 200)
     {
       ShowCorrectnessDialog(true, context);
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
+      // final responseJson = jsonDecode(response.body);
+      // print(responseJson.toString());
       _submitGradeBtnController.stop();
     }
     else
     {
       ShowCorrectnessDialog(false, context);
-      final responseJson = jsonDecode(response.body);
-      print(responseJson.toString());
+      // final responseJson = jsonDecode(response.body);
+      // print(responseJson.toString());
       _submitGradeBtnController.stop();
     }
   }
@@ -117,16 +118,17 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
   @override
   void initState() {
     super.initState();
-    if (widget.question.userAnswer.grade == null)
+    if (widget.question.userAnswer.grade == "null")
     {
       widget.question.userAnswer.grade = 0.toString();
     }
+    print(widget.question.userAnswer.grade);
     TeacherGradeController.text = widget.question.userAnswer.grade;//widget.question.userAnswer.grade,
     if (widget.question.kind == "LONGANSWER")
     {
       userAnswerLong = widget.question.userAnswer;
     }
-    print(widget.question.index);
+    //print(widget.question.index);
   }
   @override
   Widget build(BuildContext context) {
