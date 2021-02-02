@@ -808,7 +808,7 @@ class _ClassExamsState extends State<ClassExams> {
             exam.questions.add(question);
           }
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ReviewExamPage(exam, false)));
+              MaterialPageRoute(builder: (context) => ReviewExamPage(exam, true)));
         } else {
           print(response.body);
           setState(() {

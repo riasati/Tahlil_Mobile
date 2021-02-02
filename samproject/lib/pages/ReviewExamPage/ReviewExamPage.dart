@@ -18,6 +18,7 @@ class ReviewExamPage extends StatefulWidget {
   Exam exam;
   ReviewExamPage(this.exam,this.isTeacherUsing);
   bool isTeacherUsing = false;
+  static List<double> grades = [];
   @override
   _ReviewExamPageState createState() => _ReviewExamPageState();
 }
@@ -27,19 +28,33 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
   GlobalKey<ScrollSnapListState> questionRouterKey = GlobalKey();
   PageController controller=PageController();
   List<Widget> _list=<Widget>[];
-  bool isTeacherUsing = false;
+ // bool isTeacherUsing = false;
   void fillPageList()
   {
     for(int i = 0;i<widget.exam.questions.length;i++)
     {
-      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: isTeacherUsing,));
+      _list.add(QuestionViewInReviewExam(question: widget.exam.questions[i],isTeacherUsing: widget.isTeacherUsing,questionIndex:i+1));
+    }
+  }
+  void fillGrades()
+  {
+    for (int i = 0;i<widget.exam.questions.length;i++)
+    {
+      if (widget.exam.questions[i].userAnswer.grade == null)
+      {
+        widget.exam.questions[i].userAnswer.grade = 0.toString();
+      }
+      ReviewExamPage.grades.add(double.tryParse(widget.exam.questions[i].userAnswer.grade));
     }
   }
 
   @override
   void initState() {
     super.initState();
+    ReviewExamPage.grades.clear();
     fillPageList();
+    fillGrades();
+    //print(ReviewExamPage.grades.length);
   }
 
   @override
@@ -53,7 +68,7 @@ class _ReviewExamPageState extends State<ReviewExamPage> {
           title: Container(
          //   padding: EdgeInsets.only(right: 40),
             alignment: Alignment.center,
-            child: (isTeacherUsing) ? Text(//widget.exam.name
+            child: (widget.isTeacherUsing) ? Text(//widget.exam.name
               "تصحیح "  + widget.exam.name,
               textDirection: TextDirection.rtl,
               style: TextStyle(

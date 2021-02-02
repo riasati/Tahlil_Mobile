@@ -9,6 +9,7 @@ import 'package:samproject/pages/homePage.dart';
 import 'package:samproject/pages/myQuestionPage.dart';
 import 'package:samproject/pages/reportCardPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:samproject/widgets/reportButton.dart';
 class DrawerListTile extends StatefulWidget {
   final callHomePageBiuld;
 
@@ -126,6 +127,9 @@ class _DrawerListTileState extends State<DrawerListTile> {
               ),
             );
           },
+        ),
+        ListTile(
+          title: ReportButton(),
         ),
         // ListTile(
         //   //leading: Icon(Icons.alarm),

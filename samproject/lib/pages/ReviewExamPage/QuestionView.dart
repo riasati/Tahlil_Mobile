@@ -9,18 +9,25 @@ import 'package:samproject/domain/UserAnswerMultipleChoice.dart';
 import 'package:samproject/domain/UserAnswerShort.dart';
 import 'package:samproject/domain/UserAnswerTest.dart';
 import 'package:samproject/domain/question.dart';
+import 'package:samproject/pages/ReviewExamPage/ReviewExamPage.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/LongAnswer.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/MultipleChoiceQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/ShortAnswerQuestion.dart';
 import 'package:samproject/pages/ReviewExamPage/typeofanswer/TestQuestion.dart';
+import 'package:samproject/utils/showCorrectnessDialog.dart';
 import 'package:samproject/widgets/questionWidgets.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestionViewInReviewExam extends StatefulWidget {
   Question question;
   bool isTeacherUsing;
-  QuestionViewInReviewExam({Key key, this.question,this.isTeacherUsing = false})
+  String examId;
+  String userName;
+  int questionIndex;
+  QuestionViewInReviewExam({Key key, this.question,this.isTeacherUsing = false,this.examId = null,this.userName = null,this.questionIndex})
       : super(key: key);
 
   @override
@@ -46,13 +53,53 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
     );
     await _downloadFileBtnController.stop();
   }
-  void submitGradeChange()
+  void submitGradeChange() async
   {
-
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    if (token == null) {
+      return;
+    }
+    String tokenplus = "Bearer" + " " + token;
+    dynamic data;
+    String url = "https://parham-backend.herokuapp.com/exam/" + widget.examId + "/attendees/" + widget.userName;
+    print(url);
+    double totalGrade = 0;
+    ReviewExamPage.grades[widget.questionIndex-1] = double.tryParse(TeacherGradeController.text);
+    for (int i = 0;i<ReviewExamPage.grades.length;i++)
+    {
+      totalGrade += ReviewExamPage.grades[i];
+    }
+    data = jsonEncode(<String, dynamic>{
+      "answerGrades": ReviewExamPage.grades,
+      "totalGrade": totalGrade,
+    });
+    print(data);
+    final response = await http.put(url,
+        headers: {
+          'accept': 'application/json',
+          'Authorization': tokenplus,
+          'Content-Type': 'application/json',
+        },
+        body: data);
+    if (response.statusCode == 200)
+    {
+      ShowCorrectnessDialog(true, context);
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      _submitGradeBtnController.stop();
+    }
+    else
+    {
+      ShowCorrectnessDialog(false, context);
+      final responseJson = jsonDecode(response.body);
+      print(responseJson.toString());
+      _submitGradeBtnController.stop();
+    }
   }
   void onGradeChange(String value)
   {
-    if (TeacherGradeController.text != 1.2.toString())
+    if (TeacherGradeController.text != widget.question.userAnswer.grade)
     {
       IsGradeChange = true;
       setState(() {
@@ -70,12 +117,16 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
   @override
   void initState() {
     super.initState();
-    TeacherGradeController.text = 1.2.toString();//widget.question.userAnswer.grade,
+    if (widget.question.userAnswer.grade == null)
+    {
+      widget.question.userAnswer.grade = 0.toString();
+    }
+    TeacherGradeController.text = widget.question.userAnswer.grade;//widget.question.userAnswer.grade,
     if (widget.question.kind == "LONGANSWER")
     {
       userAnswerLong = widget.question.userAnswer;
     }
-    print(widget.question);
+    print(widget.question.index);
   }
   @override
   Widget build(BuildContext context) {
@@ -104,7 +155,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                 ),
               ),
             ) :
-                Text(1.2.toString(),textDirection: TextDirection.rtl,textAlign: TextAlign.center, /*widget.question.userAnswer.grade*/),
+                Text(widget.question.userAnswer.grade,textDirection: TextDirection.rtl,textAlign: TextAlign.center, /*widget.question.userAnswer.grade*/),
             Text("/"),
             Text(widget.question.grade.toString(),
                 textDirection: TextDirection.rtl,
@@ -127,6 +178,9 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
                   Container(
                     child: Card(
                       child: Container(
+                        constraints: BoxConstraints(
+                          minHeight: 50,
+                        ),
                         margin: EdgeInsets.fromLTRB(4, 15, 4, 4),
                         padding: EdgeInsets.fromLTRB(4, 10, 4, 4),
                         child: Column(
