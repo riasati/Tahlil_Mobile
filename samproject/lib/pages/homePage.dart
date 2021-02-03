@@ -59,7 +59,40 @@ class _HomePageState extends State<HomePage> {
     }else{
       appBarTitle = "بانک سوالات";
     }
-    return SafeArea(
+    if(HomePage.user.username == null)
+      return SafeArea(
+        child: Scaffold(
+          appBar:  AppBar(
+            backgroundColor: Color(0xFF3D5A80),
+            title: Padding(
+              child: Container(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 20),
+                  child: Text(
+                    appBarTitle,
+                    textDirection: TextDirection.rtl,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              padding: EdgeInsets.only(left: 20),
+            ),
+          ),
+          endDrawer: HomePage.user.username == null? null:DrawerWidget(toggleCoinCallback: callSetState,),
+          bottomNavigationBar: HomePage.user.username != null?BottomNavigator():Container(child: Text(""),),
+          body: LoadingOverlay(
+            child: Container(child: LoginOrSignup(toggleCoinCallback: stopLoading,), width: double.infinity, height: MediaQuery.of(context).size.height,),
+            isLoading: HomePage.isLoading,
+          ),
+        ),
+      );
+    else
+      return SafeArea(
       child: Scaffold(
         appBar:  AppBar(
           backgroundColor: Color(0xFF3D5A80),

@@ -69,6 +69,7 @@ class _StudentListState extends State<StudentList> {
             student.avatarUrl = memberInfo["avatar"];
             student.username = memberInfo["username"];
             student.email = memberInfo["email"];
+            print(memberInfo['totalGrade']);
             examStudents.add(student);
             memberIsOpen.add(false);
           }
@@ -197,7 +198,7 @@ class _StudentListState extends State<StudentList> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        SelectableText(
+                        Text(
                           examStudents[memberIndex].firstname + " " + examStudents[memberIndex].lastname,
                           textAlign: TextAlign.right,
                           style: TextStyle(fontWeight: FontWeight.bold),
