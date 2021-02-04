@@ -122,13 +122,12 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
     {
       widget.question.userAnswer.grade = 0.toString();
     }
-    print(widget.question.userAnswer.grade);
     TeacherGradeController.text = widget.question.userAnswer.grade;//widget.question.userAnswer.grade,
     if (widget.question.kind == "LONGANSWER")
     {
       userAnswerLong = widget.question.userAnswer;
     }
-    //print(widget.question.index);
+
   }
   @override
   Widget build(BuildContext context) {
@@ -281,7 +280,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
               //   ),
               //   width: 150,
               // )
-              else if (userAnswerLong.answerFile != null && !IsGradeChange)
+              else if (userAnswerLong.answerFile != "" && !IsGradeChange)
                   RoundedLoadingButton(borderRadius: 0,
                     width: 100,
                     height: 40,
@@ -301,7 +300,7 @@ class _QuestionViewInReviewExamState extends State<QuestionViewInReviewExam> {
               //   ),
               //   width: 150,
               // )
-              else if (userAnswerLong.answerFile != null && IsGradeChange) Row(
+              else if (userAnswerLong.answerFile != "" && IsGradeChange) Row(
                   textDirection: TextDirection.rtl,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
