@@ -114,27 +114,65 @@ class _CreateClassButtonState extends State<CreateClassButton> {
         topRight: Radius.circular(25),
       )),
       barrierColor: Colors.black45.withOpacity(0.8),
-      builder: (context) => Container(
-        height: 450,
-        child: Column(
-              children: [
-                Container(
-                  child: Icon(FontAwesomeIcons.gripLines),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom:
-                      BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          height: 450,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    child: Icon(FontAwesomeIcons.gripLines),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom:
+                        BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Padding(padding: EdgeInsets.only(top: 10),child: Image.asset("assets/img/login_logo.png")),
+                  Expanded(
+                    flex: 2,
+                    child: Padding(padding: EdgeInsets.only(top: 10),child: Image.asset("assets/img/login_logo.png")),
 
-                ),
-                Expanded(
-                  child: Padding(
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Container(
+                        child: FractionallySizedBox(
+                          widthFactor: 0.9,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: TextField(
+                              textAlign: TextAlign.right,
+                              maxLines: 1,
+                              controller: classTitleController,
+                              keyboardType: TextInputType.text,
+                              style: TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                  focusedBorder: new OutlineInputBorder(
+                                      borderSide: new BorderSide(
+                                          color: Color(0xFF3D5A80), width: 3)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xFF3D5A80)),
+                                  ),
+                                  suffixIcon: Icon(
+                                    FontAwesomeIcons.chalkboard,
+                                    color: Colors.black,
+                                  ),
+                                  labelText: 'عنوان کلاس',
+                                  labelStyle: TextStyle(color: Color(0xFF3D5A80))),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                      child: Padding(
                     padding: EdgeInsets.only(top: 10),
                     child: Container(
                       child: FractionallySizedBox(
@@ -143,8 +181,8 @@ class _CreateClassButtonState extends State<CreateClassButton> {
                           textDirection: TextDirection.rtl,
                           child: TextField(
                             textAlign: TextAlign.right,
-                            maxLines: 1,
-                            controller: classTitleController,
+                            maxLines: 2,
+                            controller: classDescriptionController,
                             keyboardType: TextInputType.text,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -152,78 +190,45 @@ class _CreateClassButtonState extends State<CreateClassButton> {
                                     borderSide: new BorderSide(
                                         color: Color(0xFF3D5A80), width: 3)),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Color(0xFF3D5A80)),
+                                  borderSide: BorderSide(color: Color(0xFF3D5A80)),
                                 ),
                                 suffixIcon: Icon(
-                                  FontAwesomeIcons.chalkboard,
+                                  FontAwesomeIcons.fileSignature,
+                                  // FontAwesomeIcons.envelope,
                                   color: Colors.black,
                                 ),
-                                labelText: 'عنوان کلاس',
+                                labelText: 'توضیحات',
                                 labelStyle: TextStyle(color: Color(0xFF3D5A80))),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                    child: Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Container(
-                    child: FractionallySizedBox(
-                      widthFactor: 0.9,
-                      child: Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: TextField(
-                          textAlign: TextAlign.right,
-                          maxLines: 2,
-                          controller: classDescriptionController,
-                          keyboardType: TextInputType.text,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              focusedBorder: new OutlineInputBorder(
-                                  borderSide: new BorderSide(
-                                      color: Color(0xFF3D5A80), width: 3)),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xFF3D5A80)),
-                              ),
-                              suffixIcon: Icon(
-                                FontAwesomeIcons.fileSignature,
-                                // FontAwesomeIcons.envelope,
-                                color: Colors.black,
-                              ),
-                              labelText: 'توضیحات',
-                              labelStyle: TextStyle(color: Color(0xFF3D5A80))),
-                        ),
-                      ),
-                    ),
-                  ),
-                )),
-                Expanded(
-                    child: Padding(
-                  padding: EdgeInsets.only(bottom: 20),
-                  child: Container(
-                      child: RoundedLoadingButton(
-                    color: Color(0xFF3D5A80),
-                    controller: btnCreateController,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
-                      child: Text(
-                        "ساخت کلاس",
-                        style: TextStyle(
-                          color: Colors.white,
-                          // fontSize: MediaQuery.of(context).size.width * 0.045,
-                          // fontFamily: "WorkSansBold"
-                        ),
-                      ),
-                    ),
-                    onPressed: _pressCreate,
                   )),
-                ))
-              ],
-            ),
+                  Expanded(
+                      child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Container(
+                        child: RoundedLoadingButton(
+                      color: Color(0xFF3D5A80),
+                      controller: btnCreateController,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 42.0),
+                        child: Text(
+                          "ساخت کلاس",
+                          style: TextStyle(
+                            color: Colors.white,
+                            // fontSize: MediaQuery.of(context).size.width * 0.045,
+                            // fontFamily: "WorkSansBold"
+                          ),
+                        ),
+                      ),
+                      onPressed: _pressCreate,
+                    )),
+                  ))
+                ],
+              ),
+        ),
       ));
 
   void _pressCreate() async {

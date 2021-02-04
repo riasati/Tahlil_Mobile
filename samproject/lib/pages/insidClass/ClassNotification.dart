@@ -490,6 +490,7 @@ class _ClassNotificationState extends State<ClassNotification> {
             builder: (BuildContext context, setState) => Container(
               height: 500,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     child: Icon(FontAwesomeIcons.gripLines),
@@ -746,7 +747,7 @@ class _ClassNotificationState extends State<ClassNotification> {
         builder: (BuildContext context) {
           return StatefulBuilder(
             builder: (BuildContext context, setState) => Container(
-              height: 500,
+              height: 450,
               child: Column(
                 children: [
                   Container(

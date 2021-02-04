@@ -109,79 +109,88 @@ class _JoinButtonState extends State<JoinButton> {
           topRight: Radius.circular(25),
         )
       ),
+      isScrollControlled: true,
       barrierColor: Colors.black45.withOpacity(0.8),
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                child: Icon(FontAwesomeIcons.gripLines),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom:
-                    BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          height: 350,
+          child: Column(
+            //crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    child: Icon(FontAwesomeIcons.gripLines),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom:
+                        BorderSide(width: 1.0, color: Color(0xFFFF000000)),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Expanded(child: Image.asset("assets/img/login_logo.png"), flex: 2,),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Container(
-                    child: FractionallySizedBox(
-                      widthFactor: 0.9,
-                      child: Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: TextField(
-                          textAlign: TextAlign.right,
-                          maxLines: 1,
-                          controller: classCodeController,
-                          keyboardType: TextInputType.text,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                              focusedBorder: new OutlineInputBorder(
-                                  borderSide: new BorderSide(
-                                      color: Color(0xFF3D5A80), width: 3)),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Color(0xFF3D5A80)),
-                              ),
-                              suffixIcon: Icon(
-                                FontAwesomeIcons.chalkboard,
-                                color: Colors.black,
-                              ),
-                              labelText: 'کد شش رقمی کلاس',
-                              labelStyle: TextStyle(color: Color(0xFF3D5A80))),
+                  Expanded(child: Image.asset("assets/img/login_logo.png"), flex: 2,),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        child: FractionallySizedBox(
+                          widthFactor: 0.9,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: TextField(
+                              textAlign: TextAlign.right,
+                              maxLines: 1,
+                              controller: classCodeController,
+                              keyboardType: TextInputType.text,
+                              style: TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                  focusedBorder: new OutlineInputBorder(
+                                      borderSide: new BorderSide(
+                                          color: Color(0xFF3D5A80), width: 3)),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Color(0xFF3D5A80)),
+                                  ),
+                                  suffixIcon: Icon(
+                                    FontAwesomeIcons.chalkboard,
+                                    color: Colors.black,
+                                  ),
+                                  labelText: 'کد شش رقمی کلاس',
+                                  labelStyle: TextStyle(color: Color(0xFF3D5A80))),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                  child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: Container(
-                    child: RoundedLoadingButton(
-                  color: Color.fromRGBO(14, 145, 140, 1),
-                  //controller: btnJoin,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 42.0),
-                    child: Text(
-                      "اضافه شدن",
-                      style: TextStyle(
-                        color: Colors.white,
-                        // fontSize: MediaQuery.of(context).size.width * 0.045,
-                        // fontFamily: "WorkSansBold"
+                  Expanded(
+                      child: Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Container(
+                        child: RoundedLoadingButton(
+                      color: Color.fromRGBO(14, 145, 140, 1),
+                      //controller: btnJoin,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 42.0),
+                        child: Text(
+                          "اضافه شدن",
+                          style: TextStyle(
+                            color: Colors.white,
+                            // fontSize: MediaQuery.of(context).size.width * 0.045,
+                            // fontFamily: "WorkSansBold"
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  onPressed: _pressJoin,
-                )),
-              ))
-            ],
-          ));
+                      onPressed: _pressJoin,
+                    )),
+                  ))
+                ],
+              ),
+        ),
+      ));
 
   void _pressJoin() async{
     final prefs = await SharedPreferences.getInstance();
