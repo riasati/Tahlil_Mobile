@@ -476,7 +476,12 @@ class _ClassExamsState extends State<ClassExams> {
   }
 
   _launchURL() async {
-    const url = 'https://flutter.dev';
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    if (token == null) {
+      return;
+    }
+    String url = "https://parham-backend.herokuapp.com/class/" + InsidClassPage.currentClass.classId + "/report?token=" + token;
     if (await canLaunch(url)) {
       await launch(url);
     } else {
