@@ -23,8 +23,23 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-
+  font_awesome_flutter: 8.7.0
+  http: 0.12.2
+  rflutter_alert: 1.1.0
+  shared_preferences: 0.5.12
+  image_picker: ^0.6.7+12
+  loading_overlay: ^0.2.1
+  rounded_loading_button: ^1.0.0
+  auto_size_text: 2.1.0
+  shamsi_date: ^0.8.1
+  marquee: 1.6.1
+  persian_datetime_picker: ^1.0.7
+  flutter_countdown_timer: ^1.5.0
+  scroll_snap_list: 0.5.1
+  flutter_downloader: ^1.5.2
+  path_provider: ^1.6.24
+  charts_flutter: ^0.9.0
+  url_launcher: ^5.7.10
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
@@ -43,7 +58,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
+  assets:
+    - assets/img/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
